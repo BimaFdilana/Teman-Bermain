@@ -17,27 +17,23 @@ class AuthenticationTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_users_can_authenticate_using_the_login_screen(): void
+    public function test_login_screen_is_google_only(): void
     {
-        $user = User::factory()->create();
+        $response = $this->get('/login');
 
-        $response = $this->post('/login', [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
-
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('home', absolute: false));
+        $response->assertSee('Masuk dengan Google', false);
+        $response->assertDontSee('type="password"', false);
+        $response->assertDontSee('Daftar akun baru', false);
     }
 
-    public function test_users_can_not_authenticate_with_invalid_password(): void
+    public function test_users_can_not_authenticate_with_email_password(): void
     {
         $user = User::factory()->create();
 
         $this->post('/login', [
             'email' => $user->email,
-            'password' => 'wrong-password',
-        ]);
+            'password' => 'password',
+        ])->assertStatus(405);
 
         $this->assertGuest();
     }
