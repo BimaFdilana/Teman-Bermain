@@ -117,12 +117,12 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
                        class="kidza-btn w-full text-center mb-3" style="background:#fff;border:2px solid #F0E7CC;color:#14532D">▶ Tonton Videonya</a>
                 @endif
                 @if($kampanye->ajakan)
-                    <p class="text-sm" style="color:#5B5344;line-height:1.6">{{ $kampanye->ajakan }}</p>
+                    <p class="text-sm" style="color:#5B5344;line-height:1.6;overflow-wrap:anywhere">{{ $kampanye->ajakan }}</p>
                 @endif
             </div>
         @elseif($kampanye->ajakan)
             <div class="mb-10">
-                <p class="text-sm" style="color:#5B5344;line-height:1.6">{{ $kampanye->ajakan }}</p>
+                <p class="text-sm" style="color:#5B5344;line-height:1.6;overflow-wrap:anywhere">{{ $kampanye->ajakan }}</p>
             </div>
         @endif
 
