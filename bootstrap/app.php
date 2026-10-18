@@ -14,7 +14,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureAdmin::class,
+            'nonadmin' => \App\Http\Middleware\EnsureNonAdmin::class,
         ]);
+        // Pengguna yang sudah login lalu membuka halaman guest (/login):
+        // admin -> dashboard admin, pengguna -> /home.
+        $middleware->redirectUsersTo(fn (Request $request) => $request->user()?->isAdmin()
+            ? route('admin.dashboard')
+            : '/home');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

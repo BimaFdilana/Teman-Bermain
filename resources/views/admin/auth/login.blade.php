@@ -33,12 +33,27 @@
                 </div>
                 <div class="mb-5">
                     <label class="text-sm font-bold block mb-1">Password</label>
-                    <input type="password" name="password" required
-                           class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+                    <div class="relative">
+                        <input type="password" name="password" id="password" required
+                               class="w-full border-2 border-gray-300 rounded-xl px-4 py-2 pr-12">
+                        <button type="button" onclick="togglePassword()" aria-label="Tampilkan/sembunyikan password"
+                                class="absolute right-3 top-1/2 -translate-y-1/2 text-xl leading-none" style="color:#6b7280">
+                            <span id="eye-icon">👁️</span>
+                        </button>
+                    </div>
                 </div>
                 <button type="submit" class="kidza-btn kidza-btn-green w-full text-lg">Masuk</button>
             </form>
         </div>
     </div>
+<script>
+function togglePassword() {
+    const input = document.getElementById('password');
+    const icon = document.getElementById('eye-icon');
+    const tampil = input.type === 'password';
+    input.type = tampil ? 'text' : 'password';
+    icon.textContent = tampil ? '🙈' : '👁️';
+}
+</script>
 </body>
 </html>

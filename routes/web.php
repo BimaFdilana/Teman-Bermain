@@ -23,7 +23,7 @@ Route::get('/p/{slug}/pesan', [App\Http\Controllers\PromoController::class, 'pes
 // Halaman iklan/promo multi-produk dengan hitungan mundur
 Route::get('/iklan/{slug}', [App\Http\Controllers\PromoController::class, 'iklan'])->name('iklan.show');
 
-Route::middleware('auth')->group(function () {
+Route::middleware(['auth', 'nonadmin'])->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
     Route::get('/ebook', function () {
