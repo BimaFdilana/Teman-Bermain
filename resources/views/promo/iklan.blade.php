@@ -34,7 +34,11 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 <body style="background:#FAF6EC;min-height:100vh;margin:0">
 {{-- Bingkai HP: putih, di atas background krem --}}
 <div class="mx-auto bg-white" style="max-width:430px;min-height:100vh;box-shadow:0 0 40px rgba(90,70,30,.12)">
-<div class="px-5 py-8 text-center">
+<div class="px-5 py-8 text-center" style="position:relative">
+
+    {{-- Daun hias ala landing page --}}
+    <span class="poster-leaf" aria-hidden="true" style="top:14px;left:6px;font-size:1.6rem">🌿</span>
+    <span class="poster-leaf" aria-hidden="true" style="top:44px;right:8px;font-size:1.6rem">🍃</span>
 
     {{-- Logo --}}
     <div class="text-center mb-4">
@@ -202,6 +206,8 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
     <p class="text-center text-xs mt-8" style="color:#a39e93">Login dengan akun Google untuk melanjutkan pemesanan</p>
     <p class="text-center text-xs mt-2" style="color:#a39e93">© {{ date('Y') }} Rumah Cahaya</p>
+    <span class="poster-leaf" aria-hidden="true" style="bottom:64px;left:8px;font-size:1.6rem">🌱</span>
+    <span class="poster-leaf" aria-hidden="true" style="bottom:96px;right:10px;font-size:1.6rem">🌿</span>
 </div>
 </div>
 
