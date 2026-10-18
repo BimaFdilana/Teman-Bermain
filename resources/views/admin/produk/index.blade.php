@@ -44,6 +44,8 @@
                 <td class="px-4 py-2">{{ is_null($p->stok) ? '∞' : $p->stok }}</td>
                 <td class="px-4 py-2"><x-badge-status :status="$p->status" /></td>
                 <td class="px-4 py-2">
+                    <button class="kidza-btn" style="background:#e8f6ee" title="Salin link promosi"
+                            onclick="navigator.clipboard.writeText('{{ route('promo.show', $p->slug) }}');this.textContent='✅';setTimeout(()=>this.textContent='🔗',1500)">🔗</button>
                     @if($p->tipe === 'bundle')
                         <a href="{{ route('admin.produk.bundle.edit', $p) }}" class="kidza-btn" style="background:#fff">✏️</a>
                         <form method="POST" action="{{ route('admin.produk.bundle.destroy', $p) }}" class="inline" onsubmit="return confirm('Hapus bundle ini?')">

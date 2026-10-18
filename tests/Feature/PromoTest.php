@@ -1,0 +1,80 @@
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Product;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+/**
+ * Halaman promosi per produk (/p/{slug}) ala link-in-bio.
+ */
+class PromoTest extends TestCase
+{
+    use RefreshDatabase;
+
+    private function buatProduk(array $over = []): Product
+    {
+        return Product::create(array_merge([
+            'tipe' => 'ebook', 'judul' => 'Ebook Promo', 'slug' => 'ebook-promo',
+            'deskripsi' => 'Deskripsi promo', 'harga' => 25000,
+            'jenjang' => 'PAUD', 'status' => 'tersedia',
+        ], $over));
+    }
+
+    public function test_halaman_promo_tampil_untuk_produk_tersedia(): void
+    {
+        $this->buatProduk();
+
+        $response = $this->get('/p/ebook-promo');
+
+        $response->assertOk();
+        $response->assertSee('Ebook Promo');
+        $response->assertSee('Pesan Sekarang');
+        $response->assertSee('25.000');
+    }
+
+    public function test_halaman_promo_404_untuk_produk_draft(): void
+    {
+        $this->buatProduk(['status' => 'draft', 'slug' => 'ebook-draft']);
+
+        $this->get('/p/ebook-draft')->assertNotFound();
+    }
+
+    public function test_tamu_diarahkan_login_google_dulu(): void
+    {
+        $this->buatProduk();
+
+        $response = $this->get('/p/ebook-promo/pesan');
+
+        $response->assertRedirect(route('google.redirect'));
+        $this->assertEquals(route('promo.pesan', 'ebook-promo'), session('url.intended'));
+    }
+
+    public function test_pengguna_login_langsung_buat_order(): void
+    {
+        $this->buatProduk();
+        $user = User::factory()->create();
+
+        $response = $this->actingAs($user)->get('/p/ebook-promo/pesan');
+
+        $this->assertDatabaseHas('orders', [
+            'user_id' => $user->id,
+            'product_id' => Product::where('slug', 'ebook-promo')->first()->id,
+        ]);
+        $order = \App\Models\Order::where('user_id', $user->id)->first();
+        $response->assertRedirect(route('checkout.bayar', $order->kode_order));
+    }
+
+    public function test_link_promo_ada_di_manage_produk(): void
+    {
+        $this->buatProduk();
+        $admin = User::factory()->create(['role' => 'admin']);
+
+        $response = $this->actingAs($admin)->get(route('admin.produk.index', ['tab' => 'ebook']));
+
+        $response->assertOk();
+        $response->assertSee(route('promo.show', 'ebook-promo'), false);
+    }
+}

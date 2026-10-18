@@ -16,6 +16,10 @@ Route::get('/harga', [LandingController::class, 'harga'])->name('harga');
 Route::get('/produk', [ProductController::class, 'index'])->name('produk.index');
 Route::get('/produk/{slug}', [ProductController::class, 'show'])->name('produk.show');
 
+// Halaman promosi per produk ala link-in-bio: /p/{slug}
+Route::get('/p/{slug}', [App\Http\Controllers\PromoController::class, 'show'])->name('promo.show');
+Route::get('/p/{slug}/pesan', [App\Http\Controllers\PromoController::class, 'pesan'])->name('promo.pesan');
+
 Route::middleware('auth')->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
