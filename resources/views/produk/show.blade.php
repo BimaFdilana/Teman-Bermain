@@ -3,6 +3,11 @@
 
 <section class="kidza-section" style="background:#F9F9F6">
     <div class="kidza-wrap">
+        @if(session('info'))
+            <div class="kidza-card p-4 mb-6" style="background:#FFF9EC;border-color:#F3A712">
+                <p class="font-bold">{{ session('info') }}</p>
+            </div>
+        @endif
         <a href="{{ route('produk.index') }}" class="kidza-link text-sm mb-6 inline-block">← Kembali ke katalog</a>
 
         <div class="grid md:grid-cols-2 gap-10 items-start">
@@ -58,8 +63,19 @@
                     </div>
                     <p class="text-sm mb-5" style="color:#6b7280">Sekali bayar, akses selamanya.</p>
                     @auth
-                        <a href="#" class="kidza-btn kidza-btn-green w-full text-lg">Beli Sekarang</a>
-                        <p class="text-xs text-center mt-2" style="color:#6b7280">Checkout via QRIS — segera hadir di Fase 3</p>
+                        @if(auth()->user()->hasProduct($product->id))
+                            <a href="{{ route('home') }}" class="kidza-btn kidza-btn-blue w-full text-lg">Sudah Milikmu — Buka di Home</a>
+                        @elseif($product->stok !== null && $product->stok <= 0)
+                            <button disabled class="kidza-btn w-full text-lg opacity-50 cursor-not-allowed" style="background:#ccc">Stok Habis</button>
+                        @else
+                            <form method="POST" action="{{ route('checkout.store', $product->slug) }}">
+                                @csrf
+                                <input type="text" name="kode_diskon" placeholder="Kode diskon (opsional)"
+                                       class="w-full border-2 border-gray-300 rounded-xl px-4 py-2 mb-3 focus:outline-none focus:border-[#167941] uppercase">
+                                <button type="submit" class="kidza-btn kidza-btn-green w-full text-lg">Beli Sekarang</button>
+                            </form>
+                            <p class="text-xs text-center mt-2" style="color:#6b7280">Bayar via QRIS, kode redeem dikirim ke WhatsApp</p>
+                        @endif
                     @else
                         <a href="{{ route('login') }}" class="kidza-btn kidza-btn-green w-full text-lg">Masuk untuk Membeli</a>
                         <p class="text-xs text-center mt-2" style="color:#6b7280">Belum punya akun? <a href="{{ route('register') }}" class="underline font-bold">Daftar gratis</a></p>

@@ -60,10 +60,11 @@ class ProductSeeder extends Seeder
 
         $created = [];
         foreach ($products as $p) {
-            $product = Product::create([
+            $product = Product::updateOrCreate(
+                ['slug' => Str::slug($p['judul'])],
+                [
                 'tipe' => $p['tipe'],
                 'judul' => $p['judul'],
-                'slug' => Str::slug($p['judul']),
                 'deskripsi' => $p['deskripsi'],
                 'fitur' => $p['fitur'],
                 'cover_path' => 'images/covers/'.$p['cover'],
@@ -71,11 +72,12 @@ class ProductSeeder extends Seeder
                 'harga_coret' => $p['harga_coret'],
                 'jenjang' => $p['jenjang'],
                 'status' => 'tersedia',
-            ]);
+                ]
+            );
             if ($p['tipe'] === 'ebook') {
-                Ebook::create(['product_id' => $product->id] + $p['detail']);
+                Ebook::updateOrCreate(['product_id' => $product->id], $p['detail']);
             } else {
-                Miniapp::create(['product_id' => $product->id] + $p['detail']);
+                Miniapp::updateOrCreate(['product_id' => $product->id], $p['detail']);
             }
             $created[$p['judul']] = $product;
         }
@@ -101,10 +103,11 @@ class ProductSeeder extends Seeder
         ];
 
         foreach ($bundles as $b) {
-            $product = Product::create([
+            $product = Product::updateOrCreate(
+                ['slug' => Str::slug($b['judul'])],
+                [
                 'tipe' => 'bundle',
                 'judul' => $b['judul'],
-                'slug' => Str::slug($b['judul']),
                 'deskripsi' => $b['deskripsi'],
                 'fitur' => $b['fitur'],
                 'cover_path' => 'images/covers/'.$b['cover'],
@@ -112,10 +115,11 @@ class ProductSeeder extends Seeder
                 'harga_coret' => $b['harga_coret'],
                 'jenjang' => $b['jenjang'],
                 'status' => 'tersedia',
-            ]);
-            $bundle = Bundle::create(['product_id' => $product->id]);
+                ]
+            );
+            $bundle = Bundle::updateOrCreate(['product_id' => $product->id]);
             foreach ($b['isi'] as $judulItem) {
-                $bundle->items()->attach($created[$judulItem]->id);
+                $bundle->items()->syncWithoutDetaching([$created[$judulItem]->id]);
             }
         }
 
@@ -126,7 +130,7 @@ class ProductSeeder extends Seeder
             ['nama' => 'Bunda Sari', 'peran' => 'Ibu dari dua anak, Surabaya', 'isi' => 'Paket PAUD Ceria worth it banget. Satu kode untuk ebook dan gamenya, anak saya yang 4 tahun dan 6 tahun bisa pakai bareng.', 'urutan' => 3],
         ];
         foreach ($testis as $t) {
-            Testimonial::create($t + ['aktif' => true]);
+            Testimonial::updateOrCreate(['nama' => $t['nama']], $t + ['aktif' => true]);
         }
 
         // Settings

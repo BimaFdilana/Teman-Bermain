@@ -59,4 +59,25 @@ class User extends Authenticatable
     {
         return $this->role === self::ROLE_ADMIN;
     }
+
+    public function entitlements(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Entitlement::class);
+    }
+
+    /** Apakah pengguna memiliki produk ini? */
+    public function hasProduct(int $productId): bool
+    {
+        return $this->entitlements()->where('product_id', $productId)->exists();
+    }
+
+    /** Produk yang dimiliki, dikelompokkan per tipe. */
+    public function ownedProducts(?string $tipe = null)
+    {
+        $query = Product::whereIn('id', $this->entitlements()->select('product_id'));
+        if ($tipe) {
+            $query->where('tipe', $tipe);
+        }
+        return $query->get();
+    }
 }
