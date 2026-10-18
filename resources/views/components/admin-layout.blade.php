@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @yield('head')
     <style>
         .admin-shell { display: flex; min-height: 100vh; }
         .admin-sidebar {
@@ -48,10 +49,16 @@
             </div>
         </div>
         <nav>
+            <a href="{{ route('admin.dashboard') }}" class="side-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">📊 Dashboard</a>
+            <a href="{{ route('admin.ebook.index') }}" class="side-link {{ request()->routeIs('admin.ebook.*') ? 'active' : '' }}">📚 Ebook</a>
+            <a href="{{ route('admin.miniapp.index') }}" class="side-link {{ request()->routeIs('admin.miniapp.*') ? 'active' : '' }}">🎮 MiniApps</a>
             <a href="{{ route('admin.pembayaran.index') }}" class="side-link {{ request()->routeIs('admin.pembayaran.*') ? 'active' : '' }}">💳 Pembayaran</a>
-            <a href="{{ route('admin.diskon.index') }}" class="side-link {{ request()->routeIs('admin.diskon.*') ? 'active' : '' }}">🏷️ Diskon</a>
+            <a href="{{ route('admin.produk.index') }}" class="side-link {{ request()->routeIs('admin.produk.*') ? 'active' : '' }}">🏷️ Manage Product</a>
+            <a href="{{ route('admin.laporan.index') }}" class="side-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">📈 Laporan</a>
+            <a href="{{ route('admin.landing.index') }}" class="side-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">🌐 Landing Page</a>
+            <a href="{{ route('admin.diskon.index') }}" class="side-link {{ request()->routeIs('admin.diskon.*') ? 'active' : '' }}">🎟️ Diskon</a>
             <a href="{{ route('admin.pengaturan.index') }}" class="side-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">⚙️ Pengaturan</a>
-            <a href="{{ route('landing') }}" class="side-link" target="_blank">🌐 Lihat Web</a>
+            <a href="{{ route('landing') }}" class="side-link" target="_blank">👁️ Lihat Web</a>
             <form method="POST" action="{{ route('logout') }}" class="mt-4">
                 @csrf
                 <button type="submit" class="side-link w-full text-left" style="color:#f0a0a0">🚪 Keluar</button>

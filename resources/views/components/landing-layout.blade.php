@@ -63,7 +63,7 @@
         <div class="kidza-footer-inner">
             <div class="kidza-footer-brand">
                 <img src="{{ asset('images/logo-stacked.png') }}" alt="Rumah Cahaya-bks" class="h-16 w-auto mb-3">
-                <p>Ebook interaktif & MiniApp game edukasi untuk anak PAUD dan SD Indonesia.</p>
+                <p>{{ \App\Models\Setting::get('footer_tagline', 'Ebook interaktif & MiniApp game edukasi untuk anak PAUD dan SD Indonesia.') }}</p>
             </div>
             <div>
                 <h4>Jelajah</h4>

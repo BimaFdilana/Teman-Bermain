@@ -52,9 +52,46 @@ Route::get('/file/miniapp/{product}', [App\Http\Controllers\MiniappController::c
 // Launcher PWA: install token -> sesi (PRD §5.6, tanpa login ulang)
 Route::get('/pwa/{token}', [App\Http\Controllers\MiniappController::class, 'launch'])->name('pwa.launch');
 
-// Admin (gaya Kidza, PRD §6.6)
+// Admin (gaya Kidza, PRD §6)
+Route::prefix('admin')->name('admin.')->group(function () {
+    // Login khusus admin: email + password saja (PRD §6.1)
+    Route::get('/login', [App\Http\Controllers\Admin\AuthController::class, 'showLogin'])
+        ->name('login')->middleware('guest');
+    Route::post('/login', [App\Http\Controllers\Admin\AuthController::class, 'login'])
+        ->name('login.store')->middleware(['guest', 'throttle:5,1']);
+});
+
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::redirect('/', '/admin/pembayaran');
+    Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+
+    // CRUD Ebook (PRD §6.4) & MiniApps (PRD §6.5)
+    Route::resource('ebook', App\Http\Controllers\Admin\EbookController::class)->except(['show']);
+    Route::resource('miniapp', App\Http\Controllers\Admin\MiniappController::class)->except(['show']);
+    Route::get('/miniapp/{miniapp}/preview', [App\Http\Controllers\Admin\MiniappController::class, 'preview'])->name('miniapp.preview');
+
+    // Manage Product — 3 tab + bundle builder (PRD §6.7)
+    Route::get('/produk', [App\Http\Controllers\Admin\ProdukController::class, 'index'])->name('produk.index');
+    Route::put('/produk/{produk}/harga', [App\Http\Controllers\Admin\ProdukController::class, 'updateHarga'])->name('produk.harga');
+    Route::get('/produk/bundle/baru', [App\Http\Controllers\Admin\ProdukController::class, 'bundleCreate'])->name('produk.bundle.create');
+    Route::post('/produk/bundle', [App\Http\Controllers\Admin\ProdukController::class, 'bundleStore'])->name('produk.bundle.store');
+    Route::get('/produk/bundle/{bundle}/edit', [App\Http\Controllers\Admin\ProdukController::class, 'bundleEdit'])->name('produk.bundle.edit');
+    Route::put('/produk/bundle/{bundle}', [App\Http\Controllers\Admin\ProdukController::class, 'bundleUpdate'])->name('produk.bundle.update');
+    Route::delete('/produk/bundle/{bundle}', [App\Http\Controllers\Admin\ProdukController::class, 'bundleDestroy'])->name('produk.bundle.destroy');
+
+    // Manage Laporan (PRD §6.8)
+    Route::get('/laporan', [App\Http\Controllers\Admin\LaporanController::class, 'index'])->name('laporan.index');
+    Route::post('/laporan/target', [App\Http\Controllers\Admin\LaporanController::class, 'simpanTarget'])->name('laporan.target');
+    Route::get('/laporan/export/excel', [App\Http\Controllers\Admin\LaporanController::class, 'exportExcel'])->name('laporan.excel');
+    Route::get('/laporan/export/pdf', [App\Http\Controllers\Admin\LaporanController::class, 'exportPdf'])->name('laporan.pdf');
+
+    // Manage Landing Page (PRD §6.9)
+    Route::get('/landing', [App\Http\Controllers\Admin\LandingController::class, 'index'])->name('landing.index');
+    Route::post('/landing/teks', [App\Http\Controllers\Admin\LandingController::class, 'simpanTeks'])->name('landing.teks');
+    Route::post('/landing/paket', [App\Http\Controllers\Admin\LandingController::class, 'simpanPaket'])->name('landing.paket');
+    Route::post('/landing/testimoni', [App\Http\Controllers\Admin\LandingController::class, 'testimoniStore'])->name('landing.testimoni.store');
+    Route::put('/landing/testimoni/{testimoni}', [App\Http\Controllers\Admin\LandingController::class, 'testimoniUpdate'])->name('landing.testimoni.update');
+    Route::delete('/landing/testimoni/{testimoni}', [App\Http\Controllers\Admin\LandingController::class, 'testimoniDestroy'])->name('landing.testimoni.destroy');
+
     Route::get('/pembayaran', [PaymentController::class, 'index'])->name('pembayaran.index');
     Route::get('/pembayaran/{order}', [PaymentController::class, 'show'])->name('pembayaran.show');
     Route::post('/pembayaran/{order}/setujui', [PaymentController::class, 'approve'])->name('pembayaran.approve');

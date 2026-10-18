@@ -1,0 +1,127 @@
+<?php
+
+namespace App\Http\Controllers\Admin;
+
+use App\Http\Controllers\Controller;
+use App\Models\Product;
+use App\Models\Setting;
+use App\Models\Testimonial;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\View\View;
+
+class LandingController extends Controller
+{
+    /**
+     * Manage Landing Page (PRD §6.9): hero, paket unggulan, testimoni, kontak, footer.
+     */
+    public function index(): View
+    {
+        $bundles = Product::where('tipe', 'bundle')->where('status', 'tersedia')
+            ->orderBy('judul')->get();
+        $paketTerpilih = json_decode(Setting::get('paket_unggulan_ids', '[]'), true) ?: [];
+
+        $testimonials = Testimonial::orderBy('urutan')->get();
+
+        return view('admin.landing.index', compact('bundles', 'paketTerpilih', 'testimonials'));
+    }
+
+    /**
+     * Simpan teks-teks landing (hero, kontak, footer).
+     */
+    public function simpanTeks(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'hero_headline' => 'required|string|max:200',
+            'hero_subheadline' => 'nullable|string|max:500',
+            'wa_admin' => 'required|string|max:20',
+            'jam_operasional' => 'nullable|string|max:100',
+            'alamat' => 'nullable|string|max:500',
+            'footer_tagline' => 'nullable|string|max:500',
+        ]);
+
+        foreach ($data as $key => $value) {
+            Setting::set($key, $value ?? '');
+        }
+
+        return back()->with('sukses', 'Teks landing page disimpan.');
+    }
+
+    /**
+     * Simpan pilihan 3 paket unggulan.
+     */
+    public function simpanPaket(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'paket' => 'nullable|array|max:3',
+            'paket.*' => 'exists:products,id',
+        ]);
+
+        Setting::set('paket_unggulan_ids', json_encode(array_values($data['paket'] ?? [])));
+
+        return back()->with('sukses', 'Paket unggulan diperbarui.');
+    }
+
+    // ---------- Testimoni ----------
+
+    public function testimoniStore(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'nama' => 'required|string|max:100',
+            'peran' => 'nullable|string|max:100',
+            'isi' => 'required|string|max:1000',
+            'foto' => 'nullable|image|max:1024',
+            'aktif' => 'nullable|boolean',
+        ]);
+
+        $fotoPath = $request->hasFile('foto') ? $request->file('foto')->store('testimoni', 'public') : null;
+
+        Testimonial::create([
+            'nama' => $data['nama'],
+            'peran' => $data['peran'] ?? null,
+            'isi' => $data['isi'],
+            'foto_path' => $fotoPath,
+            'urutan' => Testimonial::max('urutan') + 1,
+            'aktif' => (bool) ($data['aktif'] ?? false),
+        ]);
+
+        return back()->with('sukses', 'Testimoni ditambahkan.');
+    }
+
+    public function testimoniUpdate(Request $request, Testimonial $testimoni): RedirectResponse
+    {
+        $data = $request->validate([
+            'nama' => 'required|string|max:100',
+            'peran' => 'nullable|string|max:100',
+            'isi' => 'required|string|max:1000',
+            'foto' => 'nullable|image|max:1024',
+            'aktif' => 'nullable|boolean',
+            'urutan' => 'nullable|integer|min:0',
+        ]);
+
+        if ($request->hasFile('foto')) {
+            if ($testimoni->foto_path) Storage::disk('public')->delete($testimoni->foto_path);
+            $testimoni->foto_path = $request->file('foto')->store('testimoni', 'public');
+        }
+
+        $testimoni->update([
+            'nama' => $data['nama'],
+            'peran' => $data['peran'] ?? null,
+            'isi' => $data['isi'],
+            'foto_path' => $testimoni->foto_path,
+            'aktif' => (bool) ($data['aktif'] ?? false),
+            'urutan' => $data['urutan'] ?? $testimoni->urutan,
+        ]);
+
+        return back()->with('sukses', 'Testimoni diperbarui.');
+    }
+
+    public function testimoniDestroy(Testimonial $testimoni): RedirectResponse
+    {
+        if ($testimoni->foto_path) Storage::disk('public')->delete($testimoni->foto_path);
+        $testimoni->delete();
+
+        return back()->with('sukses', 'Testimoni dihapus.');
+    }
+}

@@ -31,6 +31,11 @@ class GoogleController extends Controller
             // Tautkan ke akun yang emailnya sama bila sudah ada (daftar via email).
             $user = User::where('email', $googleUser->getEmail())->first();
             if ($user) {
+                // PRD §6.1: admin wajib login email + password, tidak via Google.
+                if ($user->isAdmin()) {
+                    return redirect()->route('admin.login')
+                        ->withErrors(['email' => 'Akun admin wajib login dengan email + password.']);
+                }
                 $user->update(['google_id' => $googleUser->getId()]);
             } else {
                 $user = User::create([
@@ -40,6 +45,11 @@ class GoogleController extends Controller
                     'password' => null,
                 ]);
             }
+        }
+
+        if ($user->isAdmin()) {
+            return redirect()->route('admin.login')
+                ->withErrors(['email' => 'Akun admin wajib login dengan email + password.']);
         }
 
         Auth::login($user, true); // ingat saya 30 hari (lihat AppServiceProvider)

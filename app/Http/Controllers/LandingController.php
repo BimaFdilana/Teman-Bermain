@@ -14,7 +14,11 @@ class LandingController extends Controller
      */
     public function index(): View
     {
-        $paketUnggulan = Product::tersedia()->where('tipe', 'bundle')->take(3)->get();
+        // Paket unggulan: pilihan admin (maks 3), fallback 3 bundle tersedia pertama
+        $paketIds = json_decode(Setting::get('paket_unggulan_ids', '[]'), true) ?: [];
+        $paketUnggulan = $paketIds
+            ? Product::tersedia()->whereIn('id', $paketIds)->get()->sortBy(fn ($p) => array_search($p->id, $paketIds))
+            : Product::tersedia()->where('tipe', 'bundle')->take(3)->get();
         $produkPopuler = Product::tersedia()->whereIn('tipe', ['ebook', 'miniapp'])->take(4)->get();
         $testimonials = Testimonial::aktif()->get();
 

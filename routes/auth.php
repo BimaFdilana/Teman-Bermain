@@ -21,7 +21,8 @@ Route::middleware('guest')->group(function () {
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    Route::post('login', [AuthenticatedSessionController::class, 'store'])
+        ->middleware('throttle:5,1'); // PRD §6.1: rate-limit 5x/menit per IP
 
     Route::get('auth/google/redirect', [GoogleController::class, 'redirect'])
         ->name('google.redirect');
