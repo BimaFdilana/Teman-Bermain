@@ -136,22 +136,12 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
                        class="kidza-btn w-full text-center mb-3" style="background:#fff;border:2px solid #F0E7CC;color:#14532D">▶ Tonton Videonya</a>
                 @endif
                 @if($kampanye->ajakan)
-                    <p class="text-sm mb-3" style="color:#5B5344;line-height:1.6">{{ $kampanye->ajakan }}</p>
-                @endif
-                @if($pertama)
-                    <a href="{{ route('promo.pesan', $pertama->slug) }}" class="kidza-btn kidza-btn-green w-full text-center" style="font-size:1rem">
-                        <span class="anim-tunjuk">👉</span> Pesan Sekarang <span class="anim-tunjuk-kiri">👈</span>
-                    </a>
+                    <p class="text-sm" style="color:#5B5344;line-height:1.6">{{ $kampanye->ajakan }}</p>
                 @endif
             </div>
         @elseif($kampanye->ajakan)
             <div class="mb-10">
-                <p class="text-sm mb-3" style="color:#5B5344;line-height:1.6">{{ $kampanye->ajakan }}</p>
-                @if($pertama)
-                    <a href="{{ route('promo.pesan', $pertama->slug) }}" class="kidza-btn kidza-btn-green w-full text-center" style="font-size:1rem">
-                        <span class="anim-tunjuk">👉</span> Pesan Sekarang <span class="anim-tunjuk-kiri">👈</span>
-                    </a>
-                @endif
+                <p class="text-sm" style="color:#5B5344;line-height:1.6">{{ $kampanye->ajakan }}</p>
             </div>
         @endif
 
@@ -165,11 +155,6 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
                     @endforeach
                 </ol>
             </div>
-            @if($pertama)
-                <a href="{{ route('promo.pesan', $pertama->slug) }}" class="kidza-btn kidza-btn-green w-full text-center mt-3" style="font-size:1rem">
-                    <span class="anim-tunjuk">👉</span> Pesan Sekarang <span class="anim-tunjuk-kiri">👈</span>
-                </a>
-            @endif
         @endif
 
         {{-- Bukti Kepuasan (hidden bila kosong) --}}
