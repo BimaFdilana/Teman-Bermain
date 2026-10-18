@@ -16,7 +16,7 @@
             @forelse($bundles as $bundle)
                 <div class="kidza-card p-6 flex flex-col">
                     @if($bundle->cover_path)
-                        <img src="{{ asset($bundle->cover_path) }}" alt="{{ $bundle->judul }}" class="rounded-2xl w-full aspect-[16/10] object-cover mb-4">
+                        <img src="{{ $bundle->coverUrl() }}" alt="{{ $bundle->judul }}" class="rounded-2xl w-full aspect-[16/10] object-cover mb-4">
                     @endif
                     @if($bundle->jenjang)
                         <p class="font-bold uppercase tracking-wide text-xs mb-1" style="color:#0077B6">{{ $bundle->jenjang }}</p>

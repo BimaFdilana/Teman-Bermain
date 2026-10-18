@@ -1,6 +1,6 @@
 @php
 $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => '🎁 Paket Bundle'][$product->tipe] ?? $product->tipe;
-$cover = $product->cover_path ? asset($product->cover_path) : null;
+$cover = $product->coverUrl();
 @endphp
 <!DOCTYPE html>
 <html lang="id">

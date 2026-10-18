@@ -37,7 +37,7 @@
             @foreach($miniapps as $app)
                 <div class="brutal-card overflow-hidden">
                     @if($app->cover_path)
-                        <img src="{{ asset($app->cover_path) }}" alt="{{ $app->judul }}" class="w-full aspect-[4/5] object-cover">
+                        <img src="{{ $app->coverUrl() }}" alt="{{ $app->judul }}" class="w-full aspect-[4/5] object-cover">
                     @endif
                     <div class="p-3">
                         <p class="font-display font-bold text-sm leading-tight mb-2">{{ $app->judul }}</p>

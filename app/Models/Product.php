@@ -51,6 +51,21 @@ class Product extends Model
         return $this->harga_coret !== null && $this->harga_coret > $this->harga;
     }
 
+    /**
+     * URL cover: dukung dua format path yang ada —
+     * 'images/...' (public langsung, dari seeder) dan 'covers/...' (storage, dari upload admin).
+     */
+    public function coverUrl(): ?string
+    {
+        if (! $this->cover_path) {
+            return null;
+        }
+        if (str_starts_with($this->cover_path, 'images/')) {
+            return asset($this->cover_path);
+        }
+        return asset('storage/' . $this->cover_path);
+    }
+
     public function hargaRupiah(): string
     {
         return 'Rp'.number_format($this->harga, 0, ',', '.');

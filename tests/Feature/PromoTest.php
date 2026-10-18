@@ -77,4 +77,15 @@ class PromoTest extends TestCase
         $response->assertOk();
         $response->assertSee(route('promo.show', 'ebook-promo'), false);
     }
+
+    public function test_cover_url_dua_format_path(): void
+    {
+        $dariSeeder = $this->buatProduk(['slug' => 'a', 'cover_path' => 'images/covers/x.jpg']);
+        $dariUpload = $this->buatProduk(['slug' => 'b', 'cover_path' => 'covers/y.jpg']);
+        $tanpaCover = $this->buatProduk(['slug' => 'c', 'cover_path' => null]);
+
+        $this->assertEquals(asset('images/covers/x.jpg'), $dariSeeder->coverUrl());
+        $this->assertEquals(asset('storage/covers/y.jpg'), $dariUpload->coverUrl());
+        $this->assertNull($tanpaCover->coverUrl());
+    }
 }

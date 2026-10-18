@@ -7,7 +7,7 @@
             @foreach($ebooks as $ebook)
                 <div class="brutal-card overflow-hidden">
                     @if($ebook->cover_path)
-                        <img src="{{ asset($ebook->cover_path) }}" alt="{{ $ebook->judul }}" class="w-full aspect-[4/5] object-cover">
+                        <img src="{{ $ebook->coverUrl() }}" alt="{{ $ebook->judul }}" class="w-full aspect-[4/5] object-cover">
                     @endif
                     <div class="p-3">
                         <p class="font-display font-bold text-sm leading-tight mb-2">{{ $ebook->judul }}</p>

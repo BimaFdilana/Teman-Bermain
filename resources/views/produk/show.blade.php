@@ -14,7 +14,7 @@
             <!-- Cover -->
             <div class="kidza-card p-3 relative">
                 @if($product->cover_path)
-                    <img src="{{ asset($product->cover_path) }}" alt="{{ $product->judul }}" class="rounded-3xl w-full aspect-[4/5] object-cover">
+                    <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}" class="rounded-3xl w-full aspect-[4/5] object-cover">
                 @endif
                 <span class="kidza-badge kidza-badge-{{ $product->tipe }} absolute top-6 left-6">{{ $product->labelTipe() }}</span>
             </div>

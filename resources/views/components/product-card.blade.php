@@ -3,7 +3,7 @@
 <a href="{{ route('produk.show', $product->slug) }}" class="kidza-card block">
     <div class="relative">
         @if($product->cover_path)
-            <img src="{{ asset($product->cover_path) }}" alt="{{ $product->judul }}" class="w-full aspect-[4/5] object-cover">
+            <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}" class="w-full aspect-[4/5] object-cover">
         @else
             <div class="w-full aspect-[4/5] flex items-center justify-center text-6xl" style="background:#FFF6E0">
                 {{ $product->tipe === 'miniapp' ? '🎮' : '📚' }}
