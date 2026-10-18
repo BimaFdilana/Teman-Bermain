@@ -33,7 +33,7 @@
                     <a href="{{ route('home') }}" class="kidza-btn kidza-btn-green">Buka Akun Saya</a>
                 @else
                     <a href="{{ route('login') }}" class="kidza-link">Masuk</a>
-                    <a href="{{ route('register') }}" class="kidza-btn kidza-btn-yellow">Daftar Gratis</a>
+                    <a href="{{ route('register') }}" class="kidza-btn kidza-btn-yellow" style="color:#FFF8E7">Daftar Gratis</a>
                 @endauth
                 <button class="kidza-burger" onclick="document.getElementById('kidza-drawer').classList.toggle('open')" aria-label="Menu">
                     <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
