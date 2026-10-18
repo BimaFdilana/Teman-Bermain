@@ -34,6 +34,10 @@
 </div>
 
 <script>
+/* PWA per MiniApp (PRD §12): daftarkan service worker agar "Pasang di HP" berfungsi */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register("{{ route('miniapp.sw') }}", { scope: '/' }).catch(function () {});
+}
 (function () {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const btn = document.getElementById('btn-pasang');

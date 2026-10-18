@@ -109,6 +109,73 @@ class MiniappController extends Controller
         return redirect()->route('miniapp.main', $install->product);
     }
 
+    /**
+     * Service worker PWA MiniApp (PRD §12).
+     * Didaftarkan dari halaman player dengan scope '/' agar memenuhi syarat
+     * install Chrome (SW + fetch handler); hanya menangani URL MiniApp —
+     * situs utama & admin dilewatkan apa adanya (bukan PWA).
+     */
+    public function serviceWorker(): Response
+    {
+        // Versi cache mengikuti update MiniApp terbaru: upload baru = cache lama dibuang.
+        $versi = \App\Models\Miniapp::max('updated_at')?->timestamp ?? 1;
+        $offline = route('pwa.offline');
+
+        $js = <<<JS
+        /* Service worker Rumah Cahaya-bks — PWA per MiniApp */
+        const CACHE = 'rc-miniapp-v{$versi}';
+        const OFFLINE_URL = '{$offline}';
+
+        self.addEventListener('install', (e) => {
+            e.waitUntil(
+                caches.open(CACHE).then((c) => c.add(OFFLINE_URL)).then(() => self.skipWaiting())
+            );
+        });
+
+        self.addEventListener('activate', (e) => {
+            e.waitUntil(
+                caches.keys()
+                    .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+                    .then(() => self.clients.claim())
+            );
+        });
+
+        self.addEventListener('fetch', (e) => {
+            const url = new URL(e.request.url);
+            if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
+            const path = url.pathname;
+
+            // 1) Navigasi area PWA: network-first, fallback halaman offline
+            if (path.startsWith('/pwa/') && e.request.mode === 'navigate') {
+                e.respondWith(fetch(e.request).catch(() => caches.match(OFFLINE_URL)));
+                return;
+            }
+
+            // 2) File game MiniApp: cache-first (kunci stabil tanpa signature) agar bisa main offline
+            if (path.startsWith('/file/miniapp/')) {
+                const key = url.origin + path;
+                e.respondWith(
+                    caches.match(key).then((cached) => {
+                        const network = fetch(e.request).then((res) => {
+                            if (res && res.ok) {
+                                const copy = res.clone();
+                                caches.open(CACHE).then((c) => c.put(key, copy));
+                            }
+                            return res;
+                        }).catch(() => cached);
+                        return cached || network;
+                    })
+                );
+                return;
+            }
+
+            // 3) Selain URL MiniApp: jangan sentuh (situs utama & admin tetap non-PWA)
+        });
+        JS;
+
+        return response($js, 200, ['Content-Type' => 'application/javascript']);
+    }
+
     private function otorisasi(Request $request, Product $product): void
     {
         abort_unless($product->tipe === 'miniapp', 404);

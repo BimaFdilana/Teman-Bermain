@@ -56,6 +56,11 @@ Route::middleware(['auth', 'nonadmin'])->group(function () {
 Route::get('/file/ebook/{product}', [App\Http\Controllers\EbookController::class, 'file'])->name('file.ebook');
 Route::get('/file/miniapp/{product}', [App\Http\Controllers\MiniappController::class, 'file'])->name('file.miniapp');
 
+// PWA per MiniApp (PRD §12): service worker + halaman offline (publik, tanpa data sensitif)
+// Catatan: /pwa/offline harus di atas /pwa/{token} agar tidak tertangkap sebagai token.
+Route::get('/sw-miniapp.js', [App\Http\Controllers\MiniappController::class, 'serviceWorker'])->name('miniapp.sw');
+Route::get('/pwa/offline', fn () => view('miniapp.offline'))->name('pwa.offline');
+
 // Launcher PWA: install token -> sesi (PRD §5.6, tanpa login ulang)
 Route::get('/pwa/{token}', [App\Http\Controllers\MiniappController::class, 'launch'])->name('pwa.launch');
 
