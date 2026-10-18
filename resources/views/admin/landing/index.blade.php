@@ -37,6 +37,34 @@
     </form>
 </div>
 
+{{-- Foto background --}}
+<div class="kidza-card p-6 mb-6">
+    <h2 class="font-bold text-lg mb-2" style="font-family:'Quicksand'">🖼️ Foto Background</h2>
+    <p class="text-sm mb-4" style="color:#6b7280">Ganti foto latar section Misi Kami, Footer, dan Kata Mereka. JPG/PNG maks 2MB per foto.</p>
+    <form method="POST" action="{{ route('admin.landing.foto') }}" enctype="multipart/form-data">
+        @csrf
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            @php
+            $fotos = [
+                'misi_bg' => ['label' => 'Background Misi Kami', 'default' => 'landing/galeri-1.jpg'],
+                'footer_bg' => ['label' => 'Background Footer', 'default' => 'landing/galeri-2.jpg'],
+                'testimoni_bg' => ['label' => 'Background Kata Mereka', 'default' => 'landing/testimoni-bg.jpg'],
+            ];
+            @endphp
+            @foreach($fotos as $key => $f)
+                <div class="border-2 border-gray-200 rounded-xl p-3">
+                    <p class="text-sm font-bold mb-2">{{ $f['label'] }}</p>
+                    <img src="{{ asset('storage/'.\App\Models\Setting::get($key, $f['default'])) }}" alt="{{ $f['label'] }}" class="w-full h-28 object-cover rounded-lg mb-2">
+                    <input type="file" name="{{ $key }}" accept="image/*"
+                           class="w-full border-2 border-gray-300 rounded-xl px-3 py-1.5 text-sm">
+                    @error($key)<p class="text-xs mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+                </div>
+            @endforeach
+        </div>
+        <button type="submit" class="kidza-btn kidza-btn-green">💾 Simpan Foto</button>
+    </form>
+</div>
+
 {{-- Paket unggulan --}}
 <div class="kidza-card p-6 mb-6">
     <h2 class="font-bold text-lg mb-2" style="font-family:'Quicksand'">🎁 Paket Unggulan <span class="text-sm font-normal" style="color:#6b7280">(maks 3)</span></h2>

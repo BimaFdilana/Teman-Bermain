@@ -57,6 +57,31 @@ class LandingController extends Controller
     }
 
     /**
+     * Simpan foto-foto background landing (Misi Kami, Footer, Kata Mereka).
+     */
+    public function simpanFoto(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'misi_bg' => 'nullable|image|max:2048',
+            'footer_bg' => 'nullable|image|max:2048',
+            'testimoni_bg' => 'nullable|image|max:2048',
+        ]);
+
+        foreach (['misi_bg', 'footer_bg', 'testimoni_bg'] as $key) {
+            if ($request->hasFile($key)) {
+                $lama = Setting::get($key);
+                // Jangan hapus file bawaan
+                if ($lama && ! in_array($lama, ['landing/galeri-1.jpg', 'landing/galeri-2.jpg', 'landing/testimoni-bg.jpg', 'landing/hero-ebook.jpg'])) {
+                    Storage::disk('public')->delete($lama);
+                }
+                Setting::set($key, $request->file($key)->store('landing', 'public'));
+            }
+        }
+
+        return back()->with('sukses', 'Foto background landing page disimpan.');
+    }
+
+    /**
      * Simpan pilihan 3 paket unggulan.
      */
     public function simpanPaket(Request $request): RedirectResponse

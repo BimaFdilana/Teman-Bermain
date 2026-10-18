@@ -87,6 +87,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Manage Landing Page (PRD §6.9)
     Route::get('/landing', [App\Http\Controllers\Admin\LandingController::class, 'index'])->name('landing.index');
     Route::post('/landing/teks', [App\Http\Controllers\Admin\LandingController::class, 'simpanTeks'])->name('landing.teks');
+    Route::post('/landing/foto', [App\Http\Controllers\Admin\LandingController::class, 'simpanFoto'])->name('landing.foto');
     Route::post('/landing/paket', [App\Http\Controllers\Admin\LandingController::class, 'simpanPaket'])->name('landing.paket');
     Route::post('/landing/testimoni', [App\Http\Controllers\Admin\LandingController::class, 'testimoniStore'])->name('landing.testimoni.store');
     Route::put('/landing/testimoni/{testimoni}', [App\Http\Controllers\Admin\LandingController::class, 'testimoniUpdate'])->name('landing.testimoni.update');

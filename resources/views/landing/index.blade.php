@@ -51,7 +51,7 @@
 </section>
 
 <!-- ===== 2. TENTANG / NILAI ===== -->
-<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.78),rgba(255,248,231,.78)),url('{{ asset('storage/landing/galeri-1.jpg') }}') center/cover;">
+<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.78),rgba(255,248,231,.78)),url('{{ asset('storage/'.\App\Models\Setting::get('misi_bg', 'landing/galeri-1.jpg')) }}') center/cover;">
     <span class="poster-leaf" style="top:30px;right:30px">🌿</span>
     <span class="poster-leaf" style="bottom:40px;left:24px">🍃</span>
     <div class="kidza-wrap text-center relative z-10">
@@ -150,7 +150,7 @@
 </section>
 
 <!-- ===== 6. TESTIMONI ===== -->
-<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.72),rgba(255,248,231,.72)),url('{{ asset('storage/landing/testimoni-bg.jpg') }}') center/cover;">
+<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.72),rgba(255,248,231,.72)),url('{{ asset('storage/'.\App\Models\Setting::get('testimoni_bg', 'landing/testimoni-bg.jpg')) }}') center/cover;">
     <span class="poster-leaf" style="top:28px;left:28px">🌿</span>
     <div class="kidza-wrap relative z-10">
         <div class="text-center mb-8">

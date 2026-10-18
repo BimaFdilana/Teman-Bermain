@@ -373,12 +373,8 @@ body {
 /* Marquee */
 .poster .kidza-marquee-track span { color: var(--p-green-dark); opacity: .55; }
 
-/* Footer: foto suasana dengan lapisan hijau tua ala alam */
-.poster .kidza-footer {
-  background:
-    linear-gradient(rgba(20, 83, 45, .78), rgba(20, 83, 45, .78)),
-    url('/storage/landing/galeri-2.jpg') center/cover;
-}
+/* Footer: hijau tua ala alam (foto background diatur inline dari setting) */
+.poster .kidza-footer { background-color: var(--p-green-dark); }
 .poster .kidza-footer h4 { color: var(--p-yellow); font-family: 'Baloo 2', sans-serif; }
 .poster .kidza-footer a, .poster .kidza-footer p { color: #DCE9DC; }
 .poster .kidza-footer a:hover { color: var(--p-yellow); }

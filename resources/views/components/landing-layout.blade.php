@@ -59,7 +59,7 @@
     </main>
 
     <!-- ===== Footer ===== -->
-    <footer class="kidza-footer">
+    <footer class="kidza-footer" style="background:linear-gradient(rgba(20,83,45,.78),rgba(20,83,45,.78)),url('{{ asset('storage/'.\App\Models\Setting::get('footer_bg', 'landing/galeri-2.jpg')) }}') center/cover;">
         <div class="kidza-footer-inner">
             <div class="kidza-footer-brand">
                 <img src="{{ asset('images/logo-stacked.png') }}" alt="Rumah Cahaya-bks" class="h-16 w-auto mb-3">

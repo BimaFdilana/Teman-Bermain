@@ -160,4 +160,24 @@ class AdminProdukLaporanTest extends TestCase
         // Landing memakai gambar yang diupload
         $this->get('/')->assertOk()->assertSee('storage/'.$path, false);
     }
+
+    public function test_ganti_foto_background(): void
+    {
+        $admin = $this->admin();
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $this->actingAs($admin)->post(route('admin.landing.foto'), [
+            'misi_bg' => \Illuminate\Http\UploadedFile::fake()->image('misi.jpg'),
+            'testimoni_bg' => \Illuminate\Http\UploadedFile::fake()->image('testi.jpg'),
+        ])->assertRedirect();
+
+        $misi = \App\Models\Setting::get('misi_bg');
+        $testi = \App\Models\Setting::get('testimoni_bg');
+        $this->assertNotEmpty($misi);
+        $this->assertNotEmpty($testi);
+        \Illuminate\Support\Facades\Storage::disk('public')->assertExists($misi);
+        \Illuminate\Support\Facades\Storage::disk('public')->assertExists($testi);
+
+        $this->get('/')->assertOk()->assertSee('storage/'.$misi, false);
+    }
 }
