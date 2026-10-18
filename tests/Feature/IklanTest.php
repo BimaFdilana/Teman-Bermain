@@ -140,7 +140,7 @@ class IklanTest extends TestCase
         $response->assertSee('Promo Test');
         $response->assertSee('Produk A');
         $response->assertSee('Pesan Sekarang');
-        $response->assertSee('cd-d', false); // elemen countdown
+        $response->assertSee('cd-text', false); // elemen countdown
     }
 
     public function test_halaman_iklan_menampilkan_subjudul_dan_banner(): void

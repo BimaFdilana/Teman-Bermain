@@ -1,6 +1,6 @@
 @php
 $berakhir = $kampanye->isBerakhir();
-$tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => '🎁 Bundle'];
+$tipeLabel = ['ebook' => 'Ebook', 'miniapp' => 'MiniApp', 'bundle' => 'Bundle'];
 $produks = $kampanye->products;
 $pertama = $produks->first();
 $sisa = $produks->skip(1);
@@ -23,11 +23,6 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
     <meta property="og:type" content="website">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
-        /* Hitungan mundur: merah mencolok */
-        .cd-box { background:#A63D2F; border-radius:1rem; min-width:4.2rem; padding:.6rem .4rem;
-                  text-align:center; box-shadow:0 4px 12px rgba(220,38,38,.25); }
-        .cd-num { font-weight:800; font-size:1.6rem; color:#fff; line-height:1; font-variant-numeric:tabular-nums; }
-        .cd-lbl { font-size:.68rem; font-weight:700; color:#fecaca; margin-top:.2rem; }
         /* Jari menunjuk: goyangan halus */
         @keyframes tunjuk { 0%,100% { transform:translateX(0); } 50% { transform:translateX(7px); } }
         @keyframes tunjukKiri { 0%,100% { transform:translateX(0); } 50% { transform:translateX(-7px); } }
@@ -49,7 +44,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
     {{-- Judul promo --}}
     <div class="text-center mb-5">
-        <span class="kidza-kicker poster-kicker-yellow mb-3">🎉 Promo Spesial</span>
+        <span class="kidza-kicker poster-kicker-yellow mb-3">Promo Spesial</span>
         <h1 class="font-extrabold mt-3 mb-2" style="font-size:1.9rem;color:#14532D;line-height:1.25">{{ $kampanye->judul }}</h1>
         @if($kampanye->subjudul)
             <p class="font-extrabold mb-3" style="font-size:1.05rem;color:#1E7B34;line-height:1.4">{{ $kampanye->subjudul }}</p>
@@ -68,28 +63,18 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
     @if($berakhir)
         <div class="text-center p-6 mb-6 rounded-3xl" style="background:#FFFDF4;border:2px solid #F0E7CC">
-            <p class="font-extrabold text-lg" style="color:#14532D">⏰ Promo telah berakhir</p>
+            <p class="font-extrabold text-lg" style="color:#14532D">Promo telah berakhir</p>
             <p class="text-sm mt-1" style="color:#5B5344">Terima kasih atas antusiasmenya! Nantikan promo berikutnya.</p>
         </div>
     @else
-        {{-- Hitungan mundur (merah) --}}
+        {{-- Hitungan mundur (ramping) --}}
         <div class="mt-12 mb-10 text-center">
-            <p class="text-sm font-extrabold mb-2" style="color:#A63D2F">⏳ Promo berakhir dalam</p>
-            <div class="flex justify-center gap-2 countdown">
-                <div class="cd-box"><div class="cd-num cd-d">0</div><div class="cd-lbl">Hari</div></div>
-                <div class="cd-box"><div class="cd-num cd-h">0</div><div class="cd-lbl">Jam</div></div>
-                <div class="cd-box"><div class="cd-num cd-m">0</div><div class="cd-lbl">Menit</div></div>
-                <div class="cd-box"><div class="cd-num cd-s">0</div><div class="cd-lbl">Detik</div></div>
-            </div>
+            <p class="inline-block px-5 py-2 rounded-full text-sm font-bold countdown" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ Berakhir dalam <span class="cd-text" style="font-variant-numeric:tabular-nums">…</span></p>
             <p class="text-xs mt-2" style="color:#a39e93">s/d {{ $kampanye->berakhir_at->format('d M Y, H:i') }} WIB</p>
         </div>
 
         {{-- Tiga panah sale memantul --}}
-        <div class="flex justify-center gap-5 my-12" aria-hidden="true">
-            <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
-            <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
-            <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
-        </div>
+        <div class="my-12" aria-hidden="true" style="height:2px;background:#F0E7CC;border-radius:2px"></div>
 
         {{-- PRODUK 1 (tanpa card) --}}
         @if($pertama)
@@ -114,17 +99,13 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
             </div>
 
             {{-- Tiga panah sale --}}
-            <div class="flex justify-center gap-5 my-12" aria-hidden="true">
-                <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
-                <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
-                <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
-            </div>
+            <div class="my-12" aria-hidden="true" style="height:2px;background:#F0E7CC;border-radius:2px"></div>
         @endif
 
         {{-- Video (opsional) --}}
         @if($videoLink)
             <div class="mb-10">
-                <p class="font-extrabold text-center mb-3" style="color:#14532D">🎬 Tonton Dulu Videonya</p>
+                <p class="font-extrabold text-center mb-3" style="color:#14532D">Tonton Dulu Videonya</p>
                 @if($videoEmbed)
                     <div class="rounded-2xl overflow-hidden mb-3" style="aspect-ratio:16/9">
                         <iframe src="{{ $videoEmbed }}" class="w-full h-full" style="border:0"
@@ -148,7 +129,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         {{-- Materi Ebook (card) --}}
         @if(!empty($kampanye->materi))
             <div class="rounded-3xl p-5 mt-12 mb-8" style="background:#FFFDF4;border:2px solid #F0E7CC">
-                <p class="font-extrabold mb-3" style="color:#14532D">📚 Materi Ebook</p>
+                <p class="font-extrabold mb-3" style="color:#14532D">Materi Ebook</p>
                 <ol class="text-sm space-y-2" style="color:#444;list-style-position:inside;margin:0;padding:0">
                     @foreach($kampanye->materi as $i => $m)
                         <li><span class="font-bold" style="color:#1E7B34">{{ $i + 1 }}.</span> {{ $m }}</li>
@@ -160,7 +141,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         {{-- Bukti Kepuasan (hidden bila kosong) --}}
         @if($testimonis->isNotEmpty())
             <div class="mt-12 mb-8">
-                <p class="font-extrabold text-center mb-3" style="color:#14532D">💬 Bukti Kepuasan</p>
+                <p class="font-extrabold text-center mb-3" style="color:#14532D">Bukti Kepuasan</p>
                 @foreach($testimonis as $t)
                     <div class="rounded-2xl p-4 mb-2 bg-white" style="border:2px solid #F0E7CC">
                         <p class="text-sm italic mb-1" style="color:#444">"{{ $t->isi }}"</p>
@@ -172,7 +153,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Harga Spesial --}}
         <div class="text-center mt-12 mb-8">
-            <p class="font-extrabold mb-3" style="font-size:1.7rem;color:#14532D">🔥 HARGA SPESIAL</p>
+            <p class="font-extrabold mb-3" style="font-size:1.7rem;color:#14532D">HARGA SPESIAL</p>
             @foreach($produks as $p)
                 <div class="mb-2">
                     <p class="text-xs font-bold" style="color:#a39e93">{{ $p->judul }}</p>
@@ -189,24 +170,14 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
             @endif
         </div>
 
-        {{-- Hitungan mundur (merah) lagi --}}
+        {{-- Hitungan mundur (ramping) lagi --}}
         <div class="mb-8 text-center mt-12">
-            <p class="text-sm font-extrabold mb-2" style="color:#A63D2F">⏳ Promo berakhir dalam</p>
-            <div class="flex justify-center gap-2 countdown">
-                <div class="cd-box"><div class="cd-num cd-d">0</div><div class="cd-lbl">Hari</div></div>
-                <div class="cd-box"><div class="cd-num cd-h">0</div><div class="cd-lbl">Jam</div></div>
-                <div class="cd-box"><div class="cd-num cd-m">0</div><div class="cd-lbl">Menit</div></div>
-                <div class="cd-box"><div class="cd-num cd-s">0</div><div class="cd-lbl">Detik</div></div>
-            </div>
+            <p class="inline-block px-5 py-2 rounded-full text-sm font-bold countdown" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ Berakhir dalam <span class="cd-text" style="font-variant-numeric:tabular-nums">…</span></p>
         </div>
 
         {{-- Produk 2..n (berulang) --}}
         @foreach($sisa as $product)
-            <div class="flex justify-center gap-5 my-12" aria-hidden="true">
-                <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
-                <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
-                <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
-            </div>
+            <div class="my-12" aria-hidden="true" style="height:2px;background:#F0E7CC;border-radius:2px"></div>
             <div class="mb-10">
                 @if($product->coverUrl())
                     <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}" class="rounded-2xl w-full object-cover mb-3" style="aspect-ratio:16/10">
@@ -231,11 +202,6 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
     <p class="text-center text-xs mt-8" style="color:#a39e93">Login dengan akun Google untuk melanjutkan pemesanan</p>
     <p class="text-center text-xs mt-2" style="color:#a39e93">© {{ date('Y') }} Rumah Cahaya</p>
-    <p class="text-center mt-1" style="font-size:.65rem;color:#c9c2b2">
-        <a href="https://www.flaticon.com/free-animated-icons/scroll" target="_blank" rel="noopener" style="color:#c9c2b2">Scroll</a> &
-        <a href="https://www.flaticon.com/free-animated-icons/sale" target="_blank" rel="noopener" style="color:#c9c2b2">Sale</a>
-        animated icons by Flaticon
-    </p>
 </div>
 </div>
 
@@ -243,14 +209,16 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 <script>
 (function () {
     const akhir = new Date(@json($kampanye->berakhir_at->toIso8601String())).getTime();
+    function fmt(sisa) {
+        const d = Math.floor(sisa / 86400);
+        const h = String(Math.floor(sisa % 86400 / 3600)).padStart(2, '0');
+        const m = String(Math.floor(sisa % 3600 / 60)).padStart(2, '0');
+        const s = String(sisa % 60).padStart(2, '0');
+        return (d > 0 ? d + ' hari ' : '') + h + ':' + m + ':' + s;
+    }
     function tick() {
-        let sisa = Math.max(0, Math.floor((akhir - Date.now()) / 1000));
-        document.querySelectorAll('.countdown').forEach(function (box) {
-            box.querySelector('.cd-d').textContent = Math.floor(sisa / 86400);
-            box.querySelector('.cd-h').textContent = String(Math.floor(sisa % 86400 / 3600)).padStart(2, '0');
-            box.querySelector('.cd-m').textContent = String(Math.floor(sisa % 3600 / 60)).padStart(2, '0');
-            box.querySelector('.cd-s').textContent = String(sisa % 60).padStart(2, '0');
-        });
+        const sisa = Math.max(0, Math.floor((akhir - Date.now()) / 1000));
+        document.querySelectorAll('.countdown .cd-text').forEach(function (el) { el.textContent = fmt(sisa); });
         if (sisa <= 0) location.reload();
     }
     tick();
