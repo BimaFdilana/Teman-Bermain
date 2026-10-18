@@ -57,32 +57,9 @@ class DashboardController extends Controller
             $perJam[(int) $w->format('H')]++;
         }
 
-        // Insight otomatis dari data
-        $insights = [];
-        $total = array_sum($perHari);
-        if ($total > 0) {
-            // Jendela 2 jam tersibuk
-            $terbaik = 0; $jamMulai = 0;
-            for ($h = 0; $h < 24; $h++) {
-                $jumlah = $perJam[$h] + $perJam[($h + 1) % 24];
-                if ($jumlah > $terbaik) { $terbaik = $jumlah; $jamMulai = $h; }
-            }
-            $labelPeriode = ['minggu' => '1 minggu', 'bulan' => '1 bulan', 'tahun' => '1 tahun'][$filter];
-            $insights[] = "Dalam {$labelPeriode} terakhir pengguna biasanya aktif jam "
-                . sprintf('%02d:00–%02d:00', $jamMulai, ($jamMulai + 2) % 24);
-
-            arsort($perHari);
-            $insights[] = 'Hari paling ramai: ' . array_key_first($perHari)
-                . ' (' . reset($perHari) . ' login)';
-            $insights[] = "Total {$total} login dalam {$labelPeriode} terakhir.";
-        } else {
-            $insights[] = 'Belum ada data login pada periode ini.';
-        }
-
         return [
             'per_hari' => $perHari,
             'per_jam' => $perJam,
-            'insights' => $insights,
             'label_hari' => $namaHari,
         ];
     }

@@ -21,16 +21,6 @@
     <x-stat-card judul="Jumlah Pengguna" :nilai="$stats['pengguna']" :sub="'Menunggu verifikasi: '.$stats['menunggu_verifikasi'].' order'" warna="#F3A712" />
 </div>
 
-{{-- Insight otomatis --}}
-<div class="kidza-card p-5 mb-6" style="background:#FFF9EC">
-    <h2 class="font-bold mb-2" style="font-family:'Quicksand'">💡 Keterangan Otomatis</h2>
-    <ul class="list-disc list-inside text-sm space-y-1">
-        @foreach($aktivitas['insights'] as $insight)
-            <li>{{ $insight }}</li>
-        @endforeach
-    </ul>
-</div>
-
 {{-- Chart aktivitas (satu chart, tab Hari / Jam) --}}
 <div class="kidza-card p-5 mb-6">
     <div class="flex items-center justify-between mb-3">
