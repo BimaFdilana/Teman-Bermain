@@ -33,7 +33,6 @@
                     <a href="{{ route('home') }}" class="kidza-btn kidza-btn-green">Buka Akun Saya</a>
                 @else
                     <a href="{{ route('login') }}" class="kidza-link">Masuk</a>
-                    <a href="{{ route('google.redirect') }}" class="kidza-btn kidza-btn-yellow" style="color:#FFF8E7">Daftar Gratis</a>
                 @endauth
                 <button class="kidza-burger" onclick="document.getElementById('kidza-drawer').classList.toggle('open')" aria-label="Menu">
                     <svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
@@ -49,7 +48,6 @@
                 <a href="{{ route('home') }}">Buka Akun Saya</a>
             @else
                 <a href="{{ route('login') }}">Masuk</a>
-                <a href="{{ route('google.redirect') }}">Daftar Gratis</a>
             @endauth
         </div>
     </header>
@@ -75,7 +73,6 @@
             <div>
                 <h4>Akun</h4>
                 <a href="{{ route('login') }}">Masuk</a>
-                <a href="{{ route('google.redirect') }}">Daftar</a>
             </div>
             <div>
                 <h4>Hubungi Kami</h4>
