@@ -215,6 +215,12 @@ body {
 }
 .kidza-float { animation: kidza-float 5s ease-in-out infinite; }
 .kidza-float-2 { animation: kidza-float 7s ease-in-out infinite; animation-delay: 1s; }
+/* Goyangan pelan khusus gambar hero (amplitudo kecil, durasi panjang) */
+@keyframes kidza-float-soft {
+  0%, 100% { transform: translateY(0) rotate(2deg); }
+  50% { transform: translateY(-6px) rotate(3deg); }
+}
+.kidza-float-soft { animation: kidza-float-soft 9s ease-in-out infinite; }
 
 /* Marquee brand */
 .kidza-marquee { overflow: hidden; white-space: nowrap; }
