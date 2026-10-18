@@ -51,7 +51,7 @@
 </section>
 
 <!-- ===== 2. TENTANG / NILAI ===== -->
-<section class="kidza-section relative overflow-hidden" style="background:#FFF8E7">
+<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.9),rgba(255,248,231,.9)),url('{{ asset('storage/landing/galeri-1.jpg') }}') center/cover;">
     <span class="poster-leaf" style="top:30px;right:30px">🌿</span>
     <span class="poster-leaf" style="bottom:40px;left:24px">🍃</span>
     <div class="kidza-wrap text-center relative z-10">
@@ -117,32 +117,6 @@
             @empty
                 <p class="col-span-4 text-center" style="color:#5B5344">Produk segera hadir.</p>
             @endforelse
-        </div>
-    </div>
-</section>
-
-<!-- ===== 4B. GALERI ===== -->
-<section class="kidza-section relative overflow-hidden" style="background:#FFFEF7">
-    <span class="poster-leaf" style="top:28px;left:30px">🌿</span>
-    <span class="poster-leaf" style="bottom:40px;right:26px">🍃</span>
-    <div class="kidza-wrap relative z-10">
-        <div class="text-center mb-10">
-            <span class="kidza-kicker">📸 Galeri</span>
-            <h2 class="kidza-h2 mb-3"><span class="poster-brush">Suasana Belajar & Bermain</span></h2>
-            <p class="text-lg" style="color:#5B5344">Belajar jadi petualangan seru setiap hari.</p>
-        </div>
-        <div class="kidza-card p-2 mb-6 kidza-float" style="transform:rotate(-.6deg)">
-            <img src="{{ asset('storage/landing/galeri-1.jpg') }}" alt="Suasana taman belajar" class="rounded-3xl w-full aspect-[21/9] object-cover">
-        </div>
-        <div class="grid md:grid-cols-2 gap-6">
-            <div class="kidza-card p-2 kidza-float-2" style="transform:rotate(1.2deg)">
-                <img src="{{ asset('storage/landing/galeri-2.jpg') }}" alt="Anak-anak bermain di taman" class="rounded-3xl w-full aspect-[4/5] object-cover">
-                <p class="text-center font-extrabold py-3" style="color:#14532D">Bermain sambil belajar 🌈</p>
-            </div>
-            <div class="kidza-card p-2 kidza-float" style="transform:rotate(-1.2deg);animation-delay:.8s">
-                <img src="{{ asset('storage/landing/galeri-3.jpg') }}" alt="Bermain air belajar bersama" class="rounded-3xl w-full aspect-[4/5] object-cover">
-                <p class="text-center font-extrabold py-3" style="color:#14532D">Bermain air, belajar bersama 💦</p>
-            </div>
         </div>
     </div>
 </section>
