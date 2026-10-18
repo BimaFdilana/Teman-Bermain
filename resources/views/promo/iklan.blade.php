@@ -24,7 +24,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* Hitungan mundur: merah mencolok */
-        .cd-box { background:#DC2626; border-radius:1rem; min-width:4.2rem; padding:.6rem .4rem;
+        .cd-box { background:#A63D2F; border-radius:1rem; min-width:4.2rem; padding:.6rem .4rem;
                   text-align:center; box-shadow:0 4px 12px rgba(220,38,38,.25); }
         .cd-num { font-weight:800; font-size:1.6rem; color:#fff; line-height:1; font-variant-numeric:tabular-nums; }
         .cd-lbl { font-size:.68rem; font-weight:700; color:#fecaca; margin-top:.2rem; }
@@ -74,7 +74,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
     @else
         {{-- Hitungan mundur (merah) --}}
         <div class="mt-12 mb-10 text-center">
-            <p class="text-sm font-extrabold mb-2" style="color:#DC2626">⏳ Promo berakhir dalam</p>
+            <p class="text-sm font-extrabold mb-2" style="color:#A63D2F">⏳ Promo berakhir dalam</p>
             <div class="flex justify-center gap-2 countdown">
                 <div class="cd-box"><div class="cd-num cd-d">0</div><div class="cd-lbl">Hari</div></div>
                 <div class="cd-box"><div class="cd-num cd-h">0</div><div class="cd-lbl">Jam</div></div>
@@ -172,7 +172,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Harga Spesial --}}
         <div class="text-center mt-12 mb-8">
-            <p class="font-extrabold mb-3" style="font-size:1.7rem;color:#DC2626">🔥 HARGA SPESIAL</p>
+            <p class="font-extrabold mb-3" style="font-size:1.7rem;color:#14532D">🔥 HARGA SPESIAL</p>
             @foreach($produks as $p)
                 <div class="mb-2">
                     <p class="text-xs font-bold" style="color:#a39e93">{{ $p->judul }}</p>
@@ -191,7 +191,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Hitungan mundur (merah) lagi --}}
         <div class="mb-8 text-center mt-12">
-            <p class="text-sm font-extrabold mb-2" style="color:#DC2626">⏳ Promo berakhir dalam</p>
+            <p class="text-sm font-extrabold mb-2" style="color:#A63D2F">⏳ Promo berakhir dalam</p>
             <div class="flex justify-center gap-2 countdown">
                 <div class="cd-box"><div class="cd-num cd-d">0</div><div class="cd-lbl">Hari</div></div>
                 <div class="cd-box"><div class="cd-num cd-h">0</div><div class="cd-lbl">Jam</div></div>
