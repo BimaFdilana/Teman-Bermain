@@ -15,8 +15,14 @@
         .admin-shell { display: flex; min-height: 100vh; }
         .admin-sidebar {
             width: 240px; flex-shrink: 0; background: #1F2937; color: #F9F9F6;
-            padding: 1.5rem 1rem; position: sticky; top: 0; height: 100vh;
+            padding: 1.5rem 1rem; position: sticky; top: 0; height: 100vh; overflow-y: auto;
         }
+        .side-group-title {
+            font-family: 'Quicksand', sans-serif; font-size: .68rem; font-weight: 800;
+            letter-spacing: .1em; text-transform: uppercase; color: #8a8f98;
+            padding: 1rem .9rem .35rem; margin: 0;
+        }
+        .side-group-title:first-of-type { padding-top: .2rem; }
         .admin-sidebar a.side-link {
             display: flex; align-items: center; gap: .7rem;
             padding: .7rem .9rem; border-radius: .9rem; margin-bottom: .3rem;
@@ -34,6 +40,7 @@
             .admin-sidebar { width: 100%; height: auto; position: static; padding: 1rem; }
             .admin-sidebar nav { display: flex; gap: .4rem; overflow-x: auto; }
             .admin-sidebar a.side-link { white-space: nowrap; margin-bottom: 0; }
+            .side-group-title { display: none; }
             .admin-main { padding: 1.25rem; }
         }
     </style>
@@ -49,15 +56,20 @@
             </div>
         </div>
         <nav>
+            <p class="side-group-title">Utama</p>
             <a href="{{ route('admin.dashboard') }}" class="side-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">📊 Dashboard</a>
+            <p class="side-group-title">Katalog</p>
             <a href="{{ route('admin.ebook.index') }}" class="side-link {{ request()->routeIs('admin.ebook.*') ? 'active' : '' }}">📚 Ebook</a>
             <a href="{{ route('admin.miniapp.index') }}" class="side-link {{ request()->routeIs('admin.miniapp.*') ? 'active' : '' }}">🎮 MiniApps</a>
-            <a href="{{ route('admin.pembayaran.index') }}" class="side-link {{ request()->routeIs('admin.pembayaran.*') ? 'active' : '' }}">💳 Pembayaran</a>
             <a href="{{ route('admin.produk.index') }}" class="side-link {{ request()->routeIs('admin.produk.*') ? 'active' : '' }}">🏷️ Manage Product</a>
-            <a href="{{ route('admin.laporan.index') }}" class="side-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">📈 Laporan</a>
-            <a href="{{ route('admin.landing.index') }}" class="side-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">🌐 Landing Page</a>
+            <p class="side-group-title">Penjualan</p>
+            <a href="{{ route('admin.pembayaran.index') }}" class="side-link {{ request()->routeIs('admin.pembayaran.*') ? 'active' : '' }}">💳 Pembayaran</a>
             <a href="{{ route('admin.diskon.index') }}" class="side-link {{ request()->routeIs('admin.diskon.*') ? 'active' : '' }}">🎟️ Diskon</a>
+            <a href="{{ route('admin.laporan.index') }}" class="side-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">📈 Laporan</a>
+            <p class="side-group-title">Promosi</p>
             <a href="{{ route('admin.iklan.index') }}" class="side-link {{ request()->routeIs('admin.iklan.*') ? 'active' : '' }}">📢 Iklan Promo</a>
+            <a href="{{ route('admin.landing.index') }}" class="side-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">🌐 Landing Page</a>
+            <p class="side-group-title">Lainnya</p>
             <a href="{{ route('admin.pengaturan.index') }}" class="side-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">⚙️ Pengaturan</a>
             <a href="{{ route('landing') }}" class="side-link" target="_blank">👁️ Lihat Web</a>
             <form method="POST" action="{{ route('logout') }}" class="mt-4">
