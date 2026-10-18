@@ -30,11 +30,13 @@ class ValidMiniappHtml implements ValidationRule
             $fail('Dilarang memakai <script src> eksternal — semua JavaScript harus inline di dalam file.');
         }
 
-        // <img src> harus data-URI atau https (bukan file lokal relatif)
+        // <img src> harus data-URI atau https (bukan file lokal relatif).
+        // src berupa ekspresi JS template (${...}) dilewati — nilainya diisi saat runtime.
         if (preg_match_all('/<img[^>]+src\s*=\s*["\']([^"\']+)["\']/i', $html, $m)) {
             foreach ($m[1] as $src) {
                 $src = trim($src);
                 if ($src === '') continue;
+                if (str_contains($src, '${')) continue;
                 if (! str_starts_with($src, 'data:') && ! str_starts_with($src, 'https://') && ! str_starts_with($src, 'http://')) {
                     $fail('Gambar di dalam file harus data-URI — ditemukan <img src="'.$src.'"> yang mengarah ke file lokal.');
                     break;

@@ -99,6 +99,22 @@ class AdminKontenTest extends TestCase
         $response->assertSessionHasErrors('html');
     }
 
+    public function test_miniapp_terima_src_template_js(): void
+    {
+        // src berupa ekspresi JS template (${...}) diisi saat runtime — bukan file lokal
+        $html = '<html><body><img src="${EX.hero[i.no]}"><script>const a=1;</script></body></html>';
+
+        $response = $this->actingAs($this->admin())->post(route('admin.miniapp.store'), [
+            'judul' => 'Game Template',
+            'pwa_name' => 'Game Template',
+            'status' => 'draft',
+            'html' => $this->htmlFile($html),
+        ]);
+
+        $response->assertSessionDoesntHaveErrors('html');
+        $this->assertDatabaseHas('products', ['judul' => 'Game Template']);
+    }
+
     public function test_miniapp_tolak_file_lebih_dari_5mb(): void
     {
         $response = $this->actingAs($this->admin())->post(route('admin.miniapp.store'), [
