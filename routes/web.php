@@ -20,6 +20,9 @@ Route::get('/produk/{slug}', [ProductController::class, 'show'])->name('produk.s
 Route::get('/p/{slug}', [App\Http\Controllers\PromoController::class, 'show'])->name('promo.show');
 Route::get('/p/{slug}/pesan', [App\Http\Controllers\PromoController::class, 'pesan'])->name('promo.pesan');
 
+// Halaman iklan/promo multi-produk dengan hitungan mundur
+Route::get('/iklan/{slug}', [App\Http\Controllers\PromoController::class, 'iklan'])->name('iklan.show');
+
 Route::middleware('auth')->group(function () {
     Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
@@ -89,6 +92,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/laporan/export/pdf', [App\Http\Controllers\Admin\LaporanController::class, 'exportPdf'])->name('laporan.pdf');
 
     // Manage Landing Page (PRD §6.9)
+    Route::resource('iklan', App\Http\Controllers\Admin\IklanController::class)->except(['show']);
+
     Route::get('/landing', [App\Http\Controllers\Admin\LandingController::class, 'index'])->name('landing.index');
     Route::post('/landing/teks', [App\Http\Controllers\Admin\LandingController::class, 'simpanTeks'])->name('landing.teks');
     Route::post('/landing/foto', [App\Http\Controllers\Admin\LandingController::class, 'simpanFoto'])->name('landing.foto');

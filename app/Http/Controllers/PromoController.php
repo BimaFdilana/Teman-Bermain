@@ -25,6 +25,25 @@ class PromoController extends Controller
     }
 
     /**
+     * Halaman iklan/promo multi-produk dengan hitungan mundur.
+     * Draft & belum mulai → 404; sudah berakhir → tampil status berakhir.
+     */
+    public function iklan(string $slug): View
+    {
+        $kampanye = \App\Models\PromoCampaign::where('slug', $slug)->firstOrFail();
+
+        if ($kampanye->status !== \App\Models\PromoCampaign::STATUS_AKTIF) {
+            abort(404);
+        }
+        if ($kampanye->mulai_at && now()->lt($kampanye->mulai_at)) {
+            abort(404);
+        }
+        $kampanye->load(['products' => fn ($q) => $q->tersedia()]);
+
+        return view('promo.iklan', ['kampanye' => $kampanye]);
+    }
+
+    /**
      * Tombol "Pesan Sekarang": tamu diarahkan login Google dulu,
      * setelah login otomatis lanjut membuat order (intended URL).
      */

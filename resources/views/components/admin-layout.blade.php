@@ -57,6 +57,7 @@
             <a href="{{ route('admin.laporan.index') }}" class="side-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">📈 Laporan</a>
             <a href="{{ route('admin.landing.index') }}" class="side-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">🌐 Landing Page</a>
             <a href="{{ route('admin.diskon.index') }}" class="side-link {{ request()->routeIs('admin.diskon.*') ? 'active' : '' }}">🎟️ Diskon</a>
+            <a href="{{ route('admin.iklan.index') }}" class="side-link {{ request()->routeIs('admin.iklan.*') ? 'active' : '' }}">📢 Iklan Promo</a>
             <a href="{{ route('admin.pengaturan.index') }}" class="side-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">⚙️ Pengaturan</a>
             <a href="{{ route('landing') }}" class="side-link" target="_blank">👁️ Lihat Web</a>
             <form method="POST" action="{{ route('logout') }}" class="mt-4">
