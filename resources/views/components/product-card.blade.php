@@ -16,9 +16,9 @@
     </div>
     <div class="p-4">
         @if($product->jenjang)
-            <p class="text-xs font-bold uppercase tracking-wide mb-1" style="color:#0077B6">{{ $product->jenjang }}</p>
+            <p class="text-xs font-extrabold uppercase tracking-wide mb-1 poster-jenjang" style="color:#0077B6">{{ $product->jenjang }}</p>
         @endif
-        <h3 class="font-bold text-lg leading-snug mb-2" style="font-family:'Quicksand'">{{ $product->judul }}</h3>
+        <h3 class="font-extrabold text-lg leading-snug mb-2 poster-card-title">{{ $product->judul }}</h3>
         <div class="flex items-baseline gap-2">
             <span class="kidza-price">{{ $product->hargaRupiah() }}</span>
             @if($product->isPromo())
