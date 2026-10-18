@@ -28,7 +28,10 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         @keyframes tunjukKiri { 0%,100% { transform:translateX(0); } 50% { transform:translateX(-7px); } }
         .anim-tunjuk { display:inline-block; animation:tunjuk 1.4s ease-in-out infinite; }
         .anim-tunjuk-kiri { display:inline-block; animation:tunjukKiri 1.4s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce) { .anim-tunjuk, .anim-tunjuk-kiri { animation:none; } }
+        /* Daun hias: goyang lembut */
+        @keyframes daun-goyang { 0%,100% { transform:rotate(-5deg); } 50% { transform:rotate(6deg); } }
+        .daun-anim { animation:daun-goyang 7s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .anim-tunjuk, .anim-tunjuk-kiri, .daun-anim { animation:none; } }
     </style>
 </head>
 <body style="background:#FAF6EC;min-height:100vh;margin:0">
@@ -37,8 +40,11 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 <div class="px-5 py-8 text-center" style="position:relative">
 
     {{-- Daun hias ala landing page --}}
-    <span class="poster-leaf" aria-hidden="true" style="top:14px;left:6px;font-size:1.6rem">🌿</span>
-    <span class="poster-leaf" aria-hidden="true" style="top:44px;right:8px;font-size:1.6rem">🍃</span>
+    <span class="poster-leaf daun-anim" aria-hidden="true" style="top:14px;left:6px;font-size:1.6rem">🌿</span>
+    <span class="poster-leaf daun-anim" aria-hidden="true" style="top:44px;right:8px;font-size:1.6rem;animation-delay:1.2s">🍃</span>
+    <span class="poster-leaf daun-anim" aria-hidden="true" style="top:32%;left:4px;font-size:1.4rem;animation-delay:2s">🍃</span>
+    <span class="poster-leaf daun-anim" aria-hidden="true" style="top:52%;right:6px;font-size:1.5rem;animation-delay:.6s">🌿</span>
+    <span class="poster-leaf daun-anim" aria-hidden="true" style="top:74%;left:6px;font-size:1.4rem;animation-delay:1.8s">🌱</span>
 
     {{-- Logo --}}
     <div class="text-center mb-4">
@@ -206,8 +212,8 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
     <p class="text-center text-xs mt-8" style="color:#a39e93">Login dengan akun Google untuk melanjutkan pemesanan</p>
     <p class="text-center text-xs mt-2" style="color:#a39e93">© {{ date('Y') }} Rumah Cahaya</p>
-    <span class="poster-leaf" aria-hidden="true" style="bottom:64px;left:8px;font-size:1.6rem">🌱</span>
-    <span class="poster-leaf" aria-hidden="true" style="bottom:96px;right:10px;font-size:1.6rem">🌿</span>
+    <span class="poster-leaf daun-anim" aria-hidden="true" style="bottom:64px;left:8px;font-size:1.6rem;animation-delay:3.1s">🌱</span>
+    <span class="poster-leaf daun-anim" aria-hidden="true" style="bottom:96px;right:10px;font-size:1.6rem;animation-delay:2.6s">🌿</span>
 </div>
 </div>
 
