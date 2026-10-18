@@ -1,4 +1,4 @@
-<x-admin-layout>
+<x-admin-layout fullwidth>
 @section('head')
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 @endsection
@@ -40,7 +40,7 @@
             <button type="button" id="tab-jam" class="kidza-btn" style="background:#fff" onclick="gantiTab('jam')">Per Jam</button>
         </div>
     </div>
-    <canvas id="chartAktivitas" height="220"></canvas>
+    <div style="position:relative;height:160px"><canvas id="chartAktivitas"></canvas></div>
 </div>
 
 {{-- Log login terbaru --}}
@@ -79,7 +79,7 @@ const dataJam = {
 const chart = new Chart(document.getElementById('chartAktivitas'), {
     type: 'bar',
     data: { labels: dataHari.labels, datasets: [{ data: dataHari.data, backgroundColor: dataHari.warna, borderRadius: 8 }] },
-    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
 });
 
 function gantiTab(tab) {
