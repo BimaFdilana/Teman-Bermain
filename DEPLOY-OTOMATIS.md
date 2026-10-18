@@ -12,11 +12,29 @@ install dependency, dan migrate **tanpa disentuh manual**.
 
 ## Setup sekali saja (Cara A — webhook, disarankan)
 
-### 1. Di hosting (cPanel)
+### 0. Khusus Domainesia — siapkan environment dulu
 
-1. **Git Version Control** → *Create* → Clone URL: `https://github.com/BimaFdilana/teman-bermain.git`,
-   Repository Path: mis. `rumahcahaya`, Branch: `main`. Catat **Clone URL** & path-nya.
-2. Buka **Terminal** cPanel (atau SSH), masuk ke folder repo:
+1. **Pilih PHP 8.2 atau 8.3**: cPanel → *Select PHP Version* → pilih 8.3,
+   centang extensions: `mbstring`, `openssl`, `pdo_mysql`, `tokenizer`, `xml`,
+   `bcmath`, `gd`, `zip`, `curl`, `fileinfo`.
+2. **Aktifkan SSH** (port Domainesia: **64000**):
+   ```sh
+   ssh username@namadomainkamu.com -p 64000
+   ```
+   atau pakai menu **Terminal** di cPanel.
+3. **Install Composer** via SSH (sekali saja, ikut panduan Domainesia):
+   ```sh
+   php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+   php composer-setup.php --install-dir=$HOME/bin --filename=composer
+   ```
+   lalu `export PATH=$HOME/bin:$PATH` (tambahkan ke `~/.bashrc` agar permanen).
+
+### 1. Clone repo di hosting
+
+1. cPanel → **Git Version Control** → *Create* →
+   Clone URL: `https://github.com/BimaFdilana/teman-bermain.git`,
+   Repository Path: mis. `rumahcahaya`, Branch: `main`.
+2. Via SSH/Terminal, masuk ke folder repo dan siapkan aplikasi:
    ```sh
    cd ~/rumahcahaya
    cp .env.example .env   # lalu isi DB_*, APP_URL, MAIL_*, GOOGLE_* via File Manager
@@ -24,16 +42,18 @@ install dependency, dan migrate **tanpa disentuh manual**.
    php artisan key:generate
    php artisan migrate --force
    php artisan storage:link
+   chmod -R 775 storage bootstrap/cache
    ```
 3. Arahkan **document root** domain ke folder `public/` (cPanel → *Domains* → *Document Root*).
    Jika tidak bisa diubah, pindahkan isi `public/` ke `public_html` (lihat DEPLOY.md).
 4. Edit `public/deploy.php`: ganti `DEPLOY_SECRET` dengan token rahasia panjang
-   (buat mis. 32 karakter acak), dan `PHP_BIN` bila perlu (mis. `/usr/local/bin/ea-php83`).
+   (buat mis. 32 karakter acak). `PHP_BIN` biarkan `php` dulu; kalau deploy gagal,
+   cek `which php` via SSH dan isi path lengkapnya.
 5. Tambahkan cron scheduler Laravel (cPanel → *Cron Jobs*):
    ```
-   * * * * * /usr/local/bin/ea-php83 /home/username/rumahcahaya/artisan schedule:run >> /dev/null 2>&1
+   * * * * * /usr/local/bin/php /home/username/rumahcahaya/artisan schedule:run >> /dev/null 2>&1
    ```
-   (sesuaikan path PHP & username)
+   (sesuaikan `username`; pastikan `php -v` via SSH sudah 8.2+)
 
 ### 2. Di GitHub
 
