@@ -51,10 +51,10 @@ $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => 
         @endif
     </div>
 
-    {{-- Banner --}}
+    {{-- Banner: full-bleed selebar layar --}}
     @if($kampanye->gambarUrl())
-        <div class="kidza-card p-2 mb-6">
-            <img src="{{ $kampanye->gambarUrl() }}" alt="{{ $kampanye->judul }}" class="rounded-3xl w-full object-cover">
+        <div class="mb-8" style="margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw)">
+            <img src="{{ $kampanye->gambarUrl() }}" alt="{{ $kampanye->judul }}" class="w-full object-cover">
         </div>
     @endif
 
