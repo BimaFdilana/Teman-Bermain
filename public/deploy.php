@@ -103,9 +103,13 @@ dlog("git pull (exit $c1): " . substr($o1, 0, 500));
 if ($c1 !== 0) { http_response_code(500); exit('git pull failed'); }
 
 // 4. Install dependency PHP
+// (user web tidak punya HOME → arahkan COMPOSER_HOME ke folder writable milik app)
+$composerHome = $repoRoot . '/storage/app/.composer';
+@mkdir($composerHome, 0755, true);
 $composer = findComposer();
 dlog("composer: $composer");
-[$c2, $o2] = run('cd ' . escapeshellarg($repoRoot) . ' && ' . escapeshellarg($composer) . ' install --no-dev --optimize-autoloader --no-interaction');
+$composerEnv = 'COMPOSER_HOME=' . escapeshellarg($composerHome) . ' COMPOSER_ALLOW_SUPERUSER=1 ';
+[$c2, $o2] = run('cd ' . escapeshellarg($repoRoot) . ' && ' . $composerEnv . escapeshellarg($composer) . ' install --no-dev --optimize-autoloader --no-interaction');
 dlog("composer install (exit $c2): " . substr($o2, -500));
 
 // 5. Migrasi database
