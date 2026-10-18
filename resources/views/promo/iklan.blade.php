@@ -73,7 +73,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         </div>
     @else
         {{-- Hitungan mundur (merah) --}}
-        <div class="mt-16 mb-16 text-center">
+        <div class="mt-12 mb-10 text-center">
             <p class="text-sm font-extrabold mb-2" style="color:#DC2626">⏳ Promo berakhir dalam</p>
             <div class="flex justify-center gap-2 countdown">
                 <div class="cd-box"><div class="cd-num cd-d">0</div><div class="cd-lbl">Hari</div></div>
@@ -85,7 +85,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         </div>
 
         {{-- Tiga panah sale memantul --}}
-        <div class="flex justify-center gap-5 my-16" aria-hidden="true">
+        <div class="flex justify-center gap-5 my-12" aria-hidden="true">
             <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
             <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
             <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
@@ -93,7 +93,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- PRODUK 1 (tanpa card) --}}
         @if($pertama)
-            <div class="mb-16">
+            <div class="mb-10">
                 @if($pertama->coverUrl())
                     <img src="{{ $pertama->coverUrl() }}" alt="{{ $pertama->judul }}" class="rounded-2xl w-full object-cover mb-3" style="aspect-ratio:16/10">
                 @endif
@@ -114,7 +114,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
             </div>
 
             {{-- Tiga panah sale --}}
-            <div class="flex justify-center gap-5 my-16" aria-hidden="true">
+            <div class="flex justify-center gap-5 my-12" aria-hidden="true">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
@@ -123,7 +123,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Video (opsional) --}}
         @if($videoLink)
-            <div class="mb-16">
+            <div class="mb-10">
                 <p class="font-extrabold text-center mb-3" style="color:#14532D">🎬 Tonton Dulu Videonya</p>
                 @if($videoEmbed)
                     <div class="rounded-2xl overflow-hidden mb-3" style="aspect-ratio:16/9">
@@ -145,7 +145,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
                 @endif
             </div>
         @elseif($kampanye->ajakan)
-            <div class="mb-16">
+            <div class="mb-10">
                 <p class="text-sm mb-3" style="color:#5B5344;line-height:1.6">{{ $kampanye->ajakan }}</p>
                 @if($pertama)
                     <a href="{{ route('promo.pesan', $pertama->slug) }}" class="kidza-btn kidza-btn-green w-full text-center" style="font-size:1rem">
@@ -157,7 +157,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Materi Ebook (card) --}}
         @if(!empty($kampanye->materi))
-            <div class="rounded-3xl p-5 mt-16 mb-8" style="background:#FFFDF4;border:2px solid #F0E7CC">
+            <div class="rounded-3xl p-5 mt-12 mb-8" style="background:#FFFDF4;border:2px solid #F0E7CC">
                 <p class="font-extrabold mb-3" style="color:#14532D">📚 Materi Ebook</p>
                 <ol class="text-sm space-y-2" style="color:#444;list-style-position:inside;margin:0;padding:0">
                     @foreach($kampanye->materi as $i => $m)
@@ -174,7 +174,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Bukti Kepuasan (hidden bila kosong) --}}
         @if($testimonis->isNotEmpty())
-            <div class="mt-16 mb-8">
+            <div class="mt-12 mb-8">
                 <p class="font-extrabold text-center mb-3" style="color:#14532D">💬 Bukti Kepuasan</p>
                 @foreach($testimonis as $t)
                     <div class="rounded-2xl p-4 mb-2 bg-white" style="border:2px solid #F0E7CC">
@@ -186,7 +186,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         @endif
 
         {{-- Harga Spesial --}}
-        <div class="text-center mt-16 mb-8">
+        <div class="text-center mt-12 mb-8">
             <p class="font-extrabold mb-3" style="font-size:1.7rem;color:#DC2626">🔥 HARGA SPESIAL</p>
             @foreach($produks as $p)
                 <div class="mb-2">
@@ -205,7 +205,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         </div>
 
         {{-- Hitungan mundur (merah) lagi --}}
-        <div class="mb-8 text-center mt-16">
+        <div class="mb-8 text-center mt-12">
             <p class="text-sm font-extrabold mb-2" style="color:#DC2626">⏳ Promo berakhir dalam</p>
             <div class="flex justify-center gap-2 countdown">
                 <div class="cd-box"><div class="cd-num cd-d">0</div><div class="cd-lbl">Hari</div></div>
@@ -217,12 +217,12 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Produk 2..n (berulang) --}}
         @foreach($sisa as $product)
-            <div class="flex justify-center gap-5 my-16" aria-hidden="true">
+            <div class="flex justify-center gap-5 my-12" aria-hidden="true">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
             </div>
-            <div class="mb-16">
+            <div class="mb-10">
                 @if($product->coverUrl())
                     <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}" class="rounded-2xl w-full object-cover mb-3" style="aspect-ratio:16/10">
                 @endif
