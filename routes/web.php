@@ -1,11 +1,15 @@
 <?php
 
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('landing');
+// Publik: landing + katalog (Fase 2)
+Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::get('/harga', [LandingController::class, 'harga'])->name('harga');
+Route::get('/produk', [ProductController::class, 'index'])->name('produk.index');
+Route::get('/produk/{slug}', [ProductController::class, 'show'])->name('produk.show');
 
 Route::middleware('auth')->group(function () {
     Route::get('/home', function () {

@@ -113,3 +113,157 @@ body {
 .bottom-nav svg { width: 26px; height: 26px; }
 
 .app-shell { padding-bottom: 92px; } /* ruang untuk bottom nav */
+
+/* ===== Kidza-style landing (ceria, bukan brutalism) ===== */
+.kidza { font-family: 'Nunito', system-ui, sans-serif; }
+.kidza h1, .kidza h2, .kidza h3, .kidza .font-cheer {
+  font-family: 'Quicksand', 'Nunito', sans-serif;
+}
+
+/* Navbar */
+.kidza-nav {
+  position: sticky; top: 0; z-index: 50;
+  background: rgba(249, 249, 246, .95);
+  backdrop-filter: blur(8px);
+  border-bottom: 3px solid #1a1a1a;
+}
+.kidza-nav-inner {
+  max-width: 72rem; margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: .7rem 1.25rem; gap: 1rem;
+}
+.kidza-menu { display: none; gap: 2rem; }
+.kidza-menu a {
+  font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 1.05rem;
+  color: #1F2937; padding: .3rem .1rem; position: relative;
+}
+.kidza-menu a.active, .kidza-menu a:hover { color: #167941; }
+.kidza-menu a.active::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -4px;
+  height: 5px; border-radius: 99px; background: #F3A712;
+}
+.kidza-nav-cta { display: flex; align-items: center; gap: .9rem; }
+.kidza-link { font-weight: 800; color: #1F2937; }
+.kidza-link:hover { color: #167941; }
+.kidza-burger { display: inline-flex; padding: .4rem; }
+.kidza-drawer {
+  display: none; flex-direction: column; gap: .2rem;
+  padding: .6rem 1.25rem 1rem; background: #fff; border-bottom: 3px solid #1a1a1a;
+}
+.kidza-drawer.open { display: flex; }
+.kidza-drawer a { font-family: 'Quicksand', sans-serif; font-weight: 700; padding: .6rem 0; border-bottom: 1px dashed #e5e5e5; }
+@media (min-width: 768px) {
+  .kidza-menu { display: flex; }
+  .kidza-burger, .kidza-drawer { display: none !important; }
+}
+
+/* Buttons & cards */
+.kidza-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+  font-family: 'Quicksand', sans-serif; font-weight: 700;
+  padding: .75rem 1.6rem; border-radius: 999px;
+  border: 3px solid #1a1a1a;
+  box-shadow: 4px 4px 0 #1a1a1a;
+  transition: transform .1s ease, box-shadow .1s ease;
+}
+.kidza-btn:hover { transform: translate(-1px, -1px); box-shadow: 5px 5px 0 #1a1a1a; }
+.kidza-btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 #1a1a1a; }
+.kidza-btn-green { background: #167941; color: #fff; }
+.kidza-btn-yellow { background: #F3A712; color: #1a1a1a; }
+.kidza-btn-blue { background: #0077B6; color: #fff; }
+.kidza-btn-white { background: #fff; color: #1a1a1a; }
+
+.kidza-card {
+  background: #fff; border-radius: 1.75rem;
+  border: 3px solid #1a1a1a; box-shadow: 6px 6px 0 rgba(26,26,26,.12);
+  overflow: hidden; transition: transform .15s ease, box-shadow .15s ease;
+}
+.kidza-card:hover { transform: translateY(-4px); box-shadow: 6px 10px 0 rgba(26,26,26,.14); }
+
+.kidza-badge {
+  display: inline-block; font-family: 'Quicksand', sans-serif; font-weight: 700;
+  font-size: .78rem; letter-spacing: .06em; text-transform: uppercase;
+  padding: .3rem .9rem; border-radius: 999px; color: #fff;
+}
+.kidza-badge-ebook { background: #167941; }
+.kidza-badge-miniapp { background: #0077B6; }
+.kidza-badge-bundle { background: #F3A712; color: #1a1a1a; }
+
+/* Section helpers */
+.kidza-section { padding: 4.5rem 1.25rem; }
+.kidza-wrap { max-width: 72rem; margin: 0 auto; }
+.kidza-kicker {
+  display: inline-block; font-family: 'Quicksand', sans-serif; font-weight: 700;
+  color: #0f5c31; background: #e8f6ee; border-radius: 999px;
+  padding: .35rem 1.1rem; margin-bottom: 1rem;
+}
+.kidza-h2 {
+  font-family: 'Quicksand', sans-serif; font-weight: 700;
+  font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.15; color: #1F2937;
+}
+
+/* Wavy divider */
+.kidza-wave { display: block; width: 100%; height: 70px; margin-bottom: -1px; }
+
+/* Hero deco */
+.kidza-blob {
+  position: absolute; border-radius: 50%; filter: blur(2px); opacity: .5; z-index: 0;
+}
+@keyframes kidza-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-14px) rotate(6deg); }
+}
+.kidza-float { animation: kidza-float 5s ease-in-out infinite; }
+.kidza-float-2 { animation: kidza-float 7s ease-in-out infinite; animation-delay: 1s; }
+
+/* Marquee brand */
+.kidza-marquee { overflow: hidden; white-space: nowrap; }
+.kidza-marquee-track {
+  display: inline-flex; gap: 3rem; padding: 1rem 0;
+  animation: kidza-scroll 22s linear infinite;
+}
+@keyframes kidza-scroll {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.kidza-marquee-track span {
+  font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 1.3rem;
+  color: #1F2937; opacity: .45;
+}
+
+/* Testimonial carousel */
+.kidza-testi-track {
+  display: flex; gap: 1.25rem; overflow-x: auto; scroll-snap-type: x mandatory;
+  padding: .5rem .25rem 1.25rem; scrollbar-width: thin;
+}
+.kidza-testi-track > * { scroll-snap-align: start; flex: 0 0 min(88vw, 22rem); }
+
+/* Footer */
+.kidza-footer { background: #1F2937; color: #F9F9F6; margin-top: 2rem; }
+.kidza-footer-inner {
+  max-width: 72rem; margin: 0 auto; padding: 3.5rem 1.25rem 2rem;
+  display: grid; gap: 2rem; grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+}
+.kidza-footer h4 { font-family: 'Quicksand', sans-serif; font-weight: 700; margin-bottom: .8rem; color: #F3A712; }
+.kidza-footer a, .kidza-footer p { display: block; color: #d8d8d2; margin-bottom: .5rem; font-size: .95rem; }
+.kidza-footer a:hover { color: #F3A712; }
+.kidza-copy {
+  border-top: 1px solid rgba(255,255,255,.15); text-align: center;
+  padding: 1.2rem; font-size: .85rem; color: #b9b9b2;
+}
+.kidza-copy a { color: #F3A712; }
+@media (max-width: 768px) {
+  .kidza-footer-inner { grid-template-columns: 1fr 1fr; }
+}
+
+/* Product card price */
+.kidza-price { font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 1.35rem; color: #167941; }
+.kidza-price-coret { text-decoration: line-through; opacity: .5; font-size: .95rem; }
+
+/* Steps */
+.kidza-step-num {
+  width: 3.2rem; height: 3.2rem; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 1.4rem;
+  color: #fff; border: 3px solid #1a1a1a; flex-shrink: 0;
+}
