@@ -21,6 +21,8 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
     <meta property="og:title" content="{{ $kampanye->judul }} — Rumah Cahaya">
     <meta property="og:description" content="{{ Str::limit(strip_tags($kampanye->deskripsi ?? ''), 150) }}">
     <meta property="og:type" content="website">
+    <link rel="icon" type="image/png" href="{{ asset('images/favicon-64.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('images/apple-touch-icon-180.png') }}">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
         /* Jari menunjuk: goyangan halus */
