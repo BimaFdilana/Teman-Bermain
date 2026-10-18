@@ -150,7 +150,7 @@
 </section>
 
 <!-- ===== 6. TESTIMONI ===== -->
-<section class="kidza-section relative overflow-hidden" style="background:#FFF8E7">
+<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.9),rgba(255,248,231,.9)),url('{{ asset('storage/landing/galeri-3.jpg') }}') center/cover;">
     <span class="poster-leaf" style="top:28px;left:28px">🌿</span>
     <div class="kidza-wrap relative z-10">
         <div class="text-center mb-8">
