@@ -141,4 +141,23 @@ class AdminProdukLaporanTest extends TestCase
         ]);
         $response->assertSessionHasErrors('paket');
     }
+
+    public function test_upload_gambar_hero(): void
+    {
+        $admin = $this->admin();
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $this->actingAs($admin)->post(route('admin.landing.teks'), [
+            'hero_headline' => 'Headline',
+            'wa_admin' => '6281234567890',
+            'hero_image' => \Illuminate\Http\UploadedFile::fake()->image('hero.jpg'),
+        ])->assertRedirect();
+
+        $path = \App\Models\Setting::get('hero_image');
+        $this->assertNotEmpty($path);
+        \Illuminate\Support\Facades\Storage::disk('public')->assertExists($path);
+
+        // Landing memakai gambar yang diupload
+        $this->get('/')->assertOk()->assertSee('storage/'.$path, false);
+    }
 }

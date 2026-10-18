@@ -28,6 +28,9 @@ class LandingController extends Controller
             'testimonials' => $testimonials,
             'heroHeadline' => Setting::get('hero_headline', 'Belajar Jadi Petualangan Seru!'),
             'heroSubheadline' => Setting::get('hero_subheadline', ''),
+            'heroImage' => Setting::get('hero_image')
+                ? asset('storage/'.Setting::get('hero_image'))
+                : asset('images/covers/belajar-membaca.svg'),
         ]);
     }
 

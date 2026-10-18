@@ -11,11 +11,23 @@
 {{-- Hero + Kontak + Footer --}}
 <div class="kidza-card p-6 mb-6">
     <h2 class="font-bold text-lg mb-4" style="font-family:'Quicksand'">✨ Teks Hero, Kontak & Footer</h2>
-    <form method="POST" action="{{ route('admin.landing.teks') }}">
+    <form method="POST" action="{{ route('admin.landing.teks') }}" enctype="multipart/form-data">
         @csrf
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-form-input label="Headline Hero" name="hero_headline" :value="\App\Models\Setting::get('hero_headline')" required />
             <x-form-input label="Subheadline Hero" name="hero_subheadline" type="textarea" :value="\App\Models\Setting::get('hero_subheadline')" attrs="rows=2" />
+        </div>
+        <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">Gambar Hero (Ebook)</label>
+            @if(\App\Models\Setting::get('hero_image'))
+                <img src="{{ asset('storage/'.\App\Models\Setting::get('hero_image')) }}" alt="Hero saat ini" class="h-32 rounded-xl mb-2 border-2 border-gray-200">
+            @endif
+            <input type="file" name="hero_image" accept="image/*"
+                   class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+            @error('hero_image')<p class="text-xs mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+            <p class="text-xs mt-1" style="color:#6b7280">JPG/PNG maks 2MB. Kosongkan bila tidak ingin mengganti.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <x-form-input label="No WA Admin" name="wa_admin" :value="\App\Models\Setting::get('wa_admin')" required help="Format 62..., dipakai tombol kontak & kirim kode." />
             <x-form-input label="Jam Operasional" name="jam_operasional" :value="\App\Models\Setting::get('jam_operasional')" />
             <x-form-input label="Alamat" name="alamat" type="textarea" :value="\App\Models\Setting::get('alamat')" attrs="rows=2" />

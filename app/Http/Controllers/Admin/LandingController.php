@@ -35,17 +35,25 @@ class LandingController extends Controller
         $data = $request->validate([
             'hero_headline' => 'required|string|max:200',
             'hero_subheadline' => 'nullable|string|max:500',
+            'hero_image' => 'nullable|image|max:2048',
             'wa_admin' => 'required|string|max:20',
             'jam_operasional' => 'nullable|string|max:100',
             'alamat' => 'nullable|string|max:500',
             'footer_tagline' => 'nullable|string|max:500',
         ]);
 
+        if ($request->hasFile('hero_image')) {
+            $lama = Setting::get('hero_image');
+            if ($lama) Storage::disk('public')->delete($lama);
+            Setting::set('hero_image', $request->file('hero_image')->store('landing', 'public'));
+        }
+
         foreach ($data as $key => $value) {
+            if ($key === 'hero_image') continue;
             Setting::set($key, $value ?? '');
         }
 
-        return back()->with('sukses', 'Teks landing page disimpan.');
+        return back()->with('sukses', 'Teks & gambar hero landing page disimpan.');
     }
 
     /**

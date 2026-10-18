@@ -26,7 +26,7 @@
         </div>
         <div class="relative">
             <div class="kidza-card p-2 kidza-float" style="transform:rotate(2deg)">
-                <img src="{{ asset('images/covers/belajar-membaca.svg') }}" alt="Ebook Belajar Membaca" class="rounded-3xl w-full aspect-[4/5] object-cover">
+                <img src="{{ $heroImage }}" alt="Ebook Rumah Cahaya-bks" class="rounded-3xl w-full aspect-[4/5] object-cover">
             </div>
             <div class="kidza-card kidza-float-2 absolute -bottom-6 -left-4 px-5 py-3 flex items-center gap-3" style="transform:rotate(-3deg)">
                 <span class="text-3xl">🎮</span>
