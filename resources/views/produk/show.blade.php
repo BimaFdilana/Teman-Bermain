@@ -78,7 +78,7 @@
                         @endif
                     @else
                         <a href="{{ route('login') }}" class="kidza-btn kidza-btn-green w-full text-lg">Masuk untuk Membeli</a>
-                        <p class="text-xs text-center mt-2" style="color:#6b7280">Belum punya akun? <a href="{{ route('register') }}" class="underline font-bold">Daftar gratis</a></p>
+                        <p class="text-xs text-center mt-2" style="color:#6b7280">Belum punya akun? <a href="{{ route('google.redirect') }}" class="underline font-bold">Daftar gratis</a></p>
                     @endauth
                 </div>
             </div>

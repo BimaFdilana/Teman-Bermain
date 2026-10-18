@@ -13,16 +13,10 @@ use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
-
-    Route::post('register', [RegisteredUserController::class, 'store']);
-
+    // Register & login email/password untuk pengguna DIHAPUS (2026-10-19):
+    // pengguna hanya login via Google. Admin tetap email+password di /admin/login.
     Route::get('login', [AuthenticatedSessionController::class, 'create'])
         ->name('login');
-
-    Route::post('login', [AuthenticatedSessionController::class, 'store'])
-        ->middleware('throttle:5,1'); // PRD §6.1: rate-limit 5x/menit per IP
 
     Route::get('auth/google/redirect', [GoogleController::class, 'redirect'])
         ->name('google.redirect');
