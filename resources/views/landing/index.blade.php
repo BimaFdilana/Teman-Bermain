@@ -13,8 +13,8 @@
             <div class="mb-5">
                 <span class="kidza-kicker poster-kicker-yellow">🌱 Untuk anak PAUD & SD</span>
             </div>
-            <h1 class="font-extrabold leading-tight mb-4" style="font-size:clamp(2.2rem,5.5vw,3.4rem);color:#14532D">
-                <span class="poster-brush">{{ $heroHeadline }}</span>
+            <h1 class="font-extrabold leading-tight mb-4" style="font-size:clamp(2.2rem,5.5vw,3.4rem);color:#FFF8E7">
+                {{ $heroHeadline }}
             </h1>
             <p class="text-lg mb-8" style="color:#FFF8E7">{{ $heroSubheadline }}</p>
             <div class="flex flex-wrap gap-4 justify-center md:justify-start">
