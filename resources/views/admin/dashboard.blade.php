@@ -31,16 +31,16 @@
     </ul>
 </div>
 
-{{-- Chart aktivitas --}}
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-    <div class="kidza-card p-5">
-        <h2 class="font-bold mb-3" style="font-family:'Quicksand'">Login per Hari</h2>
-        <canvas id="chartHari" height="220"></canvas>
+{{-- Chart aktivitas (satu chart, tab Hari / Jam) --}}
+<div class="kidza-card p-5 mb-6">
+    <div class="flex items-center justify-between mb-3">
+        <h2 class="font-bold" style="font-family:'Quicksand'">📈 Aktivitas Login Pengguna</h2>
+        <div class="flex gap-2">
+            <button type="button" id="tab-hari" class="kidza-btn kidza-btn-green" onclick="gantiTab('hari')">Per Hari</button>
+            <button type="button" id="tab-jam" class="kidza-btn" style="background:#fff" onclick="gantiTab('jam')">Per Jam</button>
+        </div>
     </div>
-    <div class="kidza-card p-5">
-        <h2 class="font-bold mb-3" style="font-family:'Quicksand'">Login per Jam</h2>
-        <canvas id="chartJam" height="220"></canvas>
-    </div>
+    <canvas id="chartAktivitas" height="220"></canvas>
 </div>
 
 {{-- Log login terbaru --}}
@@ -65,23 +65,36 @@
 </div>
 
 <script>
-const hari = @json($aktivitas['label_hari']);
-const perHari = @json(array_values($aktivitas['per_hari']));
-const perJam = @json($aktivitas['per_jam']);
+const dataHari = {
+    labels: @json($aktivitas['label_hari']),
+    data: @json(array_values($aktivitas['per_hari'])),
+    warna: '#167941'
+};
+const dataJam = {
+    labels: Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')),
+    data: @json($aktivitas['per_jam']),
+    warna: '#0077B6'
+};
 
-new Chart(document.getElementById('chartHari'), {
+const chart = new Chart(document.getElementById('chartAktivitas'), {
     type: 'bar',
-    data: { labels: hari, datasets: [{ data: perHari, backgroundColor: '#167941', borderRadius: 8 }] },
+    data: { labels: dataHari.labels, datasets: [{ data: dataHari.data, backgroundColor: dataHari.warna, borderRadius: 8 }] },
     options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
 });
 
-new Chart(document.getElementById('chartJam'), {
-    type: 'bar',
-    data: {
-        labels: Array.from({length: 24}, (_, i) => String(i).padStart(2, '0')),
-        datasets: [{ data: perJam, backgroundColor: '#0077B6', borderRadius: 4 }]
-    },
-    options: { plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { precision: 0 } } } }
-});
+function gantiTab(tab) {
+    const aktif = tab === 'hari' ? dataHari : dataJam;
+    chart.data.labels = aktif.labels;
+    chart.data.datasets[0].data = aktif.data;
+    chart.data.datasets[0].backgroundColor = aktif.warna;
+    chart.update();
+
+    const btnHari = document.getElementById('tab-hari');
+    const btnJam = document.getElementById('tab-jam');
+    btnHari.className = 'kidza-btn' + (tab === 'hari' ? ' kidza-btn-green' : '');
+    btnJam.className = 'kidza-btn' + (tab === 'jam' ? ' kidza-btn-green' : '');
+    if (tab === 'hari') { btnHari.style.background = ''; btnJam.style.background = '#fff'; }
+    else { btnJam.style.background = ''; btnHari.style.background = '#fff'; }
+}
 </script>
 </x-admin-layout>
