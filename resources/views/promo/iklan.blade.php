@@ -90,20 +90,18 @@ $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => 
     <div class="grid gap-4 mt-4 grid-cols-1">
         @foreach($kampanye->products as $product)
             <div class="kidza-card p-3">
-                <div class="flex gap-3">
-                    @if($product->coverUrl())
-                        <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}"
-                             class="rounded-2xl object-cover shrink-0" style="width:88px;height:88px">
-                    @endif
-                    <div class="flex-1 min-w-0">
-                        <span class="kidza-kicker mb-1" style="font-size:.62rem">{{ $tipeLabel[$product->tipe] ?? $product->tipe }}</span>
-                        <p class="font-extrabold text-sm mb-1" style="color:#14532D;line-height:1.3">{{ $product->judul }}</p>
-                        <div class="flex items-baseline gap-1">
-                            <span class="font-extrabold" style="color:#1E7B34">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                            @if($product->harga_coret)
-                                <span class="text-xs line-through" style="color:#a39e93">{{ number_format($product->harga_coret, 0, ',', '.') }}</span>
-                            @endif
-                        </div>
+                @if($product->coverUrl())
+                    <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}"
+                         class="rounded-2xl w-full object-cover mb-3" style="aspect-ratio:16/10">
+                @endif
+                <div class="px-1">
+                    <span class="kidza-kicker mb-2" style="font-size:.65rem">{{ $tipeLabel[$product->tipe] ?? $product->tipe }}</span>
+                    <p class="font-extrabold mb-1" style="color:#14532D;line-height:1.3">{{ $product->judul }}</p>
+                    <div class="flex items-baseline gap-1">
+                        <span class="font-extrabold" style="color:#1E7B34">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                        @if($product->harga_coret)
+                            <span class="text-xs line-through" style="color:#a39e93">{{ number_format($product->harga_coret, 0, ',', '.') }}</span>
+                        @endif
                     </div>
                 </div>
                 @if($berakhir)
