@@ -50,11 +50,6 @@
         <li><strong>Deskripsi Singkat</strong> — 1–2 kalimat: isi permainan + manfaatnya untuk anak.</li>
         <li><strong>Cover</strong> — JPG/PNG maks 2MB, gambar mendatar (landscape) tampil paling bagus.</li>
         <li><strong>Icon/Logo</strong> — PNG <strong>kotak (1:1)</strong> maks 1MB. Jadi ikon aplikasi di HP — hindari teks kecil.</li>
-        <li><strong>File HTML</strong> — satu file <code>.html</code> mandiri maks 5MB:
-            <br>• CSS & JavaScript harus <strong>inline</strong> di dalam file
-            <br>• ❌ Dilarang <code>&lt;script src&gt;</code> eksternal (Google Fonts via <code>&lt;link&gt;</code> boleh)
-            <br>• Gambar harus <strong>data-URI</strong>, bukan path file lokal
-            <br>• Harus dokumen HTML valid (ada tag <code>&lt;html&gt;</code>)</li>
         <li><strong>Versi</strong> — naikkan setiap update (mis. 1.0.0 → 1.0.1) agar HP pengguna memuat file baru.</li>
         <li><strong>Status</strong> — <em>Draft</em>: belum tampil · <em>Tersedia</em>: tampil & bisa dibeli · <em>Arsip</em>: disembunyikan.</li>
     </ol>
