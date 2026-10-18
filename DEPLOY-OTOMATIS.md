@@ -46,9 +46,13 @@ install dependency, dan migrate **tanpa disentuh manual**.
    ```
 3. Arahkan **document root** domain ke folder `public/` (cPanel → *Domains* → *Document Root*).
    Jika tidak bisa diubah, pindahkan isi `public/` ke `public_html` (lihat DEPLOY.md).
-4. Edit `public/deploy.php`: ganti `DEPLOY_SECRET` dengan token rahasia panjang
-   (buat mis. 32 karakter acak). `PHP_BIN` biarkan `php` dulu; kalau deploy gagal,
-   cek `which php` via SSH dan isi path lengkapnya.
+4. Tambahkan token ke `.env` (satu baris baru):
+   ```
+   DEPLOY_SECRET=token-rahasia-kamu
+   ```
+   Buat token via SSH: `php -r "echo bin2hex(random_bytes(16)).PHP_EOL;"`.
+   **Jangan edit `public/deploy.php` di server** — file itu ikut di-pull dari GitHub,
+   edit lokal akan membuat `git pull` gagal.
 5. Tambahkan cron scheduler Laravel (cPanel → *Cron Jobs*):
    ```
    * * * * * /usr/local/bin/php /home/username/rumahcahaya/artisan schedule:run >> /dev/null 2>&1
