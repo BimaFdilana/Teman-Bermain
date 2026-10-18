@@ -72,6 +72,8 @@
             <a href="{{ route('admin.landing.index') }}" class="side-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">🌐 Landing Page</a>
             <p class="side-group-title">Lainnya</p>
             <a href="{{ route('admin.pengaturan.index') }}" class="side-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">⚙️ Pengaturan</a>
+            <a href="{{ route('admin.aktivitas.index') }}" class="side-link {{ request()->routeIs('admin.aktivitas.*') ? 'active' : '' }}">📝 Aktivitas</a>
+            <a href="{{ route('admin.backup.index') }}" class="side-link {{ request()->routeIs('admin.backup.*') ? 'active' : '' }}">💾 Backup</a>
             <a href="{{ route('landing') }}" class="side-link" target="_blank">👁️ Lihat Web</a>
             <form method="POST" action="{{ route('logout') }}" class="mt-4">
                 @csrf

@@ -7,8 +7,8 @@ use Illuminate\Support\Facades\Storage;
 
 class BackupDatabase extends Command
 {
-    protected $signature = 'backup:database';
-    protected $description = 'Backup database harian (disimpan 7 hari terakhir).';
+    protected $signature = 'backup:database {--files : Sertakan juga file storage (PDF/HTML/gambar)}';
+    protected $description = 'Backup database + file storage (disimpan 7 hari terakhir).';
 
     public function handle(): int
     {
@@ -28,14 +28,31 @@ class BackupDatabase extends Command
         $disk->put($nama, $isi);
         $this->info('Backup tersimpan: '.$nama);
 
-        // Hapus backup lebih dari 7 hari
-        $files = collect($disk->files())->sort()->values();
-        if ($files->count() > 7) {
-            foreach ($files->take($files->count() - 7) as $lama) {
-                $disk->delete($lama);
+        if ($this->option('files')) {
+            $zipNama = 'backup-files-'.now()->format('Ymd-His').'.zip';
+            $zipPath = storage_path('app/backups/'.$zipNama);
+            $zip = new \ZipArchive();
+            if ($zip->open($zipPath, \ZipArchive::CREATE) === true) {
+                foreach (['public', 'ebooks', 'miniapps'] as $dir) {
+                    $this->tambahKeZip($zip, storage_path('app/'.$dir), $dir);
+                }
+                $zip->close();
+                $this->info('File tersimpan: '.$zipNama);
             }
-            $this->info('Backup lama dihapus, tersisa 7 terbaru.');
         }
+
+        // Hapus backup lebih dari 7 hari (per jenis: database & file)
+        foreach (['backup-*.sql*', 'backup-files-*.zip'] as $pola) {
+            $files = collect($disk->files())
+                ->filter(fn ($f) => fnmatch($pola, basename($f)))
+                ->sort()->values();
+            if ($files->count() > 7) {
+                foreach ($files->take($files->count() - 7) as $lama) {
+                    $disk->delete($lama);
+                }
+            }
+        }
+        $this->info('Backup lama dihapus, tersisa 7 terbaru per jenis.');
 
         return self::SUCCESS;
     }
@@ -43,6 +60,20 @@ class BackupDatabase extends Command
     private function isMysql(): bool
     {
         return config('database.default') === 'mysql';
+    }
+
+    /** Masukkan direktori ke zip secara rekursif (lewati jika tidak ada). */
+    private function tambahKeZip(\ZipArchive $zip, string $sumber, string $namaZip): void
+    {
+        if (! is_dir($sumber)) {
+            return;
+        }
+        $iter = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($sumber, \FilesystemIterator::SKIP_DOTS)
+        );
+        foreach ($iter as $file) {
+            $zip->addFile($file->getPathname(), $namaZip.'/'.$iter->getSubPathName());
+        }
     }
 
     private function dumpMysql(): ?string

@@ -110,7 +110,7 @@
                     <td class="px-4 py-2">{{ $t->aktif ? '✅' : '❌' }}</td>
                     <td class="px-4 py-2 whitespace-nowrap">
                         <button class="kidza-btn" style="background:#fff" onclick="document.getElementById('testimoni-{{ $t->id }}').style.display='flex'">✏️</button>
-                        <form method="POST" action="{{ route('admin.landing.testimoni.destroy', $t) }}" class="inline" onsubmit="return confirm('Hapus testimoni ini?')">
+                        <form method="POST" action="{{ route('admin.landing.testimoni.destroy', $t) }}" class="inline" onsubmit="return confirm('Pindah ke sampah? Bisa dikembalikan 30 hari.')">
                             @csrf @method('DELETE')
                             <button class="kidza-btn" style="background:#fdecea">🗑️</button>
                         </form>
@@ -118,6 +118,27 @@
                 </tr>
             @endforeach
         </x-data-table>
+    @endif
+
+    @if($sampahTestimoni->isNotEmpty())
+        <div class="mt-4 p-4 rounded-xl" style="background:#FFF9EC;border:2px dashed #d9c58a">
+            <h3 class="font-bold mb-2" style="font-family:'Quicksand'">🗑️ Sampah — terhapus permanen otomatis setelah 30 hari</h3>
+            @foreach($sampahTestimoni as $t)
+                <div class="flex items-center justify-between py-2" style="border-bottom:1px dashed #e5d9b8">
+                    <span class="text-sm"><strong>{{ $t->nama }}</strong> <span style="color:#6b7280">({{ $t->deleted_at->format('d M Y') }})</span></span>
+                    <span class="whitespace-nowrap">
+                        <form method="POST" action="{{ route('admin.landing.testimoni.restore', $t->id) }}" class="inline">
+                            @csrf
+                            <button class="kidza-btn kidza-btn-green" style="padding:.3rem .8rem;font-size:.8rem">↩️ Kembalikan</button>
+                        </form>
+                        <form method="POST" action="{{ route('admin.landing.testimoni.force', $t->id) }}" class="inline" onsubmit="return confirm('Hapus permanen? Tidak bisa dikembalikan.')">
+                            @csrf @method('DELETE')
+                            <button class="kidza-btn" style="background:#fdecea;padding:.3rem .8rem;font-size:.8rem">Hapus permanen</button>
+                        </form>
+                    </span>
+                </div>
+            @endforeach
+        </div>
     @endif
 </div>
 

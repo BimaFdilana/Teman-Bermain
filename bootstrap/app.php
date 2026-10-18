@@ -15,6 +15,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => \App\Http\Middleware\EnsureAdmin::class,
             'nonadmin' => \App\Http\Middleware\EnsureNonAdmin::class,
+            'admin.idle' => \App\Http\Middleware\AdminIdleTimeout::class,
         ]);
         // Pengguna yang sudah login lalu membuka halaman guest (/login):
         // admin -> dashboard admin, pengguna -> /home.

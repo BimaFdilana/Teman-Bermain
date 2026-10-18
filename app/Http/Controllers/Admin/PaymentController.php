@@ -83,6 +83,8 @@ class PaymentController extends Controller
             $order->discountCode->increment('terpakai');
         }
 
+        \App\Models\ActivityLog::catat('verifikasi_order', "Order {$order->kode_order} ({$order->product->judul}) disetujui — kode {$redeem->kode}");
+
         return redirect()->route('admin.pembayaran.show', $order)
             ->with('sukses', "Order disetujui! Kode redeem {$redeem->kode} dibuat. Kirim ke pengguna via tombol WhatsApp di bawah.");
     }
@@ -102,6 +104,8 @@ class PaymentController extends Controller
             'status' => Order::ST_DITOLAK,
             'alasan_tolak' => $request->alasan_tolak,
         ]);
+
+        \App\Models\ActivityLog::catat('tolak_order', "Order {$order->kode_order} ({$order->product->judul}) ditolak: {$request->alasan_tolak}");
 
         return redirect()->route('admin.pembayaran.show', $order)
             ->with('sukses', 'Order ditolak. Pengguna akan melihat alasan dan bisa upload ulang 1x.');

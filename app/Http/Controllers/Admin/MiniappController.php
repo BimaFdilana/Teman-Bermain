@@ -91,11 +91,19 @@ class MiniappController extends Controller
             'versi' => 'nullable|string|max:20',
         ]);
 
+        $statusLama = $miniapp->status;
         $miniapp->update([
             'judul' => $data['judul'],
             'deskripsi' => $data['deskripsi'] ?? '',
             'status' => $data['status'],
         ]);
+
+        if ($statusLama !== $data['status'] && in_array($data['status'], ['tersedia', 'arsip'])) {
+            \App\Models\ActivityLog::catat(
+                $data['status'] === 'tersedia' ? 'publish_produk' : 'arsip_produk',
+                "MiniApp \"{$miniapp->judul}\": {$statusLama} → {$data['status']}"
+            );
+        }
 
         if ($request->hasFile('cover')) {
             if ($miniapp->cover_path) Storage::disk('public')->delete($miniapp->cover_path);
@@ -144,5 +152,26 @@ class MiniappController extends Controller
         $miniapp->delete();
 
         return redirect()->route('admin.miniapp.index')->with('sukses', 'MiniApp "'.$judul.'" dihapus.');
+    }
+
+    /** Daftar perangkat terpasang (install token) per MiniApp (PRD BR-RC-20). */
+    public function perangkat(Product $miniapp): View
+    {
+        abort_unless($miniapp->tipe === 'miniapp', 404);
+
+        $tokens = \App\Models\InstallToken::with('user')
+            ->where('product_id', $miniapp->id)
+            ->latest()->paginate(20);
+
+        return view('admin.miniapp.perangkat', ['product' => $miniapp, 'tokens' => $tokens]);
+    }
+
+    /** Cabut install token: aplikasi terpasang tidak bisa dibuka lagi. */
+    public function cabutToken(\App\Models\InstallToken $token): RedirectResponse
+    {
+        $token->update(['dicabut' => true]);
+        \App\Models\ActivityLog::catat('cabut_token', "Token {$token->user?->name} untuk \"{$token->product?->judul}\" dicabut");
+
+        return back()->with('sukses', 'Install token dicabut. Aplikasi terpasang tidak bisa dibuka lagi.');
     }
 }

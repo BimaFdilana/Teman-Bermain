@@ -52,6 +52,26 @@ Route::middleware(['auth', 'nonadmin'])->group(function () {
     Route::get('/miniapp/{product}/manifest.json', [App\Http\Controllers\MiniappController::class, 'manifest'])->name('miniapp.manifest');
 });
 
+// SEO (PRD §12): sitemap.xml dinamis
+Route::get('/sitemap.xml', function () {
+    $urls = [
+        ['loc' => route('landing'), 'changefreq' => 'daily', 'priority' => '1.0'],
+        ['loc' => route('produk.index'), 'changefreq' => 'daily', 'priority' => '0.8'],
+        ['loc' => route('harga'), 'changefreq' => 'weekly', 'priority' => '0.8'],
+    ];
+    foreach (\App\Models\Product::tersedia()->get(['slug', 'updated_at']) as $p) {
+        $urls[] = ['loc' => route('produk.show', $p->slug), 'lastmod' => $p->updated_at->toDateString(),
+                   'changefreq' => 'weekly', 'priority' => '0.7'];
+    }
+    foreach (\App\Models\PromoCampaign::where('status', 'aktif')->get(['slug', 'status', 'updated_at', 'mulai_at', 'berakhir_at']) as $k) {
+        if ($k->isLive()) {
+            $urls[] = ['loc' => route('iklan.show', $k->slug), 'lastmod' => $k->updated_at->toDateString(),
+                       'changefreq' => 'daily', 'priority' => '0.9'];
+        }
+    }
+    return response()->view('sitemap', compact('urls'))->header('Content-Type', 'application/xml');
+})->name('sitemap');
+
 // File privat via signed URL (di luar grup auth: otorisasi via signature + entitlement)
 Route::get('/file/ebook/{product}', [App\Http\Controllers\EbookController::class, 'file'])->name('file.ebook');
 Route::get('/file/miniapp/{product}', [App\Http\Controllers\MiniappController::class, 'file'])->name('file.miniapp');
@@ -73,13 +93,15 @@ Route::prefix('admin')->name('admin.')->group(function () {
         ->name('login.store')->middleware(['guest', 'throttle:5,1']);
 });
 
-Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'admin', 'admin.idle'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
     // CRUD Ebook (PRD §6.4) & MiniApps (PRD §6.5)
     Route::resource('ebook', App\Http\Controllers\Admin\EbookController::class)->except(['show']);
     Route::resource('miniapp', App\Http\Controllers\Admin\MiniappController::class)->except(['show']);
     Route::get('/miniapp/{miniapp}/preview', [App\Http\Controllers\Admin\MiniappController::class, 'preview'])->name('miniapp.preview');
+    Route::get('/miniapp/{miniapp}/perangkat', [App\Http\Controllers\Admin\MiniappController::class, 'perangkat'])->name('miniapp.perangkat');
+    Route::post('/miniapp/token/{token}/cabut', [App\Http\Controllers\Admin\MiniappController::class, 'cabutToken'])->name('miniapp.token.cabut');
 
     // Manage Product — 3 tab + bundle builder (PRD §6.7)
     Route::get('/produk', [App\Http\Controllers\Admin\ProdukController::class, 'index'])->name('produk.index');
@@ -106,12 +128,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/landing/testimoni', [App\Http\Controllers\Admin\LandingController::class, 'testimoniStore'])->name('landing.testimoni.store');
     Route::put('/landing/testimoni/{testimoni}', [App\Http\Controllers\Admin\LandingController::class, 'testimoniUpdate'])->name('landing.testimoni.update');
     Route::delete('/landing/testimoni/{testimoni}', [App\Http\Controllers\Admin\LandingController::class, 'testimoniDestroy'])->name('landing.testimoni.destroy');
+    Route::post('/landing/testimoni/sampah/{id}/kembalikan', [App\Http\Controllers\Admin\LandingController::class, 'testimoniRestore'])->name('landing.testimoni.restore');
+    Route::delete('/landing/testimoni/sampah/{id}', [App\Http\Controllers\Admin\LandingController::class, 'testimoniForceDelete'])->name('landing.testimoni.force');
 
     Route::get('/pembayaran', [PaymentController::class, 'index'])->name('pembayaran.index');
     Route::get('/pembayaran/{order}', [PaymentController::class, 'show'])->name('pembayaran.show');
     Route::post('/pembayaran/{order}/setujui', [PaymentController::class, 'approve'])->name('pembayaran.approve');
     Route::post('/pembayaran/{order}/tolak', [PaymentController::class, 'reject'])->name('pembayaran.reject');
     Route::resource('/diskon', DiscountController::class)->except(['show']);
+    Route::get('/backup', [App\Http\Controllers\Admin\BackupController::class, 'index'])->name('backup.index');
+    Route::post('/backup', [App\Http\Controllers\Admin\BackupController::class, 'store'])->name('backup.store');
+    Route::get('/backup/unduh/{nama}', [App\Http\Controllers\Admin\BackupController::class, 'download'])->name('backup.download');
+    Route::get('/aktivitas', [App\Http\Controllers\Admin\AktivitasController::class, 'index'])->name('aktivitas.index');
     Route::get('/pengaturan', [SettingController::class, 'index'])->name('pengaturan.index');
     Route::post('/pengaturan', [SettingController::class, 'update'])->name('pengaturan.update');
 });

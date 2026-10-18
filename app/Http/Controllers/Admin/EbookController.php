@@ -80,11 +80,19 @@ class EbookController extends Controller
             'jumlah_halaman' => 'nullable|integer|min:1',
         ]);
 
+        $statusLama = $ebook->status;
         $ebook->update([
             'judul' => $data['judul'],
             'deskripsi' => $data['deskripsi'] ?? '',
             'status' => $data['status'],
         ]);
+
+        if ($statusLama !== $data['status'] && in_array($data['status'], ['tersedia', 'arsip'])) {
+            \App\Models\ActivityLog::catat(
+                $data['status'] === 'tersedia' ? 'publish_produk' : 'arsip_produk',
+                "Ebook \"{$ebook->judul}\": {$statusLama} → {$data['status']}"
+            );
+        }
 
         if ($request->hasFile('cover')) {
             if ($ebook->cover_path) Storage::disk('public')->delete($ebook->cover_path);

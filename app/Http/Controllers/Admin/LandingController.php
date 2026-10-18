@@ -23,8 +23,9 @@ class LandingController extends Controller
         $paketTerpilih = json_decode(Setting::get('paket_unggulan_ids', '[]'), true) ?: [];
 
         $testimonials = Testimonial::orderBy('urutan')->get();
+        $sampahTestimoni = Testimonial::onlyTrashed()->orderBy('deleted_at', 'desc')->get();
 
-        return view('admin.landing.index', compact('bundles', 'paketTerpilih', 'testimonials'));
+        return view('admin.landing.index', compact('bundles', 'paketTerpilih', 'testimonials', 'sampahTestimoni'));
     }
 
     /**
@@ -152,9 +153,29 @@ class LandingController extends Controller
 
     public function testimoniDestroy(Testimonial $testimoni): RedirectResponse
     {
-        if ($testimoni->foto_path) Storage::disk('public')->delete($testimoni->foto_path);
+        // Soft delete (BR-RC-16): masuk sampah, bisa dikembalikan 30 hari.
+        // Foto dipertahankan agar bisa direstore utuh; dihapus permanen saat purge.
         $testimoni->delete();
 
-        return back()->with('sukses', 'Testimoni dihapus.');
+        return back()->with('sukses', 'Testimoni dipindah ke sampah. Bisa dikembalikan dalam 30 hari.');
+    }
+
+    /** Kembalikan testimoni dari sampah. */
+    public function testimoniRestore(int $id): RedirectResponse
+    {
+        $testimoni = Testimonial::onlyTrashed()->findOrFail($id);
+        $testimoni->restore();
+
+        return back()->with('sukses', 'Testimoni dikembalikan.');
+    }
+
+    /** Hapus permanen dari sampah. */
+    public function testimoniForceDelete(int $id): RedirectResponse
+    {
+        $testimoni = Testimonial::onlyTrashed()->findOrFail($id);
+        if ($testimoni->foto_path) Storage::disk('public')->delete($testimoni->foto_path);
+        $testimoni->forceDelete();
+
+        return back()->with('sukses', 'Testimoni dihapus permanen.');
     }
 }

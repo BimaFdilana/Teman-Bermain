@@ -50,6 +50,8 @@ class ProdukController extends Controller
             'status' => $data['status'],
         ]);
 
+        \App\Models\ActivityLog::catat('ubah_harga', "\"{$produk->judul}\": Rp ".number_format($data['harga'], 0, ',', '.').", status {$data['status']}");
+
         return back()->with('sukses', 'Harga & stok "'.$produk->judul.'" diperbarui.');
     }
 
