@@ -38,13 +38,11 @@ class UatAlurLengkapTest extends TestCase
 
         $admin = User::factory()->create(['role' => 'admin']);
 
-        // 2. Pengguna daftar
-        $this->post('/register', [
-            'name' => 'Orang Tua', 'email' => 'ortu@uat.test', 'whatsapp' => '081234567890',
-            'password' => 'rahasia123', 'password_confirmation' => 'rahasia123',
-        ])->assertRedirect('/home');
-        $user = User::where('email', 'ortu@uat.test')->first();
-        $this->assertEquals('6281234567890', $user->whatsapp);
+        // 2. Pengguna daftar via Google (register form dihapus 2026-10-19)
+        $user = User::factory()->create([
+            'name' => 'Orang Tua', 'email' => 'ortu@uat.test',
+            'google_id' => 'google-uat-123', 'password' => null,
+        ]);
 
         // 3. Lihat katalog & detail bundle
         $this->actingAs($user)->get('/produk')->assertOk()->assertSee('Bundle UAT', false);
