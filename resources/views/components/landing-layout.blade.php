@@ -59,6 +59,7 @@
     </main>
 
     <!-- ===== Footer ===== -->
+    <!-- auto-deploy test -->
     <footer class="kidza-footer" style="background:linear-gradient(rgba(20,83,45,.78),rgba(20,83,45,.78)),url('{{ asset('storage/'.\App\Models\Setting::get('footer_bg', 'landing/galeri-2.jpg')) }}') center/cover;">
         <div class="kidza-footer-inner">
             <div class="kidza-footer-brand">
