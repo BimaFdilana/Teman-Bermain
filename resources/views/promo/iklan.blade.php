@@ -20,6 +20,10 @@ $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => 
         .cd-num { font-family:'Baloo 2',sans-serif; font-weight:800; font-size:1.6rem;
                   color:#14532D; line-height:1; font-variant-numeric:tabular-nums; }
         .cd-lbl { font-size:.68rem; font-weight:700; color:#a39e93; margin-top:.2rem; }
+        /* Jari menunjuk ke tombol: goyangan halus kiri-kanan */
+        @keyframes tunjuk { 0%,100% { transform:translateX(0); } 50% { transform:translateX(7px); } }
+        .anim-tunjuk { display:inline-block; animation:tunjuk 1.4s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) { .anim-tunjuk { animation:none; } }
     </style>
 </head>
 <body class="poster" style="background:#FFFEF7;min-height:100vh">
@@ -59,27 +63,33 @@ $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => 
         </div>
     @endif
 
-    {{-- Produk --}}
-    <div class="grid gap-4 mt-6 {{ $kampanye->products->count() > 1 ? 'grid-cols-2' : 'grid-cols-1' }}">
+    {{-- Produk: susun vertikal ke bawah --}}
+    <div class="grid gap-4 mt-6 grid-cols-1">
         @foreach($kampanye->products as $product)
-            <div class="kidza-card p-3 flex flex-col">
-                @if($product->coverUrl())
-                    <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}"
-                         class="rounded-2xl w-full aspect-[4/3] object-cover mb-3">
-                @endif
-                <span class="kidza-kicker mb-2" style="font-size:.65rem;align-self:flex-start">{{ $tipeLabel[$product->tipe] ?? $product->tipe }}</span>
-                <p class="font-extrabold text-sm mb-1" style="color:#14532D;line-height:1.3">{{ $product->judul }}</p>
-                <div class="flex items-baseline gap-1 mb-3">
-                    <span class="font-extrabold" style="color:#1E7B34">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                    @if($product->harga_coret)
-                        <span class="text-xs line-through" style="color:#a39e93">{{ number_format($product->harga_coret, 0, ',', '.') }}</span>
+            <div class="kidza-card p-3">
+                <div class="flex gap-3">
+                    @if($product->coverUrl())
+                        <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}"
+                             class="rounded-2xl object-cover shrink-0" style="width:88px;height:88px">
                     @endif
+                    <div class="flex-1 min-w-0">
+                        <span class="kidza-kicker mb-1" style="font-size:.62rem">{{ $tipeLabel[$product->tipe] ?? $product->tipe }}</span>
+                        <p class="font-extrabold text-sm mb-1" style="color:#14532D;line-height:1.3">{{ $product->judul }}</p>
+                        <div class="flex items-baseline gap-1">
+                            <span class="font-extrabold" style="color:#1E7B34">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
+                            @if($product->harga_coret)
+                                <span class="text-xs line-through" style="color:#a39e93">{{ number_format($product->harga_coret, 0, ',', '.') }}</span>
+                            @endif
+                        </div>
+                    </div>
                 </div>
                 @if($berakhir)
-                    <span class="kidza-btn w-full text-center mt-auto" style="background:#e5e7eb;color:#9ca3af">Berakhir</span>
+                    <span class="kidza-btn w-full text-center mt-3" style="background:#e5e7eb;color:#9ca3af">Berakhir</span>
                 @else
                     <a href="{{ route('promo.pesan', $product->slug) }}"
-                       class="kidza-btn kidza-btn-green w-full text-center mt-auto" style="font-size:.85rem">Pesan Sekarang</a>
+                       class="kidza-btn kidza-btn-green w-full text-center mt-3" style="font-size:.9rem">
+                        <span class="anim-tunjuk">👉</span> Pesan Sekarang
+                    </a>
                 @endif
             </div>
         @endforeach

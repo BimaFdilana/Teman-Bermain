@@ -5,12 +5,21 @@
 </div>
 
 <div class="kidza-card p-6 max-w-2xl">
-    <form method="POST" action="{{ $bundle->exists ? route('admin.produk.bundle.update', $bundle) : route('admin.produk.bundle.store') }}">
+    <form method="POST" action="{{ $bundle->exists ? route('admin.produk.bundle.update', $bundle) : route('admin.produk.bundle.store') }}" enctype="multipart/form-data">
         @csrf
         @if($bundle->exists) @method('PUT') @endif
 
         <x-form-input label="Nama Bundle" name="judul" :value="$bundle->judul" required />
         <x-form-input label="Deskripsi" name="deskripsi" type="textarea" :value="$bundle->deskripsi" attrs="rows=3" />
+
+        <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">Cover Bundle <span class="font-normal" style="color:#6b7280">(JPG/PNG, maks 2MB)</span></label>
+            @if($bundle->coverUrl())
+                <img src="{{ $bundle->coverUrl() }}" alt="Cover" class="rounded-xl mb-2" style="max-height:120px">
+            @endif
+            <input type="file" name="cover" accept="image/*" class="w-full border-2 border-gray-300 rounded-xl px-3 py-2 text-sm">
+            @error('cover')<p class="text-xs mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+        </div>
 
         <div class="mb-4">
             <label class="text-sm font-bold block mb-2">Isi Bundle <span style="color:#e74c3c">*</span> <span class="font-normal" style="color:#6b7280">(minimal 2 produk)</span></label>

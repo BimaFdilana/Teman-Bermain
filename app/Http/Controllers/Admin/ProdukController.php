@@ -7,6 +7,7 @@ use App\Models\Bundle;
 use App\Models\Product;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -77,6 +78,7 @@ class ProdukController extends Controller
         ]);
         Bundle::create(['product_id' => $bundle->id]);
         $this->simpanIsi($bundle, $data['items']);
+        $this->simpanCoverBundle($request, $bundle);
 
         return redirect()->route('admin.produk.index', ['tab' => 'bundle'])
             ->with('sukses', 'Bundle "'.$bundle->judul.'" dibuat.');
@@ -105,6 +107,7 @@ class ProdukController extends Controller
             'status' => $data['status'],
         ]);
         $this->simpanIsi($bundle, $data['items']);
+        $this->simpanCoverBundle($request, $bundle);
 
         return redirect()->route('admin.produk.index', ['tab' => 'bundle'])
             ->with('sukses', 'Bundle "'.$bundle->judul.'" diperbarui.');
@@ -131,7 +134,19 @@ class ProdukController extends Controller
             'status' => 'required|in:draft,tersedia,arsip',
             'items' => 'required|array|min:2',
             'items.*' => 'exists:products,id',
+            'cover' => 'nullable|image|max:2048',
         ], ['items.min' => 'Bundle minimal berisi 2 produk.']);
+    }
+
+    /** Simpan/upload cover bundle bila ada file baru. */
+    private function simpanCoverBundle(Request $request, Product $bundle): void
+    {
+        if ($request->hasFile('cover')) {
+            if ($bundle->cover_path) {
+                Storage::disk('public')->delete($bundle->cover_path);
+            }
+            $bundle->update(['cover_path' => $request->file('cover')->store('covers', 'public')]);
+        }
     }
 
     private function simpanIsi(Product $bundle, array $itemIds): void

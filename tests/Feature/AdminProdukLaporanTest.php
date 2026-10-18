@@ -66,6 +66,25 @@ class AdminProdukLaporanTest extends TestCase
         $this->assertEquals(2, $bundle->bundle->items->count());
     }
 
+    public function test_bundle_bisa_upload_cover(): void
+    {
+        $admin = $this->admin();
+        $a = $this->produk(); $b = $this->produk('miniapp');
+        \Illuminate\Support\Facades\Storage::fake('public');
+
+        $response = $this->actingAs($admin)->post(route('admin.produk.bundle.store'), [
+            'judul' => 'Bundle Cover', 'harga' => 40000, 'status' => 'tersedia',
+            'items' => [$a->id, $b->id],
+            'cover' => \Illuminate\Http\UploadedFile::fake()->image('cover.jpg'),
+        ]);
+
+        $response->assertRedirect(route('admin.produk.index', ['tab' => 'bundle']));
+        $bundle = Product::where('judul', 'Bundle Cover')->first();
+        $this->assertNotNull($bundle->cover_path);
+        $this->assertNotNull($bundle->coverUrl());
+        \Illuminate\Support\Facades\Storage::disk('public')->assertExists($bundle->cover_path);
+    }
+
     public function test_bundle_ditolak_bila_kurang_dari_2_produk(): void
     {
         $a = $this->produk();
