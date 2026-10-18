@@ -3,7 +3,7 @@
     <h1 class="kidza-h2 mb-6">{{ $kampanye->exists ? 'Edit' : 'Buat' }} Iklan Promo</h1>
 
     <form method="POST" action="{{ $kampanye->exists ? route('admin.iklan.update', $kampanye) : route('admin.iklan.store') }}"
-          class="kidza-card p-6" style="max-width:44rem">
+          class="kidza-card p-6" style="max-width:44rem" enctype="multipart/form-data">
         @csrf
         @if($kampanye->exists) @method('PUT') @endif
 
@@ -23,10 +23,25 @@
         </div>
 
         <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">Sub-judul <span class="font-normal" style="color:#6b7280">(ajakan untuk orang tua, mis. "Parents, pernah bingung...?")</span></label>
+            <input type="text" name="subjudul" value="{{ old('subjudul', $kampanye->subjudul) }}" maxlength="200"
+                   class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+        </div>
+
+        <div class="mb-4">
             <label class="text-sm font-bold block mb-1">Deskripsi</label>
             <textarea name="deskripsi" rows="3" maxlength="1000"
                       class="w-full border-2 border-gray-300 rounded-xl px-4 py-2"
                       placeholder="Ceritakan promonya secara singkat...">{{ old('deskripsi', $kampanye->deskripsi) }}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">Gambar Banner <span class="font-normal" style="color:#6b7280">(JPG/PNG, maks 2MB — mis. desain promo + manfaat)</span></label>
+            @if($kampanye->gambarUrl())
+                <img src="{{ $kampanye->gambarUrl() }}" alt="Banner" class="rounded-xl mb-2" style="max-height:140px">
+            @endif
+            <input type="file" name="gambar" accept="image/*" class="w-full border-2 border-gray-300 rounded-xl px-3 py-2 text-sm">
+            @error('gambar')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
         </div>
 
         <div class="mb-4">

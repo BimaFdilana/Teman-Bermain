@@ -11,7 +11,8 @@ class PromoCampaign extends Model
     public const STATUS_AKTIF = 'aktif';
 
     protected $fillable = [
-        'judul', 'slug', 'deskripsi', 'mulai_at', 'berakhir_at', 'status',
+        'judul', 'subjudul', 'slug', 'deskripsi', 'gambar_path',
+        'mulai_at', 'berakhir_at', 'status',
     ];
 
     protected $casts = [
@@ -48,5 +49,17 @@ class PromoCampaign extends Model
     public function sisaDetik(): int
     {
         return max(0, (int) now()->diffInSeconds($this->berakhir_at, false));
+    }
+
+    /** URL gambar banner (format path sama seperti cover produk). */
+    public function gambarUrl(): ?string
+    {
+        if (! $this->gambar_path) {
+            return null;
+        }
+        if (str_starts_with($this->gambar_path, 'images/')) {
+            return asset($this->gambar_path);
+        }
+        return asset('storage/' . $this->gambar_path);
     }
 }

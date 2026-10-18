@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\PromoCampaign;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -32,6 +33,7 @@ class IklanController extends Controller
         $data = $this->validated($request);
         $kampanye = PromoCampaign::create($data);
         $this->simpanProduk($kampanye, $data['produk_ids']);
+        $this->simpanGambar($request, $kampanye);
 
         return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo dibuat.');
     }
@@ -49,6 +51,7 @@ class IklanController extends Controller
         $data = $this->validated($request, $iklan->id);
         $iklan->update($data);
         $this->simpanProduk($iklan, $data['produk_ids']);
+        $this->simpanGambar($request, $iklan);
 
         return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo diperbarui.');
     }
@@ -70,8 +73,10 @@ class IklanController extends Controller
     {
         $data = $request->validate([
             'judul' => ['required', 'string', 'max:120'],
+            'subjudul' => ['nullable', 'string', 'max:200'],
             'slug' => ['nullable', 'string', 'max:120', 'regex:/^[a-z0-9-]+$/', 'unique:promo_campaigns,slug,'.$ignoreId],
             'deskripsi' => ['nullable', 'string', 'max:1000'],
+            'gambar' => ['nullable', 'image', 'max:2048'],
             'produk_ids' => ['required', 'array', 'min:1', 'max:4'],
             'produk_ids.*' => ['integer', 'exists:products,id'],
             'mulai_at' => ['nullable', 'date'],
@@ -108,5 +113,16 @@ class IklanController extends Controller
             $sync[$id] = ['urutan' => $i];
         }
         $kampanye->products()->sync($sync);
+    }
+
+    /** Simpan/upload gambar banner bila ada file baru. */
+    private function simpanGambar(Request $request, PromoCampaign $kampanye): void
+    {
+        if ($request->hasFile('gambar')) {
+            if ($kampanye->gambar_path) {
+                Storage::disk('public')->delete($kampanye->gambar_path);
+            }
+            $kampanye->update(['gambar_path' => $request->file('gambar')->store('promo', 'public')]);
+        }
     }
 }

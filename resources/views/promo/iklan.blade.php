@@ -23,7 +23,11 @@ $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => 
         /* Jari menunjuk ke tombol: goyangan halus kiri-kanan */
         @keyframes tunjuk { 0%,100% { transform:translateX(0); } 50% { transform:translateX(7px); } }
         .anim-tunjuk { display:inline-block; animation:tunjuk 1.4s ease-in-out infinite; }
-        @media (prefers-reduced-motion: reduce) { .anim-tunjuk { animation:none; } }
+        /* Panah ke bawah: memantul lembut */
+        @keyframes lambung { 0%,100% { transform:translateY(0); } 50% { transform:translateY(10px); } }
+        .anim-panah { display:inline-block; animation:lambung 1.6s ease-in-out infinite; }
+        .anim-panah.d2 { animation-delay:.2s; } .anim-panah.d3 { animation-delay:.4s; }
+        @media (prefers-reduced-motion: reduce) { .anim-tunjuk, .anim-panah { animation:none; } }
     </style>
 </head>
 <body class="poster" style="background:#FFFEF7;min-height:100vh">
@@ -35,14 +39,24 @@ $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => 
              onerror="this.style.display='none'">
     </div>
 
-    {{-- Judul promo --}}
+    {{-- Judul promo ala sales page --}}
     <div class="text-center mb-5">
         <span class="kidza-kicker poster-kicker-yellow mb-3">🎉 Promo Spesial</span>
         <h1 class="font-extrabold mt-3 mb-2" style="font-size:1.9rem;color:#14532D;line-height:1.25">{{ $kampanye->judul }}</h1>
+        @if($kampanye->subjudul)
+            <p class="font-extrabold mb-3" style="font-size:1.05rem;color:#1E7B34;line-height:1.4">{{ $kampanye->subjudul }}</p>
+        @endif
         @if($kampanye->deskripsi)
             <p class="text-sm" style="color:#5B5344">{{ $kampanye->deskripsi }}</p>
         @endif
     </div>
+
+    {{-- Banner --}}
+    @if($kampanye->gambarUrl())
+        <div class="kidza-card p-2 mb-6">
+            <img src="{{ $kampanye->gambarUrl() }}" alt="{{ $kampanye->judul }}" class="rounded-3xl w-full object-cover">
+        </div>
+    @endif
 
     {{-- Hitungan mundur --}}
     @if($berakhir)
@@ -63,8 +77,17 @@ $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => 
         </div>
     @endif
 
+    {{-- Panah animasi menunjuk ke bawah (ke produk) --}}
+    @unless($berakhir)
+        <div class="flex justify-center gap-6 my-2" style="font-size:2.6rem;color:#dc2626" aria-hidden="true">
+            <span class="anim-panah">⬇️</span>
+            <span class="anim-panah d2">⬇️</span>
+            <span class="anim-panah d3">⬇️</span>
+        </div>
+    @endunless
+
     {{-- Produk: susun vertikal ke bawah --}}
-    <div class="grid gap-4 mt-6 grid-cols-1">
+    <div class="grid gap-4 mt-4 grid-cols-1">
         @foreach($kampanye->products as $product)
             <div class="kidza-card p-3">
                 <div class="flex gap-3">

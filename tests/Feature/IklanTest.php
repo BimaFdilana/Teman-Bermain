@@ -102,6 +102,15 @@ class IklanTest extends TestCase
         $response->assertSee('cd-d', false); // elemen countdown
     }
 
+    public function test_halaman_iklan_menampilkan_subjudul_dan_banner(): void
+    {
+        $kampanye = $this->buatKampanye(['subjudul' => 'Parents, bingung cari tontonan?', 'gambar_path' => 'promo/banner.jpg']);
+        $response = $this->get(route('iklan.show', $kampanye->slug));
+        $response->assertOk();
+        $response->assertSee('Parents, bingung cari tontonan?');
+        $response->assertSee('storage/promo/banner.jpg');
+    }
+
     public function test_halaman_iklan_404_untuk_draft(): void
     {
         $this->buatKampanye(['status' => 'draft', 'slug' => 'draft-x']);
