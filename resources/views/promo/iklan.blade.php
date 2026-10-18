@@ -34,20 +34,12 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         .anim-tunjuk { display:inline-block; animation:tunjuk 1.4s ease-in-out infinite; }
         .anim-tunjuk-kiri { display:inline-block; animation:tunjukKiri 1.4s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) { .anim-tunjuk, .anim-tunjuk-kiri { animation:none; } }
-        /* Jarak pasti dalam px (tidak tergantung build Tailwind) */
-        .gs85 { margin-top:85px !important; margin-bottom:85px !important; }
-        .gs85-t { margin-top:85px !important; }
-        .gs85-b { margin-bottom:85px !important; }
-        .gp80-b { margin-bottom:80px !important; }
-        .gi80 { margin-top:80px !important; margin-bottom:80px !important; }
-        .pad-y { padding-top:2rem !important; padding-bottom:2rem !important; }
-        .bleed { margin-left:-1.25rem !important; margin-right:-1.25rem !important; }
     </style>
 </head>
 <body style="background:#FAF6EC;min-height:100vh;margin:0">
 {{-- Bingkai HP: putih, di atas background krem --}}
 <div class="mx-auto bg-white" style="max-width:430px;min-height:100vh;box-shadow:0 0 40px rgba(90,70,30,.12)">
-<div class="px-5 pad-y text-center">
+<div class="px-5 py-8 text-center">
 
     {{-- Logo --}}
     <div class="text-center mb-4">
@@ -69,7 +61,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
     {{-- Banner (opsional) --}}
     @if($kampanye->gambarUrl())
-        <div class="mb-6 bleed">
+        <div class="mb-6 -mx-5">
             <img src="{{ $kampanye->gambarUrl() }}" alt="{{ $kampanye->judul }}" class="w-full object-cover">
         </div>
     @endif
@@ -81,7 +73,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         </div>
     @else
         {{-- Hitungan mundur (merah) --}}
-        <div class="gs85 text-center">
+        <div class="mt-20 mb-16 text-center">
             <p class="text-sm font-extrabold mb-2" style="color:#DC2626">⏳ Promo berakhir dalam</p>
             <div class="flex justify-center gap-2 countdown">
                 <div class="cd-box"><div class="cd-num cd-d">0</div><div class="cd-lbl">Hari</div></div>
@@ -93,7 +85,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         </div>
 
         {{-- Tiga panah sale memantul --}}
-        <div class="flex justify-center gap-5 gi80" aria-hidden="true">
+        <div class="flex justify-center gap-5 my-16" aria-hidden="true">
             <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
             <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
             <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
@@ -101,7 +93,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- PRODUK 1 (tanpa card) --}}
         @if($pertama)
-            <div class="gp80-b">
+            <div class="mb-16">
                 @if($pertama->coverUrl())
                     <img src="{{ $pertama->coverUrl() }}" alt="{{ $pertama->judul }}" class="rounded-2xl w-full object-cover mb-3" style="aspect-ratio:16/10">
                 @endif
@@ -122,7 +114,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
             </div>
 
             {{-- Tiga panah sale --}}
-            <div class="flex justify-center gap-5 gi80" aria-hidden="true">
+            <div class="flex justify-center gap-5 my-16" aria-hidden="true">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
@@ -131,7 +123,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Video (opsional) --}}
         @if($videoLink)
-            <div class="gs85-b">
+            <div class="mb-20">
                 <p class="font-extrabold text-center mb-3" style="color:#14532D">🎬 Tonton Dulu Videonya</p>
                 @if($videoEmbed)
                     <div class="rounded-2xl overflow-hidden mb-3" style="aspect-ratio:16/9">
@@ -153,7 +145,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
                 @endif
             </div>
         @elseif($kampanye->ajakan)
-            <div class="gs85-b">
+            <div class="mb-20">
                 <p class="text-sm mb-3" style="color:#5B5344;line-height:1.6">{{ $kampanye->ajakan }}</p>
                 @if($pertama)
                     <a href="{{ route('promo.pesan', $pertama->slug) }}" class="kidza-btn kidza-btn-green w-full text-center" style="font-size:1rem">
@@ -165,7 +157,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Materi Ebook (card) --}}
         @if(!empty($kampanye->materi))
-            <div class="rounded-3xl p-5 gs85-t mb-8" style="background:#FFFDF4;border:2px solid #F0E7CC">
+            <div class="rounded-3xl p-5 mt-20 mb-8" style="background:#FFFDF4;border:2px solid #F0E7CC">
                 <p class="font-extrabold mb-3" style="color:#14532D">📚 Materi Ebook</p>
                 <ol class="text-sm space-y-2" style="color:#444;list-style-position:inside;margin:0;padding:0">
                     @foreach($kampanye->materi as $i => $m)
@@ -182,7 +174,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Bukti Kepuasan (hidden bila kosong) --}}
         @if($testimonis->isNotEmpty())
-            <div class="gs85-t mb-8">
+            <div class="mt-20 mb-8">
                 <p class="font-extrabold text-center mb-3" style="color:#14532D">💬 Bukti Kepuasan</p>
                 @foreach($testimonis as $t)
                     <div class="rounded-2xl p-4 mb-2 bg-white" style="border:2px solid #F0E7CC">
@@ -194,7 +186,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         @endif
 
         {{-- Harga Spesial --}}
-        <div class="text-center gs85-t mb-8">
+        <div class="text-center mt-20 mb-8">
             <p class="font-extrabold mb-3" style="font-size:1.7rem;color:#DC2626">🔥 HARGA SPESIAL</p>
             @foreach($produks as $p)
                 <div class="mb-2">
@@ -213,7 +205,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         </div>
 
         {{-- Hitungan mundur (merah) lagi --}}
-        <div class="mb-8 text-center gs85-t">
+        <div class="mb-8 text-center mt-20">
             <p class="text-sm font-extrabold mb-2" style="color:#DC2626">⏳ Promo berakhir dalam</p>
             <div class="flex justify-center gap-2 countdown">
                 <div class="cd-box"><div class="cd-num cd-d">0</div><div class="cd-lbl">Hari</div></div>
@@ -225,12 +217,12 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 
         {{-- Produk 2..n (berulang) --}}
         @foreach($sisa as $product)
-            <div class="flex justify-center gap-5 gi80" aria-hidden="true">
+            <div class="flex justify-center gap-5 my-16" aria-hidden="true">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
                 <img src="{{ asset('images/iklan/sale.gif') }}" alt="" style="width:64px;height:64px">
             </div>
-            <div class="gp80-b">
+            <div class="mb-16">
                 @if($product->coverUrl())
                     <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}" class="rounded-2xl w-full object-cover mb-3" style="aspect-ratio:16/10">
                 @endif
