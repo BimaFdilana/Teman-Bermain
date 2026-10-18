@@ -2,7 +2,7 @@
 @section('title', 'Rumah Cahaya-bks — Ebook & MiniApp Edukasi Anak')
 
 <!-- ===== 1. HERO ===== -->
-<section class="relative overflow-hidden" style="background:#FFFEF7">
+<section class="relative overflow-hidden" style="background:linear-gradient(135deg,#22803F 0%,#14532D 100%)">
     <span class="poster-leaf" style="top:24px;left:18px">🌿</span>
     <span class="poster-leaf" style="top:36px;right:26px">🍃</span>
     <span class="poster-leaf" style="bottom:90px;left:6%">🌱</span>
@@ -11,17 +11,17 @@
     <div class="kidza-wrap relative z-10 grid md:grid-cols-2 gap-10 items-center py-14 md:py-20 px-5">
         <div class="text-center md:text-left">
             <div class="mb-5">
-                <span class="kidza-kicker">🌱 Untuk anak PAUD & SD</span>
+                <span class="kidza-kicker poster-kicker-yellow">🌱 Untuk anak PAUD & SD</span>
             </div>
             <h1 class="font-extrabold leading-tight mb-4" style="font-size:clamp(2.2rem,5.5vw,3.4rem);color:#14532D">
                 <span class="poster-brush">{{ $heroHeadline }}</span>
             </h1>
-            <p class="text-lg mb-8" style="color:#5B5344">{{ $heroSubheadline }}</p>
+            <p class="text-lg mb-8" style="color:#FFF8E7">{{ $heroSubheadline }}</p>
             <div class="flex flex-wrap gap-4 justify-center md:justify-start">
-                <a href="{{ route('produk.index', ['tipe' => 'ebook']) }}" class="kidza-btn kidza-btn-green">📚 Lihat Ebook</a>
-                <a href="{{ route('produk.index', ['tipe' => 'miniapp']) }}" class="kidza-btn kidza-btn-yellow">🎮 Coba MiniApp</a>
+                <a href="{{ route('produk.index', ['tipe' => 'ebook']) }}" class="kidza-btn kidza-btn-yellow">📚 Lihat Ebook</a>
+                <a href="{{ route('produk.index', ['tipe' => 'miniapp']) }}" class="kidza-btn kidza-btn-white">🎮 Coba MiniApp</a>
             </div>
-            <div class="flex flex-wrap gap-x-6 gap-y-2 mt-8 text-sm font-bold justify-center md:justify-start" style="color:#5B5344">
+            <div class="flex flex-wrap gap-x-6 gap-y-2 mt-8 text-sm font-bold justify-center md:justify-start" style="color:#FFF8E7">
                 <span>✓ Bayar via QRIS</span>
                 <span>✓ Kode via WhatsApp</span>
                 <span>✓ Tanpa ribet</span>
@@ -51,7 +51,7 @@
 </section>
 
 <!-- ===== 2. TENTANG / NILAI ===== -->
-<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.9),rgba(255,248,231,.9)),url('{{ asset('storage/landing/galeri-1.jpg') }}') center/cover;">
+<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.78),rgba(255,248,231,.78)),url('{{ asset('storage/landing/galeri-1.jpg') }}') center/cover;">
     <span class="poster-leaf" style="top:30px;right:30px">🌿</span>
     <span class="poster-leaf" style="bottom:40px;left:24px">🍃</span>
     <div class="kidza-wrap text-center relative z-10">
@@ -150,7 +150,7 @@
 </section>
 
 <!-- ===== 6. TESTIMONI ===== -->
-<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.9),rgba(255,248,231,.9)),url('{{ asset('storage/landing/galeri-3.jpg') }}') center/cover;">
+<section class="kidza-section relative overflow-hidden" style="background:linear-gradient(rgba(255,248,231,.72),rgba(255,248,231,.72)),url('{{ asset('storage/landing/galeri-3.jpg') }}') center/cover;">
     <span class="poster-leaf" style="top:28px;left:28px">🌿</span>
     <div class="kidza-wrap relative z-10">
         <div class="text-center mb-8">
