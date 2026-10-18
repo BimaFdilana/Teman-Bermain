@@ -41,7 +41,7 @@
                     @endif
                     <div class="p-3">
                         <p class="font-display font-bold text-sm leading-tight mb-2">{{ $app->judul }}</p>
-                        <span class="brutal-badge" style="background:#0077B6;color:#fff">Mainkan</span>
+                        <a href="{{ route('miniapp.main', $app) }}" class="brutal-badge" style="background:#0077B6;color:#fff">Mainkan →</a>
                     </div>
                 </div>
             @endforeach

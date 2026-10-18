@@ -15,6 +15,7 @@
 
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
+        @yield('head')
     </head>
     <body class="antialiased">
         <div class="app-shell min-h-screen">

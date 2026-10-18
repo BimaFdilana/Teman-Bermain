@@ -11,7 +11,7 @@
                     @endif
                     <div class="p-3">
                         <p class="font-display font-bold text-sm leading-tight mb-2">{{ $ebook->judul }}</p>
-                        <span class="brutal-badge" style="background:#167941;color:#fff">Baca</span>
+                        <a href="{{ route('ebook.baca', $ebook) }}" class="brutal-badge" style="background:#167941;color:#fff">Baca →</a>
                     </div>
                 </div>
             @endforeach

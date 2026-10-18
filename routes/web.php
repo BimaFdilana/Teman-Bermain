@@ -36,7 +36,21 @@ Route::middleware('auth')->group(function () {
 
     // Redeem code
     Route::post('/redeem', [RedeemController::class, 'store'])->name('redeem.store');
+
+    // Ebook reader (Fase 4, PRD §5.5)
+    Route::get('/baca/{product}', [App\Http\Controllers\EbookController::class, 'baca'])->name('ebook.baca');
+
+    // MiniApp player + PWA (Fase 4, PRD §5.6)
+    Route::get('/main/{product}', [App\Http\Controllers\MiniappController::class, 'main'])->name('miniapp.main');
+    Route::get('/miniapp/{product}/manifest.json', [App\Http\Controllers\MiniappController::class, 'manifest'])->name('miniapp.manifest');
 });
+
+// File privat via signed URL (di luar grup auth: otorisasi via signature + entitlement)
+Route::get('/file/ebook/{product}', [App\Http\Controllers\EbookController::class, 'file'])->name('file.ebook');
+Route::get('/file/miniapp/{product}', [App\Http\Controllers\MiniappController::class, 'file'])->name('file.miniapp');
+
+// Launcher PWA: install token -> sesi (PRD §5.6, tanpa login ulang)
+Route::get('/pwa/{token}', [App\Http\Controllers\MiniappController::class, 'launch'])->name('pwa.launch');
 
 // Admin (gaya Kidza, PRD §6.6)
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {

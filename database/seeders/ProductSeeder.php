@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Setting;
 use App\Models\Testimonial;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ProductSeeder extends Seeder
@@ -133,6 +134,8 @@ class ProductSeeder extends Seeder
             Testimonial::updateOrCreate(['nama' => $t['nama']], $t + ['aktif' => true]);
         }
 
+        $this->tautkanFileContoh($created);
+
         // Settings
         $settings = [
             'hero_headline' => 'Belajar Jadi Petualangan Seru!',
@@ -144,5 +147,60 @@ class ProductSeeder extends Seeder
         foreach ($settings as $key => $value) {
             Setting::set($key, $value);
         }
+    }
+
+    /**
+     * Salin file contoh ke storage privat dan tautkan ke produk contoh.
+     * Hanya untuk development/demo — di produksi admin upload via Manage Product.
+     */
+    private function tautkanFileContoh(array $created): void
+    {
+        // MiniApp: file HTML asli contoh dari pengguna
+        $sumber = database_path('seeders/fixtures/Teman-Main-Garden-School__1.html');
+        if (is_file($sumber) && isset($created['Teman Main: Garden School'])) {
+            Storage::disk('local')->put('miniapps/Teman-Main-Garden-School__1.html', file_get_contents($sumber));
+            $created['Teman Main: Garden School']->miniapp->update([
+                'html_path' => 'miniapps/Teman-Main-Garden-School__1.html',
+                'pwa_name' => 'Garden School',
+            ]);
+        }
+
+        // Ebook: PDF 1 halaman minimal yang valid
+        if (isset($created['Belajar Membaca: Petualangan Huruf A-Z'])) {
+            Storage::disk('local')->put('ebooks/contoh.pdf', $this->pdfContoh());
+            $created['Belajar Membaca: Petualangan Huruf A-Z']->ebook->update([
+                'pdf_path' => 'ebooks/contoh.pdf',
+                'jumlah_halaman' => 48,
+            ]);
+        }
+    }
+
+    private function pdfContoh(): string
+    {
+        $objs = [];
+        $objs[] = '<< /Type /Catalog /Pages 2 0 R >>';
+        $objs[] = '<< /Type /Pages /Kids [3 0 R] /Count 1 >>';
+        $content = "BT /F1 28 Tf 72 720 Td (Belajar Membaca) Tj ET\n"
+            . "BT /F1 16 Tf 72 680 Td (Petualangan Huruf A-Z) Tj ET\n"
+            . "BT /F1 12 Tf 72 640 Td (Halaman contoh untuk Ebook Reader Rumah Cahaya-bks.) Tj ET\n"
+            . "BT /F1 48 Tf 72 560 Td (A a  B b  C c) Tj ET";
+        $objs[] = "<< /Length " . strlen($content) . " >>\nstream\n{$content}\nendstream";
+        $objs[] = '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R /Resources << /Font << /F1 5 0 R >> >> >>';
+        $objs[] = '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>';
+
+        $pdf = "%PDF-1.4\n";
+        $offsets = [];
+        foreach ($objs as $i => $body) {
+            $offsets[] = strlen($pdf);
+            $pdf .= ($i + 1) . " 0 obj\n{$body}\nendobj\n";
+        }
+        $xref = strlen($pdf);
+        $pdf .= "xref\n0 " . (count($objs) + 1) . "\n0000000000 65535 f \n";
+        foreach ($offsets as $off) {
+            $pdf .= sprintf("%010d 00000 n \n", $off);
+        }
+        $pdf .= "trailer\n<< /Size " . (count($objs) + 1) . " /Root 1 0 R >>\nstartxref\n{$xref}\n%%EOF";
+
+        return $pdf;
     }
 }
