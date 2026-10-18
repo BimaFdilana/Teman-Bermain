@@ -1,4 +1,3 @@
-@props(['fullwidth' => false])
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -31,8 +30,7 @@
         }
         .admin-sidebar a.side-link:hover { background: rgba(255,255,255,.08); color: #fff; }
         .admin-sidebar a.side-link.active { background: #F3A712; color: #1a1a1a; }
-        .admin-main { flex: 1; padding: 2rem; max-width: 72rem; }
-        .admin-main.full { max-width: none; }
+        .admin-main { flex: 1; padding: 2rem; }
         .admin-topbar {
             display: flex; justify-content: space-between; align-items: center;
             margin-bottom: 1.5rem;
@@ -80,7 +78,7 @@
             </form>
         </nav>
     </aside>
-    <div class="admin-main{{ $fullwidth ? ' full' : '' }}">
+    <div class="admin-main">
         @if(session('sukses'))
             <div class="kidza-card p-4 mb-5" style="background:#e8f6ee"><p class="font-bold">{{ session('sukses') }}</p></div>
         @endif
