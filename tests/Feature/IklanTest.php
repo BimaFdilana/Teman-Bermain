@@ -57,6 +57,47 @@ class IklanTest extends TestCase
         $this->assertCount(2, $k->products);
     }
 
+    public function test_admin_bisa_simpan_konten_sales_page(): void
+    {
+        $p1 = $this->buatProduk('a', 'A');
+
+        $response = $this->actingAs($this->admin())->post(route('admin.iklan.store'), [
+            'judul' => 'Promo Konten',
+            'produk_ids' => [$p1->id],
+            'berakhir_at' => now()->addDays(5)->format('Y-m-d\\TH:i'),
+            'status' => 'aktif',
+            'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+            'ajakan' => 'Jangan sampai kehabisan!',
+            'materi' => ['Materi Satu', '', 'Materi Dua'],
+        ]);
+
+        $response->assertRedirect(route('admin.iklan.index'));
+        $k = PromoCampaign::where('slug', 'promo-konten')->first();
+        $this->assertNotNull($k);
+        $this->assertEquals('https://www.youtube.com/watch?v=dQw4w9WgXcQ', $k->video_url);
+        $this->assertEquals('Jangan sampai kehabisan!', $k->ajakan);
+        $this->assertEquals(['Materi Satu', 'Materi Dua'], $k->materi); // yang kosong dibuang
+    }
+
+    public function test_halaman_iklan_tampilkan_materi_video_tanpa_label_deskripsi(): void
+    {
+        $p = $this->buatProduk('a', 'Produk A');
+        $kampanye = $this->buatKampanye([
+            'video_url' => 'https://youtu.be/dQw4w9WgXcQ',
+            'ajakan' => 'Amankan sekarang!',
+            'materi' => ['Materi Satu', 'Materi Dua'],
+        ]);
+        $kampanye->products()->sync([$p->id => ['urutan' => 0]]);
+
+        $response = $this->get(route('iklan.show', $kampanye->slug));
+        $response->assertOk();
+        $response->assertSee('Materi Satu');
+        $response->assertSee('youtube-nocookie.com/embed/dQw4w9WgXcQ');
+        $response->assertSee('Amankan sekarang!');
+        $response->assertDontSee('Deskripsi Produk:');
+        $response->assertSee('HARGA SPESIAL');
+    }
+
     public function test_iklan_tolak_lebih_dari_4_produk(): void
     {
         $ids = [];

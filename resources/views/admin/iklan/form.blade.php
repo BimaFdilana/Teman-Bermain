@@ -45,6 +45,41 @@
         </div>
 
         <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">Video <span class="font-normal" style="color:#6b7280">(opsional — link YouTube/Instagram)</span></label>
+            <input type="url" name="video_url" value="{{ old('video_url', $kampanye->video_url) }}" maxlength="255"
+                   class="w-full border-2 border-gray-300 rounded-xl px-4 py-2" placeholder="https://youtube.com/watch?v=...">
+            @error('video_url')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+        </div>
+
+        <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">Kalimat Ajakan <span class="font-normal" style="color:#6b7280">(tampil di bawah video)</span></label>
+            <textarea name="ajakan" rows="2" maxlength="500"
+                      class="w-full border-2 border-gray-300 rounded-xl px-4 py-2"
+                      placeholder="mis. Jangan sampai kehabisan, amankan sekarang!">{{ old('ajakan', $kampanye->ajakan) }}</textarea>
+        </div>
+
+        <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">Materi Ebook <span class="font-normal" style="color:#6b7280">(tampil dalam card — bisa tambah sebanyaknya)</span></label>
+            <div id="daftar-materi" class="space-y-2">
+                @php $materis = old('materi', $kampanye->materi ?? []); @endphp
+                @forelse((array) $materis as $m)
+                    <div class="flex gap-2 materi-row">
+                        <input type="text" name="materi[]" value="{{ $m }}" maxlength="120"
+                               class="flex-1 border-2 border-gray-300 rounded-xl px-4 py-2" placeholder="Judul materi...">
+                        <button type="button" class="hapus-materi kidza-btn px-3" style="background:#e74c3c" title="Hapus">✕</button>
+                    </div>
+                @empty
+                    <div class="flex gap-2 materi-row">
+                        <input type="text" name="materi[]" maxlength="120"
+                               class="flex-1 border-2 border-gray-300 rounded-xl px-4 py-2" placeholder="Judul materi...">
+                        <button type="button" class="hapus-materi kidza-btn px-3" style="background:#e74c3c" title="Hapus">✕</button>
+                    </div>
+                @endforelse
+            </div>
+            <button type="button" id="tambah-materi" class="kidza-btn mt-2 text-sm" style="background:#F5B301;color:#14532D">+ Tambah Materi</button>
+        </div>
+
+        <div class="mb-4">
             <label class="text-sm font-bold block mb-1">Produk yang tampil <span style="color:#6b7280">(pilih 1–4)</span>
                 <span id="hitung-produk" class="kidza-badge ml-2" style="background:#167941">0 dipilih</span>
             </label>
@@ -106,6 +141,23 @@
         }
         boxes.forEach(b => b.addEventListener('change', hitung));
         hitung();
+    })();
+    // Tambah/hapus baris materi dinamis
+    (function () {
+        const daftar = document.getElementById('daftar-materi');
+        document.getElementById('tambah-materi').addEventListener('click', () => {
+            const row = document.createElement('div');
+            row.className = 'flex gap-2 materi-row';
+            row.innerHTML = `<input type="text" name="materi[]" maxlength="120"
+                class="flex-1 border-2 border-gray-300 rounded-xl px-4 py-2" placeholder="Judul materi...">
+                <button type="button" class="hapus-materi kidza-btn px-3" style="background:#e74c3c" title="Hapus">✕</button>`;
+            daftar.appendChild(row);
+        });
+        daftar.addEventListener('click', (e) => {
+            if (e.target.classList.contains('hapus-materi')) {
+                e.target.closest('.materi-row').remove();
+            }
+        });
     })();
     </script>
 </x-admin-layout>

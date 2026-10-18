@@ -31,6 +31,7 @@ class IklanController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validated($request);
+        $data['materi'] = $this->bersihkanMateri($data['materi'] ?? null);
         $kampanye = PromoCampaign::create($data);
         $this->simpanProduk($kampanye, $data['produk_ids']);
         $this->simpanGambar($request, $kampanye);
@@ -49,6 +50,7 @@ class IklanController extends Controller
     public function update(Request $request, PromoCampaign $iklan): RedirectResponse
     {
         $data = $this->validated($request, $iklan->id);
+        $data['materi'] = $this->bersihkanMateri($data['materi'] ?? null);
         $iklan->update($data);
         $this->simpanProduk($iklan, $data['produk_ids']);
         $this->simpanGambar($request, $iklan);
@@ -77,6 +79,10 @@ class IklanController extends Controller
             'slug' => ['nullable', 'string', 'max:120', 'regex:/^[a-z0-9-]+$/', 'unique:promo_campaigns,slug,'.$ignoreId],
             'deskripsi' => ['nullable', 'string', 'max:1000'],
             'gambar' => ['nullable', 'image', 'max:2048'],
+            'video_url' => ['nullable', 'url', 'max:255'],
+            'ajakan' => ['nullable', 'string', 'max:500'],
+            'materi' => ['nullable', 'array', 'max:50'],
+            'materi.*' => ['nullable', 'string', 'max:120'],
             'produk_ids' => ['required', 'array', 'min:1', 'max:4'],
             'produk_ids.*' => ['integer', 'exists:products,id'],
             'mulai_at' => ['nullable', 'date'],
@@ -113,6 +119,16 @@ class IklanController extends Controller
             $sync[$id] = ['urutan' => $i];
         }
         $kampanye->products()->sync($sync);
+    }
+
+    /** Buang entri materi yang kosong; null bila tidak ada isi. */
+    private function bersihkanMateri(?array $materi): ?array
+    {
+        if (! $materi) {
+            return null;
+        }
+        $bersih = array_values(array_filter(array_map('trim', $materi), fn ($m) => $m !== ''));
+        return $bersih === [] ? null : $bersih;
     }
 
     /** Simpan/upload gambar banner bila ada file baru. */

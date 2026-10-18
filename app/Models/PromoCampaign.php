@@ -12,12 +12,14 @@ class PromoCampaign extends Model
 
     protected $fillable = [
         'judul', 'subjudul', 'slug', 'deskripsi', 'gambar_path',
+        'video_url', 'ajakan', 'materi',
         'mulai_at', 'berakhir_at', 'status',
     ];
 
     protected $casts = [
         'mulai_at' => 'datetime',
         'berakhir_at' => 'datetime',
+        'materi' => 'array',
     ];
 
     public function products(): BelongsToMany
