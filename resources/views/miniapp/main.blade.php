@@ -80,6 +80,12 @@ if ('serviceWorker' in navigator) {
     // Fallback: bila prompt tak kunjung datang tapi mode pasang, tetap sorot tombolnya
     if (modePasang) setTimeout(() => { if (!deferredPrompt) sorotPasang(); }, 2500);
 
+    // Sudah terpasang sebagai app: sembunyikan tombol
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        btn.style.display = 'none';
+        return;
+    }
+
     btn.addEventListener('click', async () => {
         if (deferredPrompt) {
             deferredPrompt.prompt();
@@ -87,7 +93,7 @@ if ('serviceWorker' in navigator) {
             deferredPrompt = null;
             btn.style.display = 'none';
         } else {
-            infoDialog('Untuk memasang: buka menu browser (⋮) lalu pilih "Install app" / "Add to Home screen".', '📲');
+            infoDialog('Belum bisa memicu install otomatis. Coba refresh halaman ini sekali lalu tekan "📲 Pasang di HP" lagi. Jika tetap tidak muncul, buka menu browser (⋮) lalu pilih "Install app" / "Add to Home screen".', '📲');
         }
     });
 

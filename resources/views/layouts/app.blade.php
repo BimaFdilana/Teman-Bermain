@@ -52,6 +52,13 @@
                 </div>
             </nav>
         </div>
-    ('components.dialog-custom')
+    @include('components.dialog-custom')
+<script>
+/* Daftarkan SW PWA lebih awal (semua halaman user) agar saat buka player,
+   SW sudah aktif dan Chrome bisa memicu beforeinstallprompt */
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register("{{ route('miniapp.sw') }}", { scope: '/' }).catch(function () {});
+}
+</script>
 </body>
 </html>

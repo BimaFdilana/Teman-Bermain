@@ -85,6 +85,6 @@
             © {{ date('Y') }} Rumah Cahaya-bks · <a href="#">Kebijakan Privasi</a> · <a href="#">Syarat & Ketentuan</a>
         </div>
     </footer>
-('components.dialog-custom')
+@include('components.dialog-custom')
 </body>
 </html>
