@@ -33,11 +33,37 @@
     <p class="text-xs opacity-60 mt-3">Setelah dipasang, buka lewat ikon — langsung masuk tanpa login ulang.</p>
 </div>
 
+<!-- Panel diagnostik PWA (?debug=1) -->
+<div id="pwa-debug" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9998;background:#1a1a1a;color:#0f0;font-family:monospace;font-size:11px;padding:8px;max-height:40vh;overflow:auto"></div>
+
 <script>
 /* PWA per MiniApp (PRD §12): daftarkan service worker agar "Pasang di HP" berfungsi */
 if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register("{{ route('miniapp.sw') }}", { scope: '/' }).catch(function () {});
 }
+/* Diagnostik ?debug=1: tampilkan status SW, manifest, prompt */
+(function () {
+    if (new URLSearchParams(window.location.search).get('debug') !== '1') return;
+    const panel = document.getElementById('pwa-debug');
+    panel.style.display = 'block';
+    const log = (t) => { panel.innerHTML += t + '<br>'; };
+    log('UA: ' + navigator.userAgent);
+    log('SW didukung: ' + ('serviceWorker' in navigator));
+    navigator.serviceWorker.ready.then(() => {
+        log('SW ready ✓ scope: ' + (navigator.serviceWorker.controller ? 'mengontrol halaman ✓' : 'TIDAK mengontrol ✗'));
+    }).catch((e) => log('SW ready GAGAL: ' + e));
+    fetch("{{ $manifestUrl }}").then((r) => {
+        log('Manifest HTTP: ' + r.status);
+        return r.json();
+    }).then((m) => {
+        log('Manifest name: ' + m.name + ' | display: ' + m.display);
+        log('start_url: ' + m.start_url);
+        m.icons.forEach((ic, i) => fetch(ic.src, { method: 'HEAD' }).then((r) => log('Icon[' + i + '] ' + ic.sizes + ': HTTP ' + r.status)).catch(() => log('Icon[' + i + '] GAGAL')));
+    }).catch((e) => log('Manifest GAGAL: ' + e));
+    window.addEventListener('beforeinstallprompt', () => log('EVENT beforeinstallprompt MASUK ✓'));
+    setTimeout(() => log('--- 10 dtk, event belum masuk = Chrome menilai tidak installable ---'), 10000);
+})();
+</script>
 (function () {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const btn = document.getElementById('btn-pasang');
@@ -92,8 +118,29 @@ if ('serviceWorker' in navigator) {
             await deferredPrompt.userChoice;
             deferredPrompt = null;
             btn.style.display = 'none';
+            return;
+        }
+        // Event belum datang (Chrome cek installability secara async):
+        // tunggu sampai 8 detik sebelum menyerah
+        const labelAsli = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = '⏳ Menyiapkan...';
+        const eventTunggu = await new Promise((resolve) => {
+            const timer = setTimeout(() => resolve(null), 8000);
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                clearTimeout(timer);
+                resolve(e);
+            }, { once: true });
+        });
+        btn.disabled = false;
+        btn.innerHTML = labelAsli;
+        if (eventTunggu) {
+            eventTunggu.prompt();
+            await eventTunggu.userChoice;
+            btn.style.display = 'none';
         } else {
-            infoDialog('Belum bisa memicu install otomatis. Coba refresh halaman ini sekali lalu tekan "📲 Pasang di HP" lagi. Jika tetap tidak muncul, buka menu browser (⋮) lalu pilih "Install app" / "Add to Home screen".', '📲');
+            infoDialog('Belum bisa memicu install otomatis setelah menunggu. Coba: 1) pastikan belum terpasang, 2) refresh halaman lalu coba lagi, 3) atau buka menu browser (⋮) → "Install app" / "Add to Home screen".', '📲');
         }
     });
 
