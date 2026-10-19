@@ -23,7 +23,7 @@
                 @forelse($kampanyes as $k)
                     <tr class="border-t align-top">
                         <td class="p-3 font-bold" style="font-family:'Quicksand'">{{ $k->judul }}</td>
-                        <td class="p-3">{{ $k->products_count }} produk</td>
+                        <td class="p-3">{{ $k->produkPrimary?->judul ?? '—' }}<span style="color:#6b7280"> +{{ $k->produk_secondary_count }} tambahan</span></td>
                         <td class="p-3 text-xs" style="color:#6b7280">
                             {{ $k->mulai_at?->format('d M Y H:i') ?? '—' }}<br>s/d {{ $k->berakhir_at->format('d M Y H:i') }}
                         </td>

@@ -1,9 +1,6 @@
 @php
 $berakhir = $kampanye->isBerakhir();
 $tipeLabel = ['ebook' => 'Ebook', 'miniapp' => 'MiniApp', 'bundle' => 'Bundle'];
-$produks = $kampanye->products;
-$pertama = $produks->first();
-$sisa = $produks->skip(1);
 
 // Parse URL video: YouTube -> embed, selain itu -> link
 $videoEmbed = null; $videoLink = $kampanye->video_url;
@@ -54,24 +51,14 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
              onerror="this.style.display='none'">
     </div>
 
-    {{-- Judul promo --}}
+    {{-- Judul promo (tetap di atas) --}}
     <div class="text-center mb-5">
         <span class="kidza-kicker poster-kicker-yellow mb-3">Promo Spesial</span>
         <h1 class="font-extrabold mt-3 mb-2" style="font-size:1.9rem;color:#14532D;line-height:1.25">{{ $kampanye->judul }}</h1>
         @if($kampanye->subjudul)
             <p class="font-extrabold mb-3" style="font-size:1.05rem;color:#1E7B34;line-height:1.4">{{ $kampanye->subjudul }}</p>
         @endif
-        @if($kampanye->deskripsi)
-            <p class="text-sm" style="color:#5B5344">{{ $kampanye->deskripsi }}</p>
-        @endif
     </div>
-
-    {{-- Banner (opsional) --}}
-    @if($kampanye->gambarUrl())
-        <div class="mb-6 -mx-5">
-            <img src="{{ $kampanye->gambarUrl() }}" alt="{{ $kampanye->judul }}" class="w-full object-cover">
-        </div>
-    @endif
 
     @if($berakhir)
         <div class="text-center p-6 mb-6 rounded-3xl" style="background:#FFFDF4;border:2px solid #F0E7CC">
@@ -79,191 +66,11 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
             <p class="text-sm mt-1" style="color:#5B5344">Terima kasih atas antusiasmenya! Nantikan promo berikutnya.</p>
         </div>
     @else
-        {{-- Hitungan mundur (ramping) --}}
-        <div class="mt-12 mb-10 text-center">
-            <p class="inline-block px-5 py-2 rounded-full text-sm font-bold countdown" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ Berakhir dalam <span class="cd-text" style="font-variant-numeric:tabular-nums">…</span></p>
-            <p class="text-xs mt-2" style="color:#a39e93">s/d {{ $kampanye->berakhir_at->format('d M Y, H:i') }} WIB</p>
-        </div>
-
-        {{-- Tiga panah sale memantul --}}
-        <div class="my-12" aria-hidden="true" style="height:2px;background:#F0E7CC;border-radius:2px"></div>
-
-        {{-- PRODUK 1 (tanpa card) --}}
-        @if($pertama)
-            <div class="mb-10">
-                @if($pertama->coverUrl())
-                    <img src="{{ $pertama->coverUrl() }}" alt="{{ $pertama->judul }}" class="rounded-2xl w-full object-cover mb-3" style="aspect-ratio:16/10">
-                @endif
-                <span class="kidza-kicker mb-2" style="font-size:.65rem">{{ $tipeLabel[$pertama->tipe] ?? $pertama->tipe }}</span>
-                <p class="font-extrabold mb-2" style="font-size:1.15rem;color:#14532D;line-height:1.3">{{ $pertama->judul }}</p>
-                @if($pertama->deskripsi)
-                    <p class="text-sm mb-3" style="color:#5B5344;line-height:1.6">{{ $pertama->deskripsi }}</p>
-                @endif
-                <div class="flex items-baseline justify-center gap-2 mb-3">
-                    <span class="font-extrabold" style="font-size:1.2rem;color:#1E7B34">Rp {{ number_format($pertama->harga, 0, ',', '.') }}</span>
-                    @if($pertama->harga_coret)
-                        <span class="text-sm line-through" style="color:#a39e93">Rp {{ number_format($pertama->harga_coret, 0, ',', '.') }}</span>
-                    @endif
-                </div>
-                <div class="text-center">
-                    <a href="{{ route('promo.pesan', $pertama->slug) }}" class="kidza-btn kidza-btn-green" style="font-size:1rem;display:inline-block">
-                        <span class="anim-tunjuk">👉</span> Pesan Sekarang <span class="anim-tunjuk-kiri">👈</span>
-                    </a>
-                </div>
-            </div>
-
-            {{-- Tiga panah sale --}}
-            <div class="my-12" aria-hidden="true" style="height:2px;background:#F0E7CC;border-radius:2px"></div>
-        @endif
-
-        {{-- Video (opsional) --}}
-        @if($videoLink)
-            <div class="mb-10">
-                <p class="font-extrabold text-center mb-3" style="color:#14532D">Tonton Dulu Videonya</p>
-                @if($videoEmbed)
-                    <div class="rounded-2xl overflow-hidden mb-3" style="aspect-ratio:16/9">
-                        <iframe src="{{ $videoEmbed }}" class="w-full h-full" style="border:0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen title="Video promo"></iframe>
-                    </div>
-                @else
-                    <a href="{{ $videoLink }}" target="_blank" rel="noopener"
-                       class="kidza-btn w-full text-center mb-3" style="background:#fff;border:2px solid #F0E7CC;color:#14532D">▶ Tonton Videonya</a>
-                @endif
-                @if($kampanye->ajakan)
-                    <p class="text-sm" style="color:#5B5344;line-height:1.6;overflow-wrap:anywhere">{{ $kampanye->ajakan }}</p>
-                @endif
-            </div>
-        @elseif($kampanye->ajakan)
-            <div class="mb-10">
-                <p class="text-sm" style="color:#5B5344;line-height:1.6;overflow-wrap:anywhere">{{ $kampanye->ajakan }}</p>
-            </div>
-        @endif
-
-        {{-- Materi Ebook (card) --}}
-        @if(!empty($kampanye->materi))
-            <div class="rounded-3xl p-5 mt-12 mb-8" style="background:#FFFDF4;border:2px solid #F0E7CC">
-                <p class="font-extrabold mb-3" style="color:#14532D">Materi Ebook</p>
-                <ol class="text-sm space-y-2" style="color:#444;list-style-position:inside;margin:0;padding:0">
-                    @foreach($kampanye->materi as $i => $m)
-                        <li><span class="font-bold" style="color:#1E7B34">{{ $i + 1 }}.</span> {{ $m }}</li>
-                    @endforeach
-                </ol>
-            </div>
-        @endif
-
-        {{-- Bukti Kepuasan: slider screenshot WA (3-6 gambar, card) --}}
-        @if(!empty($kampanye->testimoni_ss))
-            <div class="mt-12 mb-8">
-                <p class="font-extrabold text-center mb-1" style="color:#14532D">💬 Kata Mereka</p>
-                <p class="text-center text-xs mb-4" style="color:#a39e93">Geser untuk melihat testimoni pelanggan</p>
-                <div class="ss-slider" id="ssSlider">
-                    @foreach($kampanye->testimoniSsUrls() as $i => $url)
-                        <div class="ss-slide">
-                            <img src="{{ $url }}" alt="Testimoni {{ $i+1 }}" loading="lazy">
-                        </div>
-                    @endforeach
-                </div>
-                <div class="ss-dots" id="ssDots">
-                    @foreach($kampanye->testimoniSsUrls() as $i => $url)
-                        <button type="button" data-i="{{ $i }}" aria-label="Slide {{ $i+1 }}"></button>
-                    @endforeach
-                </div>
-            </div>
-            <style>
-            .ss-slider{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 2px;scroll-behavior:smooth}
-            .ss-slider::-webkit-scrollbar{display:none}
-            .ss-slide{flex:0 0 auto;width:min(240px,68vw);scroll-snap-align:center;border-radius:16px;overflow:hidden;background:#fff;border:2px solid #F0E7CC;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-            .ss-slide img{width:100%;height:auto;display:block}
-            .ss-dots{display:flex;justify-content:center;gap:8px;margin-top:12px}
-            .ss-dots button{width:10px;height:10px;border-radius:999px;border:none;background:#E5DCC3;cursor:pointer;padding:0;transition:background .3s}
-            .ss-dots button.aktif{background:#1E7B34;transform:scale(1.2)}
-            </style>
-            <script>
-            (function(){
-                var slider=document.getElementById('ssSlider'),dots=document.getElementById('ssDots');
-                if(!slider||!dots)return;
-                var btns=dots.querySelectorAll('button');
-                function tandai(){
-                    var tengah=slider.scrollLeft+slider.clientWidth/2,idx=0,jarakMin=1e9;
-                    slider.querySelectorAll('.ss-slide').forEach(function(s,i){
-                        var j=Math.abs((s.offsetLeft+s.clientWidth/2)-tengah);
-                        if(j<jarakMin){jarakMin=j;idx=i;}
-                    });
-                    btns.forEach(function(b,i){b.classList.toggle('aktif',i===idx);});
-                }
-                btns.forEach(function(b,i){
-                    if(i===0)b.classList.add('aktif');
-                    b.addEventListener('click',function(){
-                        var s=slider.querySelectorAll('.ss-slide')[i];
-                        if(s)slider.scrollTo({left:s.offsetLeft-(slider.clientWidth-s.clientWidth)/2,behavior:'smooth'});
-                    });
-                });
-                var t;slider.addEventListener('scroll',function(){clearTimeout(t);t=setTimeout(tandai,120);},{passive:true});
-            })();
-            </script>
-        @elseif($testimonis->isNotEmpty())
-            <div class="mt-12 mb-8">
-                <p class="font-extrabold text-center mb-3" style="color:#14532D">Bukti Kepuasan</p>
-                @foreach($testimonis as $t)
-                    <div class="rounded-2xl p-4 mb-2 bg-white" style="border:2px solid #F0E7CC">
-                        <p class="text-sm italic mb-1" style="color:#444">"{{ $t->isi }}"</p>
-                        <p class="text-xs font-bold" style="color:#a39e93">— {{ $t->nama }}{{ $t->peran ? ', '.$t->peran : '' }}</p>
-                    </div>
-                @endforeach
-            </div>
-        @endif
-
-        {{-- Harga Spesial --}}
-        <div class="text-center mt-12 mb-8">
-            <p class="font-extrabold mb-3" style="font-size:1.7rem;color:#14532D">HARGA SPESIAL</p>
-            @foreach($produks as $p)
-                <div class="mb-2">
-                    <p class="text-xs font-bold" style="color:#a39e93">{{ $p->judul }}</p>
-                    @if($p->harga_coret)
-                        <span class="text-sm line-through" style="color:#a39e93">Rp {{ number_format($p->harga_coret, 0, ',', '.') }}</span>
-                    @endif
-                    <p class="font-extrabold" style="font-size:1.6rem;color:#14532D">Rp {{ number_format($p->harga, 0, ',', '.') }}</p>
-                </div>
-            @endforeach
-            @if($pertama)
-                <div class="text-center">
-                    <a href="{{ route('promo.pesan', $pertama->slug) }}" class="kidza-btn kidza-btn-green mt-2" style="font-size:1rem;display:inline-block">
-                        <span class="anim-tunjuk">👉</span> Pesan Sekarang <span class="anim-tunjuk-kiri">👈</span>
-                    </a>
-                </div>
+        {{-- Section dinamis sesuai urutan yang diatur admin --}}
+        @foreach($kampanye->urutanKontenEfektif() as $section)
+            @if($kampanye->sectionTampil($section))
+                @include('promo.iklan.sections.' . str_replace('_', '-', $section))
             @endif
-        </div>
-
-        {{-- Hitungan mundur (ramping) lagi --}}
-        <div class="mb-8 text-center mt-12">
-            <p class="inline-block px-5 py-2 rounded-full text-sm font-bold countdown" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ Berakhir dalam <span class="cd-text" style="font-variant-numeric:tabular-nums">…</span></p>
-        </div>
-
-        {{-- Produk 2..n (berulang) --}}
-        @foreach($sisa as $product)
-            <div class="my-12" aria-hidden="true" style="height:2px;background:#F0E7CC;border-radius:2px"></div>
-            <div class="mb-10">
-                @if($product->coverUrl())
-                    <img src="{{ $product->coverUrl() }}" alt="{{ $product->judul }}" class="rounded-2xl w-full object-cover mb-3" style="aspect-ratio:16/10">
-                @endif
-                <span class="kidza-kicker mb-2" style="font-size:.65rem">{{ $tipeLabel[$product->tipe] ?? $product->tipe }}</span>
-                <p class="font-extrabold mb-2" style="font-size:1.15rem;color:#14532D;line-height:1.3">{{ $product->judul }}</p>
-                @if($product->deskripsi)
-                    <p class="text-sm mb-3" style="color:#5B5344;line-height:1.6">{{ $product->deskripsi }}</p>
-                @endif
-                <div class="flex items-baseline justify-center gap-2 mb-3">
-                    <span class="font-extrabold" style="font-size:1.2rem;color:#1E7B34">Rp {{ number_format($product->harga, 0, ',', '.') }}</span>
-                    @if($product->harga_coret)
-                        <span class="text-sm line-through" style="color:#a39e93">Rp {{ number_format($product->harga_coret, 0, ',', '.') }}</span>
-                    @endif
-                </div>
-                <div class="text-center">
-                    <a href="{{ route('promo.pesan', $product->slug) }}" class="kidza-btn kidza-btn-green" style="font-size:1rem;display:inline-block">
-                        <span class="anim-tunjuk">👉</span> Pesan Sekarang <span class="anim-tunjuk-kiri">👈</span>
-                    </a>
-                </div>
-            </div>
         @endforeach
     @endif
 

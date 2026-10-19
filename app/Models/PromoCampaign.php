@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class PromoCampaign extends Model
@@ -13,6 +14,7 @@ class PromoCampaign extends Model
     protected $fillable = [
         'judul', 'subjudul', 'slug', 'deskripsi', 'gambar_path',
         'video_url', 'ajakan', 'materi', 'testimoni_ss',
+        'produk_primary_id', 'tampilan_secondary', 'urutan_konten', 'section_sembunyi',
         'mulai_at', 'berakhir_at', 'status',
     ];
 
@@ -21,7 +23,56 @@ class PromoCampaign extends Model
         'berakhir_at' => 'datetime',
         'materi' => 'array',
         'testimoni_ss' => 'array',
+        'urutan_konten' => 'array',
+        'section_sembunyi' => 'array',
     ];
+
+    /** Daftar section default halaman iklan (berurutan). */
+    public const SECTIONS = [
+        'banner' => '🖼️ Banner',
+        'countdown' => '⏳ Hitungan Mundur',
+        'deskripsi' => '📝 Deskripsi',
+        'produk_utama' => '⭐ Produk Utama',
+        'produk_tambahan' => '🎁 Produk Tambahan',
+        'video_ajakan' => '🎬 Video & Ajakan',
+        'materi' => '📖 Materi Ebook',
+        'testimoni' => '💬 Testimoni',
+        'harga_cta' => '💰 Harga + Tombol Pesan',
+    ];
+
+    /** Produk utama (primary). */
+    public function produkPrimary(): BelongsTo
+    {
+        return $this->belongsTo(Product::class, 'produk_primary_id');
+    }
+
+    /** Produk tambahan (secondary) via pivot. */
+    public function produkSecondary(): BelongsToMany
+    {
+        return $this->belongsToMany(Product::class, 'promo_campaign_product')
+            ->withPivot('urutan')
+            ->orderByPivot('urutan');
+    }
+
+    /** Urutan section efektif (default bila belum diatur). */
+    public function urutanKontenEfektif(): array
+    {
+        $urut = $this->urutan_konten ?? [];
+        $valid = array_values(array_intersect($urut, array_keys(self::SECTIONS)));
+        foreach (array_keys(self::SECTIONS) as $key) {
+            if (! in_array($key, $valid)) {
+                $valid[] = $key;
+            }
+        }
+
+        return $valid;
+    }
+
+    /** Apakah section ditampilkan? */
+    public function sectionTampil(string $key): bool
+    {
+        return ! in_array($key, $this->section_sembunyi ?? []);
+    }
 
     /**
      * URL publik screenshot testimoni (array).
@@ -35,14 +86,6 @@ class PromoCampaign extends Model
             $this->testimoni_ss ?? []
         );
     }
-
-    public function products(): BelongsToMany
-    {
-        return $this->belongsToMany(Product::class, 'promo_campaign_product')
-            ->withPivot('urutan')
-            ->orderByPivot('urutan');
-    }
-
     /** Kampanye sedang tayang: aktif dan dalam rentang waktu. */
     public function isLive(): bool
     {

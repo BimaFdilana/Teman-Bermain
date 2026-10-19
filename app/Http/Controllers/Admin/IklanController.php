@@ -16,7 +16,7 @@ class IklanController extends Controller
     public function index(): View
     {
         return view('admin.iklan.index', [
-            'kampanyes' => PromoCampaign::withCount('products')->latest()->paginate(15),
+            'kampanyes' => PromoCampaign::with('produkPrimary')->withCount('produkSecondary')->latest()->paginate(15),
         ]);
     }
 
@@ -36,7 +36,7 @@ class IklanController extends Controller
         }
         $data['materi'] = $this->bersihkanMateri($data['materi'] ?? null);
         $kampanye = PromoCampaign::create($data);
-        $this->simpanProduk($kampanye, $data['produk_ids']);
+        $this->simpanProduk($kampanye, $data['produk_primary_id'], $data['produk_secondary_ids'] ?? []);
         $this->simpanGambar($request, $kampanye);
         $this->simpanTestimoniSs($request, $kampanye);
 
@@ -46,7 +46,7 @@ class IklanController extends Controller
     public function edit(PromoCampaign $iklan): View
     {
         return view('admin.iklan.form', [
-            'kampanye' => $iklan->load('products'),
+            'kampanye' => $iklan->load(['produkPrimary', 'produkSecondary']),
             'produks' => $this->produkTersedia(),
         ]);
     }
@@ -56,7 +56,7 @@ class IklanController extends Controller
         $data = $this->validated($request, $iklan->id);
         $data['materi'] = $this->bersihkanMateri($data['materi'] ?? null);
         $iklan->update($data);
-        $this->simpanProduk($iklan, $data['produk_ids']);
+        $this->simpanProduk($iklan, $data['produk_primary_id'], $data['produk_secondary_ids'] ?? []);
         $this->simpanGambar($request, $iklan);
         $hasilSs = $this->kelolaTestimoniSs($request, $iklan);
         if ($hasilSs !== true) {
@@ -101,14 +101,20 @@ class IklanController extends Controller
             'testimoni_ss.*' => ['image', 'max:2048'],
             'hapus_ss' => ['nullable', 'array'],
             'hapus_ss.*' => ['integer', 'min:0'],
-            'produk_ids' => ['required', 'array', 'min:1', 'max:4'],
-            'produk_ids.*' => ['integer', 'exists:products,id'],
+            'produk_primary_id' => ['required', 'integer', 'exists:products,id'],
+            'produk_secondary_ids' => ['nullable', 'array', 'max:3'],
+            'produk_secondary_ids.*' => ['integer', 'exists:products,id', 'different:produk_primary_id'],
+            'tampilan_secondary' => ['required', 'in:card,list'],
+            'urutan_konten' => ['nullable', 'array'],
+            'urutan_konten.*' => ['string', 'in:'.implode(',', array_keys(PromoCampaign::SECTIONS))],
+            'section_sembunyi' => ['nullable', 'array'],
+            'section_sembunyi.*' => ['string', 'in:'.implode(',', array_keys(PromoCampaign::SECTIONS))],
             'mulai_at' => ['nullable', 'date'],
             'berakhir_at' => ['required', 'date', 'after:mulai_at'],
             'status' => ['required', 'in:draft,aktif'],
         ], [
-            'produk_ids.min' => 'Pilih minimal 1 produk.',
-            'produk_ids.max' => 'Maksimal 4 produk per iklan.',
+            'produk_secondary_ids.max' => 'Maksimal 3 produk tambahan.',
+            'produk_secondary_ids.*.different' => 'Produk tambahan tidak boleh sama dengan produk utama.',
             'berakhir_at.after' => 'Waktu berakhir harus setelah waktu mulai.',
         ]);
 
@@ -130,13 +136,15 @@ class IklanController extends Controller
         return $slug;
     }
 
-    private function simpanProduk(PromoCampaign $kampanye, array $ids): void
+    /** Simpan produk utama + produk tambahan (pivot). */
+    private function simpanProduk(PromoCampaign $kampanye, int $primaryId, array $secondaryIds): void
     {
+        $kampanye->update(['produk_primary_id' => $primaryId]);
         $sync = [];
-        foreach (array_values($ids) as $i => $id) {
+        foreach (array_values($secondaryIds) as $i => $id) {
             $sync[$id] = ['urutan' => $i];
         }
-        $kampanye->products()->sync($sync);
+        $kampanye->produkSecondary()->sync($sync);
     }
 
     /** Buang entri materi yang kosong; null bila tidak ada isi. */

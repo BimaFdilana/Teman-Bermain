@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\PromoCampaign;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 /**
@@ -46,7 +47,14 @@ class IklanTest extends TestCase
         $response = $this->actingAs($this->admin())->post(route('admin.iklan.store'), [
             'judul' => 'Promo Merdeka',
             'deskripsi' => 'Merdeka belajar',
-            'produk_ids' => [$p1->id, $p2->id],
+            'produk_primary_id' => $p1->id,
+            'produk_secondary_ids' => [$p2->id],
+            'tampilan_secondary' => 'card',
+            'testimoni_ss' => [
+                UploadedFile::fake()->image('t1.jpg'),
+                UploadedFile::fake()->image('t2.jpg'),
+                UploadedFile::fake()->image('t3.jpg'),
+            ],
             'berakhir_at' => now()->addDays(5)->format('Y-m-d\TH:i'),
             'status' => 'aktif',
         ]);
@@ -54,7 +62,9 @@ class IklanTest extends TestCase
         $response->assertRedirect(route('admin.iklan.index'));
         $k = PromoCampaign::where('slug', 'promo-merdeka')->first();
         $this->assertNotNull($k);
-        $this->assertCount(2, $k->products);
+        $this->assertEquals($p1->id, $k->produk_primary_id);
+        $this->assertCount(1, $k->produkSecondary);
+        $this->assertCount(3, $k->testimoni_ss);
     }
 
     public function test_admin_bisa_simpan_konten_sales_page(): void
@@ -63,7 +73,13 @@ class IklanTest extends TestCase
 
         $response = $this->actingAs($this->admin())->post(route('admin.iklan.store'), [
             'judul' => 'Promo Konten',
-            'produk_ids' => [$p1->id],
+            'produk_primary_id' => $p1->id,
+            'tampilan_secondary' => 'list',
+            'testimoni_ss' => [
+                UploadedFile::fake()->image('t1.jpg'),
+                UploadedFile::fake()->image('t2.jpg'),
+                UploadedFile::fake()->image('t3.jpg'),
+            ],
             'berakhir_at' => now()->addDays(5)->format('Y-m-d\\TH:i'),
             'status' => 'aktif',
             'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -87,7 +103,7 @@ class IklanTest extends TestCase
             'ajakan' => 'Amankan sekarang!',
             'materi' => ['Materi Satu', 'Materi Dua'],
         ]);
-        $kampanye->products()->sync([$p->id => ['urutan' => 0]]);
+        $kampanye->update(['produk_primary_id' => $p->id]);
 
         $response = $this->get(route('iklan.show', $kampanye->slug));
         $response->assertOk();
@@ -132,7 +148,7 @@ class IklanTest extends TestCase
     {
         $k = $this->buatKampanye();
         $p = $this->buatProduk('a', 'Produk A');
-        $k->products()->sync([$p->id => ['urutan' => 0]]);
+        $k->update(['produk_primary_id' => $p->id]);
 
         $response = $this->get('/iklan/promo-test');
 
@@ -163,7 +179,7 @@ class IklanTest extends TestCase
     {
         $k = $this->buatKampanye(['berakhir_at' => now()->subHour(), 'slug' => 'lewat']);
         $p = $this->buatProduk('a', 'Produk A');
-        $k->products()->sync([$p->id => ['urutan' => 0]]);
+        $k->update(['produk_primary_id' => $p->id]);
 
         $response = $this->get('/iklan/lewat');
 
@@ -177,5 +193,52 @@ class IklanTest extends TestCase
         $user = User::factory()->create();
 
         $this->actingAs($user)->get(route('admin.iklan.index'))->assertForbidden();
+    }
+
+    public function test_urutan_konten_dan_section_sembunyi(): void
+    {
+        $p = $this->buatProduk('a', 'Produk A');
+        $k = $this->buatKampanye();
+        $k->update(['produk_primary_id' => $p->id]);
+
+        $response = $this->actingAs($this->admin())->put(route('admin.iklan.update', $k), [
+            'judul' => 'Promo Test',
+            'produk_primary_id' => $p->id,
+            'tampilan_secondary' => 'list',
+            'testimoni_ss' => [
+                UploadedFile::fake()->image('t1.jpg'),
+                UploadedFile::fake()->image('t2.jpg'),
+                UploadedFile::fake()->image('t3.jpg'),
+            ],
+            'urutan_konten' => ['testimoni', 'produk_utama', 'banner'],
+            'section_sembunyi' => ['countdown'],
+            'berakhir_at' => now()->addDays(5)->format('Y-m-d\\TH:i'),
+            'status' => 'aktif',
+        ]);
+
+        $response->assertRedirect(route('admin.iklan.index'));
+        $k->refresh();
+        $this->assertEquals(['testimoni', 'produk_utama', 'banner'], array_slice($k->urutan_konten, 0, 3));
+        $this->assertEquals(['countdown'], $k->section_sembunyi);
+        $this->assertFalse($k->sectionTampil('countdown'));
+        $this->assertTrue($k->sectionTampil('banner'));
+        // Urutan efektif tetap mencakup semua section
+        $this->assertCount(count(PromoCampaign::SECTIONS), $k->urutanKontenEfektif());
+    }
+
+    public function test_halaman_iklan_tampilkan_primary_dan_secondary_list(): void
+    {
+        $utama = $this->buatProduk('utama', 'Produk Utama');
+        $tambahan = $this->buatProduk('tambahan', 'Produk Tambahan');
+        $k = $this->buatKampanye(['tampilan_secondary' => 'list']);
+        $k->update(['produk_primary_id' => $utama->id]);
+        $k->produkSecondary()->sync([$tambahan->id => ['urutan' => 0]]);
+
+        $response = $this->get(route('iklan.show', $k->slug));
+
+        $response->assertOk();
+        $response->assertSee('PRODUK UTAMA');
+        $response->assertSee('Produk Tambahan');
+        $response->assertSee('+ Lihat');
     }
 }

@@ -101,27 +101,71 @@
         </div>
 
         <div class="mb-4">
-            <label class="text-sm font-bold block mb-1">Produk yang tampil <span style="color:#6b7280">(pilih 1–4)</span>
+            @php
+                $primaryDipilih = old('produk_primary_id', $kampanye->produk_primary_id);
+                $secondaryDipilih = old('produk_secondary_ids', $kampanye->produkSecondary->pluck('id')->toArray());
+                $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => '🎁 Bundle'];
+            @endphp
+            <label class="text-sm font-bold block mb-1">⭐ Produk Utama <span style="color:#6b7280">(1 produk — bintang iklan)</span></label>
+            <select name="produk_primary_id" id="pilih-primary" required class="w-full border-2 border-gray-300 rounded-xl px-4 py-2 mb-4">
+                <option value="">— Pilih produk utama —</option>
+                @foreach($produks as $p)
+                    <option value="{{ $p->id }}" @selected((string)$primaryDipilih === (string)$p->id)>{{ $p->judul }} — Rp {{ number_format($p->harga, 0, ',', '.') }}</option>
+                @endforeach
+            </select>
+            @error('produk_primary_id')<p class="text-xs font-bold mt-1 mb-2" style="color:#e74c3c">{{ $message }}</p>@enderror
+
+            <label class="text-sm font-bold block mb-1">🎁 Produk Tambahan <span style="color:#6b7280">(maks 3, opsional)</span>
                 <span id="hitung-produk" class="kidza-badge ml-2" style="background:#167941">0 dipilih</span>
             </label>
-            <div class="border-2 border-gray-300 rounded-xl p-4 grid md:grid-cols-2 gap-2" style="max-height:16rem;overflow-y:auto">
-                @php
-                    $dipilih = old('produk_ids', $kampanye->products->pluck('id')->toArray());
-                    $tipeLabel = ['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApp', 'bundle' => '🎁 Bundle'];
-                @endphp
+            <div class="border-2 border-gray-300 rounded-xl p-4 grid md:grid-cols-2 gap-2 mb-3" style="max-height:14rem;overflow-y:auto">
                 @foreach($produks->groupBy('tipe') as $tipe => $daftar)
                     <p class="md:col-span-2 text-xs font-bold mt-1" style="color:#6b7280">{{ $tipeLabel[$tipe] ?? $tipe }}</p>
                     @foreach($daftar as $p)
-                        <label class="flex items-center gap-2 text-sm border rounded-xl px-3 py-2 cursor-pointer hover:bg-gray-50">
-                            <input type="checkbox" name="produk_ids[]" value="{{ $p->id }}"
-                                   @checked(in_array($p->id, (array) $dipilih)) class="cek-produk w-4 h-4">
+                        <label class="flex items-center gap-2 text-sm border rounded-xl px-3 py-2 cursor-pointer hover:bg-gray-50 label-secondary" data-id="{{ $p->id }}">
+                            <input type="checkbox" name="produk_secondary_ids[]" value="{{ $p->id }}"
+                                   @checked(in_array($p->id, (array) $secondaryDipilih)) class="cek-produk w-4 h-4">
                             <span class="font-bold">{{ $p->judul }}</span>
                             <span class="ml-auto whitespace-nowrap" style="color:#6b7280">Rp {{ number_format($p->harga, 0, ',', '.') }}</span>
                         </label>
                     @endforeach
                 @endforeach
             </div>
-            @error('produk_ids')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+            @error('produk_secondary_ids')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+
+            <label class="text-sm font-bold block mb-1">Tampilan produk tambahan</label>
+            <div class="flex gap-4">
+                <label class="flex items-center gap-2 text-sm border-2 rounded-xl px-4 py-2 cursor-pointer">
+                    <input type="radio" name="tampilan_secondary" value="card" @checked(old('tampilan_secondary', $kampanye->tampilan_secondary ?? 'card') === 'card') class="w-4 h-4">
+                    🗂️ Card
+                </label>
+                <label class="flex items-center gap-2 text-sm border-2 rounded-xl px-4 py-2 cursor-pointer">
+                    <input type="radio" name="tampilan_secondary" value="list" @checked(old('tampilan_secondary', $kampanye->tampilan_secondary ?? 'card') === 'list') class="w-4 h-4">
+                    📋 List
+                </label>
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">🔀 Susun Urutan Konten <span class="font-normal" style="color:#6b7280">(atas = tampil duluan)</span></label>
+            <div id="daftar-section" class="border-2 border-gray-300 rounded-xl p-3 space-y-1" style="max-height:16rem;overflow-y:auto">
+                @php
+                    $urutAwal = old('urutan_konten', $kampanye->urutanKontenEfektif());
+                    $sembunyiAwal = old('section_sembunyi', $kampanye->section_sembunyi ?? []);
+                @endphp
+                @foreach($urutAwal as $key)
+                    <div class="section-row flex items-center gap-2 bg-white border rounded-xl px-3 py-2" data-key="{{ $key }}">
+                        <input type="hidden" name="urutan_konten[]" value="{{ $key }}">
+                        <span class="text-sm font-bold flex-1">{{ \App\Models\PromoCampaign::SECTIONS[$key] ?? $key }}</span>
+                        <label class="text-xs flex items-center gap-1 cursor-pointer" style="color:#6b7280" title="Sembunyikan section">
+                            <input type="checkbox" name="section_sembunyi[]" value="{{ $key }}" @checked(in_array($key, (array)$sembunyiAwal)) class="cek-sembunyi"> 🙈
+                        </label>
+                        <button type="button" class="pindah-atas kidza-btn px-2 py-1 text-xs" title="Naik">▲</button>
+                        <button type="button" class="pindah-bawah kidza-btn px-2 py-1 text-xs" title="Turun">▼</button>
+                    </div>
+                @endforeach
+            </div>
+            <p class="text-xs mt-1" style="color:#6b7280">Centang 🙈 untuk menyembunyikan section dari halaman iklan.</p>
         </div>
 
         <div class="grid md:grid-cols-3 gap-4 mb-6">
@@ -190,16 +234,40 @@
     </div>
     <script>
     (function () {
-        const boxes = document.querySelectorAll('.cek-produk');
+        const boxes = [...document.querySelectorAll('.cek-produk')];
+        const primary = document.getElementById('pilih-primary');
         const label = document.getElementById('hitung-produk');
         function hitung() {
-            const n = document.querySelectorAll('.cek-produk:checked').length;
+            // Cegah produk utama dipilih sebagai tambahan
+            boxes.forEach(b => {
+                const lbl = b.closest('.label-secondary');
+                if (primary.value && b.value === primary.value) {
+                    b.checked = false; b.disabled = true; lbl.style.opacity = '.4';
+                } else { lbl.style.opacity = ''; }
+            });
+            const n = boxes.filter(b => b.checked).length;
             label.textContent = n + ' dipilih';
-            label.style.background = n > 4 ? '#e74c3c' : '#167941';
-            boxes.forEach(b => { b.disabled = !b.checked && n >= 4; });
+            label.style.background = n > 3 ? '#e74c3c' : '#167941';
+            boxes.forEach(b => { if (!(primary.value && b.value === primary.value)) b.disabled = !b.checked && n >= 3; });
         }
         boxes.forEach(b => b.addEventListener('change', hitung));
+        primary.addEventListener('change', hitung);
         hitung();
+    })();
+    // Susun urutan section (naik/turun)
+    (function () {
+        const daftar = document.getElementById('daftar-section');
+        if (!daftar) return;
+        daftar.addEventListener('click', (e) => {
+            const btn = e.target.closest('.pindah-atas, .pindah-bawah');
+            if (!btn) return;
+            const row = btn.closest('.section-row');
+            if (btn.classList.contains('pindah-atas') && row.previousElementSibling) {
+                daftar.insertBefore(row, row.previousElementSibling);
+            } else if (btn.classList.contains('pindah-bawah') && row.nextElementSibling) {
+                daftar.insertBefore(row.nextElementSibling, row);
+            }
+        });
     })();
     // Tambah/hapus baris materi dinamis
     (function () {
@@ -256,23 +324,46 @@
         const updVideo = () => { pvVideo.style.display = videoInp.value.trim() ? 'block' : 'none'; };
         videoInp.addEventListener('input', updVideo); updVideo();
 
-        // Produk terpilih → card preview
+        // Produk: utama (besar) + tambahan (card/list sesuai pilihan)
         const pvProduk = $('pv-produk');
+        const rp = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
+        const cardProduk = (p, besar) => `
+            <div class="rounded-2xl p-3 mb-2 bg-white" style="border:2px solid #F0E7CC">
+                ${p.cover ? `<img src="${p.cover}" class="rounded-xl w-full object-cover mb-2" style="aspect-ratio:16/${besar ? '10' : '12'}" alt="">` : ''}
+                <p class="font-extrabold ${besar ? '' : 'text-sm'}" style="color:#14532D;${besar ? 'font-size:1.1rem' : ''}">${p.judul}</p>
+                <p class="${besar ? '' : 'text-sm'}"><b style="color:#1E7B34">${rp(p.harga)}</b>
+                ${p.harga_coret ? `<span class="line-through text-xs" style="color:#a39e93">${rp(p.harga_coret)}</span>` : ''}</p>
+            </div>`;
+        const listProduk = (p) => `
+            <div class="flex items-center gap-2 rounded-2xl p-2 mb-2 bg-white" style="border:2px solid #F0E7CC">
+                ${p.cover ? `<img src="${p.cover}" class="rounded-xl object-cover shrink-0" style="width:56px;height:56px" alt="">` : ''}
+                <div class="flex-1 min-w-0">
+                    <p class="font-extrabold text-xs truncate" style="color:#14532D">${p.judul}</p>
+                    <p class="text-xs"><b style="color:#1E7B34">${rp(p.harga)}</b></p>
+                </div>
+                <span class="text-xs font-bold px-2 py-1 rounded-full shrink-0" style="background:#F5B301">+ Tambah</span>
+            </div>`;
         const updProduk = () => {
+            const primaryEl = document.getElementById('pilih-primary');
+            const mode = form.querySelector('[name="tampilan_secondary"]:checked')?.value || 'card';
+            let html = '';
+            const pUtama = produkData[primaryEl.value];
+            if (pUtama) {
+                html += `<p class="text-xs font-bold mb-1" style="color:#a39e93">⭐ PRODUK UTAMA</p>` + cardProduk(pUtama, true);
+            }
             const ids = [...form.querySelectorAll('.cek-produk:checked')].map(c => c.value);
-            pvProduk.innerHTML = ids.map(id => {
-                const p = produkData[id];
-                if (!p) return '';
-                const rp = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
-                return `<div class="rounded-2xl p-3 mb-2 bg-white" style="border:2px solid #F0E7CC">
-                    ${p.cover ? `<img src="${p.cover}" class="rounded-xl w-full object-cover mb-2" style="aspect-ratio:16/9" alt="">` : ''}
-                    <p class="font-extrabold text-sm" style="color:#14532D">${p.judul}</p>
-                    <p class="text-sm"><b style="color:#1E7B34">${rp(p.harga)}</b>
-                    ${p.harga_coret ? `<span class="line-through text-xs" style="color:#a39e93">${rp(p.harga_coret)}</span>` : ''}</p>
-                </div>`;
-            }).join('') || '<p class="text-xs text-center" style="color:#a39e93">— belum ada produk dipilih —</p>';
+            if (ids.length) {
+                html += `<p class="text-xs font-bold mb-1 mt-3" style="color:#a39e93">🎁 PRODUK TAMBAHAN</p>`;
+                html += ids.map(id => {
+                    const p = produkData[id];
+                    return p ? (mode === 'list' ? listProduk(p) : cardProduk(p, false)) : '';
+                }).join('');
+            }
+            pvProduk.innerHTML = html || '<p class="text-xs text-center" style="color:#a39e93">— belum ada produk dipilih —</p>';
         };
         form.querySelectorAll('.cek-produk').forEach(c => c.addEventListener('change', updProduk));
+        document.getElementById('pilih-primary').addEventListener('change', updProduk);
+        form.querySelectorAll('[name="tampilan_secondary"]').forEach(r => r.addEventListener('change', updProduk));
         updProduk();
 
         // Materi dinamis → list preview
