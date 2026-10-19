@@ -5,9 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InstallToken;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
@@ -89,10 +87,13 @@ class MiniappController extends Controller
     /**
      * Launcher PWA: token ditukar menjadi sesi — tanpa login ulang (PRD §5.6).
      * Kritis untuk iOS yang storage-nya terpisah dari browser.
+     *
+     * Yang terpasang = file HTML gamenya LANGSUNG (bukan halaman web):
+     * start_url menyajikan HTML MiniApp, bukan redirect ke player.
      */
-    public function launch(string $token): RedirectResponse
+    public function launch(string $token): Response
     {
-        $install = InstallToken::where('token', $token)->with('product')->first();
+        $install = InstallToken::where('token', $token)->with('product.miniapp')->first();
 
         if (! $install || ! $install->berlaku() || $install->product->tipe !== 'miniapp') {
             abort(403, 'Tautan install tidak valid atau sudah dicabut.');
@@ -103,10 +104,17 @@ class MiniappController extends Controller
             abort(403, 'Akses MiniApp ini sudah tidak berlaku.');
         }
 
-        Auth::login($install->user, true);
         $install->update(['dipakai_terakhir_at' => now()]);
 
-        return redirect()->route('miniapp.main', $install->product);
+        $path = $install->product->miniapp?->html_path;
+        if (! $path || ! Storage::disk('local')->exists($path)) {
+            abort(404, 'File MiniApp belum tersedia.');
+        }
+
+        return response()->file(
+            Storage::disk('local')->path($path),
+            ['Content-Type' => 'text/html; charset=utf-8']
+        );
     }
 
     /**
@@ -145,9 +153,21 @@ class MiniappController extends Controller
             if (e.request.method !== 'GET' || url.origin !== self.location.origin) return;
             const path = url.pathname;
 
-            // 1) Navigasi area PWA: network-first, fallback halaman offline
+            // 1) Navigasi area PWA (file HTML game langsung): cache-first agar bisa main
+            //    offline setelah terpasang; fallback ke halaman offline bila belum pernah dibuka
             if (path.startsWith('/pwa/') && e.request.mode === 'navigate') {
-                e.respondWith(fetch(e.request).catch(() => caches.match(OFFLINE_URL)));
+                e.respondWith(
+                    caches.match(e.request).then((cached) => {
+                        const network = fetch(e.request).then((res) => {
+                            if (res && res.ok) {
+                                const copy = res.clone();
+                                caches.open(CACHE).then((c) => c.put(e.request, copy));
+                            }
+                            return res;
+                        }).catch(() => cached || caches.match(OFFLINE_URL));
+                        return cached || network;
+                    })
+                );
                 return;
             }
 

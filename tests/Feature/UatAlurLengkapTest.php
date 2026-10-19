@@ -89,11 +89,11 @@ class UatAlurLengkapTest extends TestCase
         $startUrl = $manifest->json('start_url');
         $this->assertStringContainsString('/pwa/', $startUrl);
 
-        // 10. Simulasi buka dari HP terpasang: token -> login otomatis
+        // 10. Simulasi buka dari HP terpasang: token -> HTML game langsung
         $this->post('/logout');
         $token = basename($startUrl);
-        $this->get($startUrl)->assertRedirect(route('miniapp.main', $miniapp));
-        $this->assertAuthenticatedAs($user);
+        $this->get($startUrl)->assertOk()
+            ->assertHeader('Content-Type', 'text/html; charset=utf-8');
 
         // 11. Riwayat pesanan tercatat
         $this->actingAs($user)->get(route('checkout.riwayat'))->assertOk()

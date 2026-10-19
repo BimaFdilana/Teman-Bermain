@@ -92,7 +92,7 @@ class MiniappPlayerTest extends TestCase
         $this->assertNotEquals($t1->token, $t3->token);
     }
 
-    public function test_pwa_launch_login_otomatis(): void
+    public function test_pwa_launch_sajikan_html_langsung(): void
     {
         $user = User::factory()->create();
         $p = $this->miniappMilik($user);
@@ -100,8 +100,9 @@ class MiniappPlayerTest extends TestCase
 
         $response = $this->get(route('pwa.launch', ['token' => $token->token]));
 
-        $response->assertRedirect(route('miniapp.main', $p));
-        $this->assertAuthenticatedAs($user);
+        // Start URL menyajikan HTML game langsung (bukan redirect ke web)
+        $response->assertOk();
+        $response->assertHeader('Content-Type', 'text/html; charset=utf-8');
         $this->assertNotNull($token->fresh()->dipakai_terakhir_at);
     }
 
