@@ -1,7 +1,7 @@
 <x-admin-layout>
     <div class="admin-topbar">
         <div>
-            <h1 class="kidza-h2">{{ $status === 'semua' ? '🧾 Orderan / Pesanan Produk' : 'Verifikasi Pembayaran' }}</h1>
+            <h1 class="kidza-h2">🧾 Orderan / Pesanan Produk</h1>
             <p style="color:#4b5563">Setujui atau tolak bukti pembayaran pengguna.</p>
         </div>
     </div>

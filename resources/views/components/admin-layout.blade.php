@@ -63,8 +63,7 @@
             <a href="{{ route('admin.miniapp.index') }}" class="side-link {{ request()->routeIs('admin.miniapp.*') ? 'active' : '' }}">🎮 MiniApps</a>
             <a href="{{ route('admin.produk.index') }}" class="side-link {{ request()->routeIs('admin.produk.*') ? 'active' : '' }}">🏷️ Manage Product</a>
             <p class="side-group-title">Penjualan</p>
-            <a href="{{ route('admin.pembayaran.index') }}" class="side-link {{ request()->routeIs('admin.pembayaran.*') && request('status', 'verifikasi') !== 'semua' ? 'active' : '' }}">💳 Pembayaran</a>
-            <a href="{{ route('admin.pembayaran.index', ['status' => 'semua']) }}" class="side-link {{ request()->routeIs('admin.pembayaran.*') && request('status') === 'semua' ? 'active' : '' }}">🧾 Orderan</a>
+            <a href="{{ route('admin.pembayaran.index', ['status' => 'semua']) }}" class="side-link {{ request()->routeIs('admin.pembayaran.*') ? 'active' : '' }}">🧾 Orderan</a>
             <a href="{{ route('admin.diskon.index') }}" class="side-link {{ request()->routeIs('admin.diskon.*') ? 'active' : '' }}">🎟️ Diskon</a>
             <a href="{{ route('admin.laporan.index') }}" class="side-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">📈 Laporan</a>
             <p class="side-group-title">Promosi</p>
