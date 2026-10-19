@@ -42,7 +42,18 @@ if ('serviceWorker' in navigator) {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const btn = document.getElementById('btn-pasang');
     const panduan = document.getElementById('panduan-ios');
+    const modePasang = new URLSearchParams(window.location.search).get('pasang') === '1';
     let deferredPrompt = null;
+
+    // Dari tombol "Install" di MiniApps Milikku: sorot tombol pasang
+    function sorotPasang() {
+        btn.style.display = 'inline-flex';
+        btn.style.animation = 'pulse-pasang 1.2s ease-in-out 3';
+        btn.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    const style = document.createElement('style');
+    style.textContent = '@keyframes pulse-pasang{0%,100%{transform:scale(1)}50%{transform:scale(1.12)}}';
+    document.head.appendChild(style);
 
     if (isIOS) {
         // iOS: tidak ada prompt otomatis — tampilkan tombol + panduan manual
@@ -51,6 +62,10 @@ if ('serviceWorker' in navigator) {
             panduan.style.display = panduan.style.display === 'none' ? 'block' : 'none';
             panduan.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         });
+        if (modePasang) {
+            panduan.style.display = 'block';
+            setTimeout(sorotPasang, 400);
+        }
         return;
     }
 
@@ -59,7 +74,11 @@ if ('serviceWorker' in navigator) {
         e.preventDefault();
         deferredPrompt = e;
         btn.style.display = 'inline-flex';
+        if (modePasang) setTimeout(sorotPasang, 400);
     });
+
+    // Fallback: bila prompt tak kunjung datang tapi mode pasang, tetap sorot tombolnya
+    if (modePasang) setTimeout(() => { if (!deferredPrompt) sorotPasang(); }, 2500);
 
     btn.addEventListener('click', async () => {
         if (deferredPrompt) {
