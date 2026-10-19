@@ -39,21 +39,23 @@
                 @if($rekomendasi->isNotEmpty())
                     <div class="kidza-card p-5">
                         <h2 class="font-bold text-lg mb-1" style="font-family:'Quicksand'">🎁 Lengkapi belanjamu</h2>
-                        <p class="text-sm mb-4" style="color:#6b7280">Rekomendasi produk terkait & promo terbaru.</p>
-                        <div class="grid grid-cols-2 gap-4">
+                        <p class="text-sm mb-3" style="color:#6b7280">Produk lainnya:</p>
+                        <div>
                             @foreach($rekomendasi as $r)
-                                <div class="rounded-2xl border-2 border-gray-100 p-3 text-center">
+                                <div class="flex items-center gap-3 py-2" style="border-bottom:1px dashed #e5e5e5">
                                     @if($r->coverUrl())
-                                        <img src="{{ $r->coverUrl() }}" alt="{{ $r->judul }}" class="rounded-xl mx-auto mb-2" style="height:90px;object-fit:cover">
+                                        <img src="{{ $r->coverUrl() }}" alt="{{ $r->judul }}" class="rounded-lg" style="width:44px;height:56px;object-fit:cover">
                                     @endif
-                                    <p class="font-bold text-sm leading-tight">{{ $r->judul }}</p>
-                                    <p class="text-sm mb-2">
-                                        @if($r->harga_coret)<s class="text-xs" style="color:#9ca3af">Rp {{ number_format($r->harga_coret, 0, ',', '.') }}</s><br>@endif
-                                        <strong style="color:#167941">Rp {{ number_format($r->harga, 0, ',', '.') }}</strong>
-                                    </p>
+                                    <div class="flex-1">
+                                        <p class="font-bold text-sm leading-tight">{{ $r->judul }}</p>
+                                        <p class="text-sm">
+                                            @if($r->harga_coret)<s class="text-xs" style="color:#9ca3af">Rp {{ number_format($r->harga_coret, 0, ',', '.') }}</s> @endif
+                                            <strong style="color:#167941">Rp {{ number_format($r->harga, 0, ',', '.') }}</strong>
+                                        </p>
+                                    </div>
                                     <form method="POST" action="{{ route('cart.tambah', $r->slug) }}">
                                         @csrf
-                                        <button class="kidza-btn kidza-btn-yellow w-full" style="padding:.4rem;font-size:.85rem">＋ Tambah</button>
+                                        <button class="kidza-btn kidza-btn-yellow" style="padding:.35rem .9rem;font-size:.85rem">＋ Tambah</button>
                                     </form>
                                 </div>
                             @endforeach
