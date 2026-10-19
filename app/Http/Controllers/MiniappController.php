@@ -74,7 +74,7 @@ class MiniappController extends Controller
             'short_name' => mb_substr($nama, 0, 12),
             'description' => $product->deskripsi,
             'start_url' => route('pwa.launch', ['token' => $token->token]),
-            'scope' => route('pwa.launch', ['token' => $token->token]),
+            'scope' => '/',
             'display' => 'standalone',
             'orientation' => 'any',
             'background_color' => '#F9F9F6',

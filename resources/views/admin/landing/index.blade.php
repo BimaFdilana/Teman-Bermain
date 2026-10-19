@@ -110,7 +110,7 @@
                     <td class="px-4 py-2">{{ $t->aktif ? '✅' : '❌' }}</td>
                     <td class="px-4 py-2 whitespace-nowrap">
                         <button class="kidza-btn" style="background:#fff" onclick="document.getElementById('testimoni-{{ $t->id }}').style.display='flex'">✏️</button>
-                        <form method="POST" action="{{ route('admin.landing.testimoni.destroy', $t) }}" class="inline" onsubmit="return confirm('Pindah ke sampah? Bisa dikembalikan 30 hari.')">
+                        <form method="POST" action="{{ route('admin.landing.testimoni.destroy', $t) }}" class="inline" onsubmit="return tanyaForm(this, 'Pindah ke sampah? Bisa dikembalikan 30 hari.')">
                             @csrf @method('DELETE')
                             <button class="kidza-btn" style="background:#fdecea">🗑️</button>
                         </form>
@@ -131,7 +131,7 @@
                             @csrf
                             <button class="kidza-btn kidza-btn-green" style="padding:.3rem .8rem;font-size:.8rem">↩️ Kembalikan</button>
                         </form>
-                        <form method="POST" action="{{ route('admin.landing.testimoni.force', $t->id) }}" class="inline" onsubmit="return confirm('Hapus permanen? Tidak bisa dikembalikan.')">
+                        <form method="POST" action="{{ route('admin.landing.testimoni.force', $t->id) }}" class="inline" onsubmit="return tanyaForm(this, 'Hapus permanen? Tidak bisa dikembalikan.')">
                             @csrf @method('DELETE')
                             <button class="kidza-btn" style="background:#fdecea;padding:.3rem .8rem;font-size:.8rem">Hapus permanen</button>
                         </form>

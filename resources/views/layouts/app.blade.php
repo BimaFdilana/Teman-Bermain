@@ -52,5 +52,6 @@
                 </div>
             </nav>
         </div>
-    </body>
+    ('components.dialog-custom')
+</body>
 </html>

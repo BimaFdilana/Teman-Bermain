@@ -52,7 +52,7 @@
                     <form method="POST" action="{{ route('admin.pembayaran.approve', $order) }}" class="mb-4">
                         @csrf
                         <button type="submit" class="kidza-btn kidza-btn-green w-full text-lg"
-                                onclick="return confirm('Setujui order ini dan buat kode redeem?')">✓ Setujui & Buat Kode Redeem</button>
+                                onclick="return tanyaForm(this.form, 'Setujui order ini dan buat kode redeem?', '✅')">✓ Setujui & Buat Kode Redeem</button>
                     </form>
                     <form method="POST" action="{{ route('admin.pembayaran.reject', $order) }}">
                         @csrf
@@ -60,7 +60,7 @@
                         <textarea name="alasan_tolak" rows="2" required placeholder="mis. Bukti tidak jelas / nominal kurang"
                                   class="w-full border-2 border-gray-300 rounded-xl px-4 py-2 mb-3"></textarea>
                         <button type="submit" class="kidza-btn w-full" style="background:#e74c3c;color:#fff"
-                                onclick="return confirm('Tolak order ini?')">✕ Tolak</button>
+                                onclick="return tanyaForm(this.form, 'Tolak order ini?', '✕')">✕ Tolak</button>
                     </form>
                 </div>
             @endif

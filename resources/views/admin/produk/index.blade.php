@@ -48,7 +48,7 @@
                             onclick="navigator.clipboard.writeText('{{ route('promo.show', $p->slug) }}');this.textContent='✅';setTimeout(()=>this.textContent='🔗',1500)">🔗</button>
                     @if($p->tipe === 'bundle')
                         <a href="{{ route('admin.produk.bundle.edit', $p) }}" class="kidza-btn" style="background:#fff">✏️</a>
-                        <form method="POST" action="{{ route('admin.produk.bundle.destroy', $p) }}" class="inline" onsubmit="return confirm('Hapus bundle ini?')">
+                        <form method="POST" action="{{ route('admin.produk.bundle.destroy', $p) }}" class="inline" onsubmit="return tanyaForm(this, 'Hapus bundle ini?')">
                             @csrf @method('DELETE')
                             <button class="kidza-btn" style="background:#fdecea">🗑️</button>
                         </form>

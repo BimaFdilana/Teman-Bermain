@@ -41,10 +41,7 @@
                     @endif
                     <div class="p-3">
                         <p class="font-display font-bold text-sm leading-tight mb-2">{{ $app->judul }}</p>
-                        <div class="flex gap-2">
-                            <a href="{{ route('miniapp.main', $app) }}" class="brutal-badge" style="background:#0077B6;color:#fff">Mainkan →</a>
-                            <a href="{{ route('miniapp.main', [$app, 'pasang' => 1]) }}" class="brutal-badge" style="background:#F3A712;color:#1a1a1a">📲 Install</a>
-                        </div>
+                        <a href="{{ route('miniapp.main', [$app, 'pasang' => 1]) }}" class="brutal-btn brutal-btn-yellow w-full text-center" style="padding:.5rem;font-size:.85rem;display:block">📲 Install</a>
                     </div>
                 </div>
             @endforeach

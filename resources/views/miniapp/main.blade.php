@@ -87,7 +87,7 @@ if ('serviceWorker' in navigator) {
             deferredPrompt = null;
             btn.style.display = 'none';
         } else {
-            alert('Untuk memasang: buka menu browser (⋮) lalu pilih "Install app" / "Add to Home screen".');
+            infoDialog('Untuk memasang: buka menu browser (⋮) lalu pilih "Install app" / "Add to Home screen".', '📲');
         }
     });
 

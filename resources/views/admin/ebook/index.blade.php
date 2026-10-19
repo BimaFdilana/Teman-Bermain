@@ -25,7 +25,7 @@
                 <td class="px-4 py-2"><x-badge-status :status="$p->status" /></td>
                 <td class="px-4 py-2 whitespace-nowrap">
                     <a href="{{ route('admin.ebook.edit', $p) }}" class="kidza-btn" style="background:#fff">✏️</a>
-                    <form method="POST" action="{{ route('admin.ebook.destroy', $p) }}" class="inline" onsubmit="return confirm('Hapus Ebook ini?')">
+                    <form method="POST" action="{{ route('admin.ebook.destroy', $p) }}" class="inline" onsubmit="return tanyaForm(this, 'Hapus Ebook ini?')">
                         @csrf @method('DELETE')
                         <button class="kidza-btn" style="background:#fdecea">🗑️</button>
                     </form>

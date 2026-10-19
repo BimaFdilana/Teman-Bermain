@@ -23,7 +23,7 @@
                         <td class="py-2 pr-3">{!! $t->dicabut ? '🔌 Dicabut' : '✅ Aktif' !!}</td>
                         <td class="py-2">
                             @if(! $t->dicabut)
-                                <form method="POST" action="{{ route('admin.miniapp.token.cabut', $t) }}" onsubmit="return confirm('Cabut akses perangkat ini? Aplikasi terpasang tidak bisa dibuka lagi.')">
+                                <form method="POST" action="{{ route('admin.miniapp.token.cabut', $t) }}" onsubmit="return tanyaForm(this, 'Cabut akses perangkat ini? Aplikasi terpasang tidak bisa dibuka lagi.')">
                                     @csrf
                                     <button class="kidza-btn" style="background:#fdecea;padding:.3rem .8rem;font-size:.8rem">🔌 Cabut</button>
                                 </form>

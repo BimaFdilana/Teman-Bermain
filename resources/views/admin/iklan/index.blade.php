@@ -46,7 +46,7 @@
                             <a href="{{ route('iklan.show', $k->slug) }}" target="_blank" class="kidza-link text-sm mr-3">Lihat</a>
                             <a href="{{ route('admin.iklan.edit', $k) }}" class="kidza-link text-sm mr-3">Edit</a>
                             <form method="POST" action="{{ route('admin.iklan.destroy', $k) }}" class="inline"
-                                  onsubmit="return confirm('Hapus iklan {{ $k->judul }}?')">
+                                  onsubmit="return tanyaForm(this, 'Hapus iklan {{ $k->judul }}?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="text-sm font-bold" style="color:#e74c3c">Hapus</button>
                             </form>

@@ -29,7 +29,7 @@
                     <a href="{{ route('admin.miniapp.preview', $p) }}" class="kidza-btn" style="background:#fff" title="Preview">👁️</a>
                     <a href="{{ route('admin.miniapp.perangkat', $p) }}" class="kidza-btn" style="background:#fff" title="Perangkat terpasang">📲</a>
                     <a href="{{ route('admin.miniapp.edit', $p) }}" class="kidza-btn" style="background:#fff" title="Edit">✏️</a>
-                    <form method="POST" action="{{ route('admin.miniapp.destroy', $p) }}" class="inline" onsubmit="return confirm('Hapus MiniApp ini?')">
+                    <form method="POST" action="{{ route('admin.miniapp.destroy', $p) }}" class="inline" onsubmit="return tanyaForm(this, 'Hapus MiniApp ini?')">
                         @csrf @method('DELETE')
                         <button class="kidza-btn" style="background:#fdecea" title="Hapus">🗑️</button>
                     </form>

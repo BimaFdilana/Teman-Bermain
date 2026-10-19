@@ -36,7 +36,7 @@
                         <td class="p-3 whitespace-nowrap">
                             <a href="{{ route('admin.diskon.edit', $d) }}" class="kidza-link text-sm mr-3">Edit</a>
                             <form method="POST" action="{{ route('admin.diskon.destroy', $d) }}" class="inline"
-                                  onsubmit="return confirm('Hapus kode {{ $d->kode }}?')">
+                                  onsubmit="return tanyaForm(this, 'Hapus kode {{ $d->kode }}?')">
                                 @csrf @method('DELETE')
                                 <button type="submit" class="text-sm font-bold" style="color:#e74c3c">Hapus</button>
                             </form>

@@ -90,5 +90,6 @@
         {{ $slot }}
     </div>
 </div>
+('components.dialog-custom')
 </body>
 </html>
