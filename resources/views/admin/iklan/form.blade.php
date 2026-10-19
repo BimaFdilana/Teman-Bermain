@@ -2,8 +2,9 @@
     <a href="{{ route('admin.iklan.index') }}" class="kidza-link text-sm mb-4 inline-block">← Kembali</a>
     <h1 class="kidza-h2 mb-6">{{ $kampanye->exists ? 'Edit' : 'Buat' }} Iklan Promo</h1>
 
+    <div class="flex flex-col xl:flex-row gap-6 items-start">
     <form method="POST" action="{{ $kampanye->exists ? route('admin.iklan.update', $kampanye) : route('admin.iklan.store') }}"
-          class="kidza-card p-6" style="max-width:44rem" enctype="multipart/form-data">
+          class="kidza-card p-6 flex-1 w-full" style="max-width:44rem" enctype="multipart/form-data">
         @csrf
         @if($kampanye->exists) @method('PUT') @endif
 
@@ -149,6 +150,44 @@
         <button type="submit" class="kidza-btn kidza-btn-green">💾 Simpan Iklan</button>
     </form>
 
+    {{-- Preview langsung (kanan) --}}
+    <aside class="w-full xl:w-[400px] shrink-0 xl:sticky xl:top-6">
+        <p class="text-sm font-bold mb-2" style="color:#6b7280">👁️ Preview Iklan <span class="font-normal">(update otomatis)</span></p>
+        <div id="pv-phone" class="mx-auto bg-white rounded-[2rem] overflow-hidden" style="max-width:400px;border:3px solid #1a1a1a;box-shadow:6px 6px 0 #1a1a1a">
+            <div class="text-center py-3" style="background:#FFFEF7;border-bottom:2px solid #F0E7CC">
+                <span class="font-extrabold" style="font-family:'Baloo 2',cursive;color:#1E7B34">rumahcahaya-bks</span>
+            </div>
+            <div class="p-4 overflow-y-auto" style="max-height:70vh;background:#FFFEF7">
+                <p class="text-center font-extrabold mb-1" style="color:#A63D2F;font-size:.8rem">🔥 PROMO SPESIAL 🔥</p>
+                <h2 id="pv-judul" class="text-center font-extrabold mb-2" style="color:#14532D;font-size:1.3rem;line-height:1.3">Judul Promo</h2>
+                <p id="pv-subjudul" class="text-center text-sm mb-3" style="color:#5B5344"></p>
+                <img id="pv-banner" class="rounded-2xl w-full object-cover mb-3" style="display:none;aspect-ratio:16/9" alt="Banner">
+                <div class="text-center mb-3">
+                    <span class="inline-block px-4 py-1 rounded-full text-xs font-bold" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ Berakhir dalam 2 hari 04:15:30</span>
+                </div>
+                <p id="pv-deskripsi" class="text-sm mb-4" style="color:#5B5344;line-height:1.6"></p>
+                <div id="pv-produk" class="mb-4"></div>
+                <div id="pv-video" class="mb-4" style="display:none">
+                    <div class="rounded-2xl flex items-center justify-center text-4xl" style="aspect-ratio:16/9;background:#1a1a1a">▶️</div>
+                </div>
+                <div id="pv-ajakan-wrap" class="mb-4" style="display:none">
+                    <p id="pv-ajakan" class="text-center text-sm font-bold italic px-4" style="color:#1E7B34"></p>
+                </div>
+                <div id="pv-materi-wrap" class="mb-4" style="display:none">
+                    <p class="font-extrabold text-sm mb-2" style="color:#14532D">📖 Materi Ebook</p>
+                    <ul id="pv-materi" class="text-sm space-y-1" style="color:#5B5344"></ul>
+                </div>
+                <div id="pv-ss-wrap" class="mb-4" style="display:none">
+                    <p class="font-extrabold text-center text-sm mb-2" style="color:#14532D">💬 Kata Mereka</p>
+                    <div id="pv-ss" class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width:none"></div>
+                </div>
+                <div class="text-center mt-4">
+                    <span class="kidza-btn kidza-btn-green" style="font-size:.9rem;display:inline-block;pointer-events:none">👉 Pesan Sekarang 👈</span>
+                </div>
+            </div>
+        </div>
+    </aside>
+    </div>
     <script>
     (function () {
         const boxes = document.querySelectorAll('.cek-produk');
@@ -178,6 +217,106 @@
                 e.target.closest('.materi-row').remove();
             }
         });
+    })();
+    // ===== Live preview iklan (panel kanan) =====
+    (function () {
+        const $ = (id) => document.getElementById(id);
+        const form = document.querySelector('form');
+        const produkData = @json($produks->mapWithKeys(fn($p) => [$p->id => ['judul' => $p->judul, 'harga' => $p->harga, 'harga_coret' => $p->harga_coret, 'cover' => $p->coverUrl()]]));
+
+        const txt = (name, elId, def = '') => {
+            const inp = form.querySelector(`[name="${name}"]`);
+            const el = $(elId);
+            const upd = () => { el.textContent = inp.value.trim() || def; el.style.display = inp.value.trim() || def ? '' : 'none'; };
+            inp.addEventListener('input', upd); upd();
+        };
+        txt('judul', 'pv-judul', 'Judul Promo');
+        txt('subjudul', 'pv-subjudul');
+        txt('deskripsi', 'pv-deskripsi');
+        txt('ajakan', 'pv-ajakan');
+
+        // Banner: file baru (FileReader) atau gambar lama
+        const bannerInp = form.querySelector('[name="gambar"]');
+        const pvBanner = $('pv-banner');
+        @if($kampanye->gambarUrl())
+            pvBanner.src = @json($kampanye->gambarUrl());
+            pvBanner.style.display = 'block';
+        @endif
+        bannerInp.addEventListener('change', () => {
+            const f = bannerInp.files[0];
+            if (!f) return;
+            const r = new FileReader();
+            r.onload = (e) => { pvBanner.src = e.target.result; pvBanner.style.display = 'block'; };
+            r.readAsDataURL(f);
+        });
+
+        // Video: tampilkan placeholder bila ada URL
+        const videoInp = form.querySelector('[name="video_url"]');
+        const pvVideo = $('pv-video');
+        const updVideo = () => { pvVideo.style.display = videoInp.value.trim() ? 'block' : 'none'; };
+        videoInp.addEventListener('input', updVideo); updVideo();
+
+        // Produk terpilih → card preview
+        const pvProduk = $('pv-produk');
+        const updProduk = () => {
+            const ids = [...form.querySelectorAll('.cek-produk:checked')].map(c => c.value);
+            pvProduk.innerHTML = ids.map(id => {
+                const p = produkData[id];
+                if (!p) return '';
+                const rp = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
+                return `<div class="rounded-2xl p-3 mb-2 bg-white" style="border:2px solid #F0E7CC">
+                    ${p.cover ? `<img src="${p.cover}" class="rounded-xl w-full object-cover mb-2" style="aspect-ratio:16/9" alt="">` : ''}
+                    <p class="font-extrabold text-sm" style="color:#14532D">${p.judul}</p>
+                    <p class="text-sm"><b style="color:#1E7B34">${rp(p.harga)}</b>
+                    ${p.harga_coret ? `<span class="line-through text-xs" style="color:#a39e93">${rp(p.harga_coret)}</span>` : ''}</p>
+                </div>`;
+            }).join('') || '<p class="text-xs text-center" style="color:#a39e93">— belum ada produk dipilih —</p>';
+        };
+        form.querySelectorAll('.cek-produk').forEach(c => c.addEventListener('change', updProduk));
+        updProduk();
+
+        // Materi dinamis → list preview
+        const pvMateriWrap = $('pv-materi-wrap'), pvMateri = $('pv-materi');
+        const updMateri = () => {
+            const items = [...form.querySelectorAll('[name="materi[]"]')].map(i => i.value.trim()).filter(Boolean);
+            pvMateriWrap.style.display = items.length ? 'block' : 'none';
+            pvMateri.innerHTML = items.map(m => `<li>✅ ${m.replace(/</g, '&lt;')}</li>`).join('');
+        };
+        form.addEventListener('input', (e) => { if (e.target.name === 'materi[]') updMateri(); });
+        form.addEventListener('click', (e) => { if (e.target.classList.contains('hapus-materi')) setTimeout(updMateri, 50); });
+        document.getElementById('tambah-materi').addEventListener('click', () => setTimeout(updMateri, 50));
+        updMateri();
+
+        // Screenshot testimoni: gambar lama + file baru
+        const pvSsWrap = $('pv-ss-wrap'), pvSs = $('pv-ss');
+        const ssLama = @json($kampanye->testimoniSsUrls());
+        const ssHapus = new Set();
+        let ssBaru = [];
+        const updSs = () => {
+            const tampil = ssLama.filter((_, i) => !ssHapus.has(i)).concat(ssBaru);
+            pvSsWrap.style.display = tampil.length ? 'block' : 'none';
+            pvSs.innerHTML = tampil.map(u =>
+                `<img src="${u}" class="rounded-xl shrink-0" style="width:120px;border:2px solid #F0E7CC" alt="Testimoni">`
+            ).join('');
+        };
+        form.querySelectorAll('[name="hapus_ss[]"]').forEach(cb => {
+            cb.addEventListener('change', () => {
+                const i = parseInt(cb.value);
+                cb.checked ? ssHapus.add(i) : ssHapus.delete(i);
+                updSs();
+            });
+        });
+        const ssInp = form.querySelector('[name="testimoni_ss[]"]');
+        if (ssInp) ssInp.addEventListener('change', () => {
+            ssBaru = [];
+            [...ssInp.files].forEach(f => {
+                const r = new FileReader();
+                r.onload = (e) => { ssBaru.push(e.target.result); updSs(); };
+                r.readAsDataURL(f);
+            });
+            if (!ssInp.files.length) updSs();
+        });
+        updSs();
     })();
     </script>
 </x-admin-layout>
