@@ -41,7 +41,7 @@
                     @endif
                     <div class="p-3">
                         <p class="font-display font-bold text-sm leading-tight mb-2">{{ $app->judul }}</p>
-                        <a href="{{ route('miniapp.main', [$app, 'pasang' => 1]) }}" class="brutal-btn brutal-btn-yellow w-full text-center" style="padding:.5rem;font-size:.85rem;display:block">📲 Install</a>
+                        <a href="{{ route('miniapp.install', $app) }}" class="brutal-btn brutal-btn-yellow w-full text-center" style="padding:.5rem;font-size:.85rem;display:block">📲 Install</a>
                     </div>
                 </div>
             @endforeach

@@ -103,7 +103,21 @@ class MiniappPlayerTest extends TestCase
         // Start URL menyajikan HTML game langsung (bukan redirect ke web)
         $response->assertOk();
         $response->assertHeader('Content-Type', 'text/html; charset=utf-8');
+        // Manifest + tombol install mengambang terinjeksi di HTML
+        $response->assertSee('rel="manifest"', false);
+        $response->assertSee('rc-install-fab', false);
         $this->assertNotNull($token->fresh()->dipakai_terakhir_at);
+    }
+
+    public function test_install_redirect_ke_html_langsung(): void
+    {
+        $user = User::factory()->create();
+        $p = $this->miniappMilik($user);
+
+        $response = $this->actingAs($user)->get(route('miniapp.install', $p));
+
+        $token = InstallToken::untuk($user, $p);
+        $response->assertRedirect(route('pwa.launch', ['token' => $token->token]));
     }
 
     public function test_pwa_launch_token_dicabut_ditolak(): void

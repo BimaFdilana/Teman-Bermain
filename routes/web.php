@@ -60,6 +60,7 @@ Route::middleware(['auth', 'nonadmin'])->group(function () {
 
     // MiniApp player + PWA (Fase 4, PRD §5.6)
     Route::get('/main/{product}', [App\Http\Controllers\MiniappController::class, 'main'])->name('miniapp.main');
+    Route::get('/miniapp/{product}/pasang', [App\Http\Controllers\MiniappController::class, 'install'])->name('miniapp.install');
     Route::get('/miniapp/{product}/manifest.json', [App\Http\Controllers\MiniappController::class, 'manifest'])->name('miniapp.manifest');
 });
 

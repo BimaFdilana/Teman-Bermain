@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\InstallToken;
 use App\Models\Product;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\URL;
@@ -61,7 +62,9 @@ class MiniappController extends Controller
     {
         $this->otorisasi($request, $product);
 
-        $token = InstallToken::untuk($request->user(), $product);
+        $user = $request->user() ?? $this->userDariToken($request, $product);
+        abort_unless($user, 403);
+        $token = InstallToken::untuk($user, $product);
         $nama = $product->miniapp?->pwa_name ?: $product->judul;
         $icon = $product->miniapp?->icon_path
             ? asset('storage/'.$product->miniapp->icon_path)
@@ -89,7 +92,8 @@ class MiniappController extends Controller
      * Kritis untuk iOS yang storage-nya terpisah dari browser.
      *
      * Yang terpasang = file HTML gamenya LANGSUNG (bukan halaman web):
-     * start_url menyajikan HTML MiniApp, bukan redirect ke player.
+     * start_url menyajikan HTML MiniApp dengan manifest + tombol install
+     * mengambang yang diinjeksi — tanpa view website.
      */
     public function launch(string $token): Response
     {
@@ -111,10 +115,66 @@ class MiniappController extends Controller
             abort(404, 'File MiniApp belum tersedia.');
         }
 
-        return response()->file(
-            Storage::disk('local')->path($path),
-            ['Content-Type' => 'text/html; charset=utf-8']
-        );
+        $html = Storage::disk('local')->get($path);
+        $html = $this->injeksiPwa($html, $install->product, $token);
+
+        return response($html, 200, ['Content-Type' => 'text/html; charset=utf-8']);
+    }
+
+    /**
+     * Injeksi manifest + tombol install mengambang ke HTML game.
+     * Hasil: yang dibuka/dipasang murni game, bukan view website.
+     */
+    private function injeksiPwa(string $html, Product $product, string $token): string
+    {
+        $manifestUrl = route('miniapp.manifest', [$product, 'token' => $token]);
+        $swUrl = route('miniapp.sw');
+
+        $headInject = '<link rel="manifest" href="'.e($manifestUrl).'">'."\n"
+            .'<meta name="theme-color" content="#167941">'."\n";
+
+        $btnInject = <<<'HTML'
+<style>
+#rc-install-fab{position:fixed;bottom:18px;right:18px;z-index:2147483647;background:#F5B301;color:#1a1a1a;
+font-family:system-ui,sans-serif;font-weight:800;font-size:15px;border:3px solid #1a1a1a;border-radius:999px;
+padding:12px 20px;cursor:pointer;box-shadow:4px 4px 0 #1a1a1a;display:none;align-items:center;gap:8px}
+#rc-install-fab:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #1a1a1a}
+@media (display-mode: standalone){#rc-install-fab{display:none!important}}
+</style>
+<button id="rc-install-fab">📲 Pasang di HP</button>
+<script>
+(function(){
+var btn=document.getElementById('rc-install-fab'),dp=null;
+if('serviceWorker' in navigator){navigator.serviceWorker.register(SW_URL,{scope:'/'}).catch(function(){});}
+function tampil(){btn.style.display='inline-flex';}
+window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;tampil();});
+setTimeout(function(){if(!dp)tampil();},3000);
+if(window.matchMedia('(display-mode: standalone)').matches){return;}
+btn.addEventListener('click',function(){
+  if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;btn.style.display='none';});}
+  else{alert('Belum bisa install otomatis.\n\nCara manual:\n1. Buka menu browser (titik tiga)\n2. Pilih "Install app" / "Add to Home screen"');}
+});
+window.addEventListener('appinstalled',function(){btn.style.display='none';});
+})();
+</script>
+HTML;
+        $btnInject = str_replace('SW_URL', json_encode($swUrl), $btnInject);
+
+        // Injeksi ke <head>, fallback ke awal dokumen
+        if (stripos($html, '</head>') !== false) {
+            $html = preg_replace('/<\/head>/i', $headInject.'</head>', $html, 1);
+        } else {
+            $html = $headInject.$html;
+        }
+
+        // Injeksi tombol sebelum </body>, fallback ke akhir dokumen
+        if (stripos($html, '</body>') !== false) {
+            $html = preg_replace('/<\/body>/i', $btnInject.'</body>', $html, 1);
+        } else {
+            $html .= $btnInject;
+        }
+
+        return $html;
     }
 
     /**
@@ -199,7 +259,40 @@ class MiniappController extends Controller
     private function otorisasi(Request $request, Product $product): void
     {
         abort_unless($product->tipe === 'miniapp', 404);
+        // Otorisasi via sesi login ATAU token install (?token=) — launcher tidak login
+        $user = $request->user() ?? $this->userDariToken($request, $product);
+        abort_unless($user && ($user->isAdmin() || $user->hasProduct($product->id)), 403);
+    }
+
+    /**
+     * Ambil user dari token install pada query (?token=...) bila tanpa sesi login.
+     */
+    private function userDariToken(Request $request, Product $product): ?User
+    {
+        $token = $request->query('token');
+        if (! $token) {
+            return null;
+        }
+        $install = InstallToken::where('token', $token)->first();
+        if (! $install || ! $install->berlaku() || $install->product_id !== $product->id) {
+            return null;
+        }
+
+        return $install->user;
+    }
+
+    /**
+     * Tombol "Install" di MiniApps Milikku: buat token lalu arahkan
+     * langsung ke HTML game (/pwa/{token}) — tanpa view website.
+     */
+    public function install(Request $request, Product $product): RedirectResponse
+    {
+        abort_unless($product->tipe === 'miniapp', 404);
         $user = $request->user();
         abort_unless($user && ($user->isAdmin() || $user->hasProduct($product->id)), 403);
+
+        $token = InstallToken::untuk($user, $product);
+
+        return redirect()->route('pwa.launch', ['token' => $token->token]);
     }
 }
