@@ -12,7 +12,7 @@ class PromoCampaign extends Model
 
     protected $fillable = [
         'judul', 'subjudul', 'slug', 'deskripsi', 'gambar_path',
-        'video_url', 'ajakan', 'materi',
+        'video_url', 'ajakan', 'materi', 'testimoni_ss',
         'mulai_at', 'berakhir_at', 'status',
     ];
 
@@ -20,7 +20,21 @@ class PromoCampaign extends Model
         'mulai_at' => 'datetime',
         'berakhir_at' => 'datetime',
         'materi' => 'array',
+        'testimoni_ss' => 'array',
     ];
+
+    /**
+     * URL publik screenshot testimoni (array).
+     *
+     * @return string[]
+     */
+    public function testimoniSsUrls(): array
+    {
+        return array_map(
+            fn ($p) => asset('storage/'.$p),
+            $this->testimoni_ss ?? []
+        );
+    }
 
     public function products(): BelongsToMany
     {

@@ -31,10 +31,14 @@ class IklanController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validated($request);
+        if (count($request->file('testimoni_ss', [])) < 3) {
+            return back()->withErrors(['testimoni_ss' => 'Upload minimal 3 screenshot testimoni WhatsApp (maksimal 6).'])->withInput();
+        }
         $data['materi'] = $this->bersihkanMateri($data['materi'] ?? null);
         $kampanye = PromoCampaign::create($data);
         $this->simpanProduk($kampanye, $data['produk_ids']);
         $this->simpanGambar($request, $kampanye);
+        $this->simpanTestimoniSs($request, $kampanye);
 
         return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo dibuat.');
     }
@@ -54,12 +58,22 @@ class IklanController extends Controller
         $iklan->update($data);
         $this->simpanProduk($iklan, $data['produk_ids']);
         $this->simpanGambar($request, $iklan);
+        $hasilSs = $this->kelolaTestimoniSs($request, $iklan);
+        if ($hasilSs !== true) {
+            return back()->withErrors(['testimoni_ss' => $hasilSs])->withInput();
+        }
 
         return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo diperbarui.');
     }
 
     public function destroy(PromoCampaign $iklan): RedirectResponse
     {
+        if ($iklan->gambar_path) {
+            Storage::disk('public')->delete($iklan->gambar_path);
+        }
+        foreach ($iklan->testimoni_ss ?? [] as $path) {
+            Storage::disk('public')->delete($path);
+        }
         $iklan->delete();
 
         return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo dihapus.');
@@ -83,6 +97,10 @@ class IklanController extends Controller
             'ajakan' => ['nullable', 'string', 'max:500'],
             'materi' => ['nullable', 'array', 'max:50'],
             'materi.*' => ['nullable', 'string', 'max:120'],
+            'testimoni_ss' => ['nullable', 'array', 'max:6'],
+            'testimoni_ss.*' => ['image', 'max:2048'],
+            'hapus_ss' => ['nullable', 'array'],
+            'hapus_ss.*' => ['integer', 'min:0'],
             'produk_ids' => ['required', 'array', 'min:1', 'max:4'],
             'produk_ids.*' => ['integer', 'exists:products,id'],
             'mulai_at' => ['nullable', 'date'],
@@ -140,5 +158,47 @@ class IklanController extends Controller
             }
             $kampanye->update(['gambar_path' => $request->file('gambar')->store('promo', 'public')]);
         }
+    }
+
+    /** Simpan screenshot testimoni baru (store): langsung jadi array path. */
+    private function simpanTestimoniSs(Request $request, PromoCampaign $kampanye): void
+    {
+        $paths = [];
+        foreach ($request->file('testimoni_ss', []) as $file) {
+            $paths[] = $file->store('promo/testimoni', 'public');
+        }
+        $kampanye->update(['testimoni_ss' => $paths]);
+    }
+
+    /**
+     * Kelola screenshot testimoni saat update: hapus yang ditandai + tambah baru.
+     * Total harus 3-6 gambar. Return true bila OK, pesan error bila tidak.
+     */
+    private function kelolaTestimoniSs(Request $request, PromoCampaign $kampanye): bool|string
+    {
+        $ssSisa = [];
+        foreach ($kampanye->testimoni_ss ?? [] as $i => $path) {
+            if (in_array($i, $request->input('hapus_ss', []))) {
+                Storage::disk('public')->delete($path);
+            } else {
+                $ssSisa[] = $path;
+            }
+        }
+        $ssBaru = [];
+        foreach ($request->file('testimoni_ss', []) as $file) {
+            $ssBaru[] = $file->store('promo/testimoni', 'public');
+        }
+        $total = array_merge($ssSisa, $ssBaru);
+        $jumlah = count($total);
+        if ($jumlah < 3 || $jumlah > 6) {
+            foreach ($ssBaru as $p) {
+                Storage::disk('public')->delete($p);
+            }
+
+            return "Total screenshot testimoni harus 3–6 gambar (saat ini {$jumlah}).";
+        }
+        $kampanye->update(['testimoni_ss' => $total]);
+
+        return true;
     }
 }

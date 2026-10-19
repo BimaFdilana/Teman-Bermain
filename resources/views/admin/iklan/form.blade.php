@@ -45,6 +45,26 @@
         </div>
 
         <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">📱 Screenshot Testimoni WhatsApp <span class="font-normal" style="color:#6b7280">(wajib 3–6 gambar, JPG/PNG maks 2MB per file)</span></label>
+            @if(!empty($kampanye->testimoni_ss))
+                <div class="flex flex-wrap gap-2 mb-2">
+                    @foreach($kampanye->testimoni_ss as $i => $ss)
+                        <label class="relative inline-block cursor-pointer" title="Centang untuk hapus">
+                            <img src="{{ asset('storage/'.$ss) }}" alt="Testimoni {{ $i+1 }}" class="rounded-lg" style="height:90px;border:2px solid #e5e7eb">
+                            <span class="absolute top-0 right-0 bg-white rounded-bl-lg px-1 text-xs">
+                                <input type="checkbox" name="hapus_ss[]" value="{{ $i }}"> 🗑️
+                            </span>
+                        </label>
+                    @endforeach
+                </div>
+                <p class="text-xs mb-2" style="color:#6b7280">Centang 🗑️ untuk menghapus gambar yang sudah ada.</p>
+            @endif
+            <input type="file" name="testimoni_ss[]" accept="image/*" multiple class="w-full border-2 border-gray-300 rounded-xl px-3 py-2 text-sm">
+            @error('testimoni_ss')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+            @error('testimoni_ss.*')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+        </div>
+
+        <div class="mb-4">
             <label class="text-sm font-bold block mb-1">Video <span class="font-normal" style="color:#6b7280">(opsional — link YouTube/Instagram)</span></label>
             <input type="url" name="video_url" value="{{ old('video_url', $kampanye->video_url) }}" maxlength="255"
                    class="w-full border-2 border-gray-300 rounded-xl px-4 py-2" placeholder="https://youtube.com/watch?v=...">
