@@ -25,6 +25,35 @@ class GuestCheckoutTest extends TestCase
         ]);
     }
 
+    public function test_tamu_bisa_download_invoice_pdf(): void
+    {
+        $p = $this->produk();
+        $this->get('/p/'.$p->slug.'/pesan');
+        $this->post('/p/checkout', [
+            'nama' => 'Budi', 'email' => 'budi@example.com',
+            'whatsapp' => '081234567890', 'metode_bayar' => 'qris',
+        ]);
+        $order = Order::where('guest_email', 'budi@example.com')->first();
+
+        $response = $this->get(route('checkout.invoice-pdf', $order->kode_order));
+
+        $response->assertOk();
+        $this->assertEquals('application/pdf', $response->headers->get('Content-Type'));
+    }
+
+    public function test_tamu_tidak_bisa_download_invoice_orang_lain(): void
+    {
+        $user = User::factory()->create();
+        $p = $this->produk();
+        $order = Order::create([
+            'kode_order' => 'RCB-20260101-INV9', 'user_id' => $user->id,
+            'product_id' => $p->id, 'total_bayar' => 50000,
+            'batas_bayar' => now()->addDay(),
+        ]);
+
+        $this->get(route('checkout.invoice-pdf', $order->kode_order))->assertNotFound();
+    }
+
     public function test_tamu_bisa_checkout_tanpa_login(): void
     {
         $p = $this->produk();

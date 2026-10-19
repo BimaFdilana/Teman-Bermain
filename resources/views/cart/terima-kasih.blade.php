@@ -10,6 +10,8 @@
             <p class="mb-6" style="color:#4b5563">Nomor order/invoice kamu:</p>
             <p class="font-bold text-2xl mb-6" style="font-family:'Quicksand';color:#167941">{{ $order->kode_order }}</p>
 
+            <a href="{{ route('checkout.invoice-pdf', $order->kode_order) }}" class="kidza-btn kidza-btn-yellow mb-6" style="display:inline-block">📄 Download Invoice (PDF)</a>
+
             <div class="rounded-2xl p-4 text-left text-sm mb-6" style="background:#FFF9EC">
                 <p class="font-bold mb-2">Yang perlu kamu tahu:</p>
                 <ol class="list-decimal list-inside space-y-1" style="color:#4b5563">

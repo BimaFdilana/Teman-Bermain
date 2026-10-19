@@ -31,6 +31,7 @@ Route::get('/p/{slug}', [App\Http\Controllers\PromoController::class, 'show'])->
 Route::get('/bayar/{kode_order}', [CheckoutController::class, 'bayar'])->name('checkout.bayar');
 Route::post('/bayar/{kode_order}/bukti', [CheckoutController::class, 'uploadBukti'])->name('checkout.bukti')->middleware('throttle:10,1');
 Route::get('/terima-kasih/{kode_order}', [App\Http\Controllers\CartController::class, 'terimaKasih'])->name('checkout.terima-kasih');
+Route::get('/invoice/{kode_order}/pdf', [App\Http\Controllers\CartController::class, 'invoicePdf'])->name('checkout.invoice-pdf');
 
 // Halaman iklan/promo multi-produk dengan hitungan mundur
 Route::get('/iklan/{slug}', [App\Http\Controllers\PromoController::class, 'iklan'])->name('iklan.show');

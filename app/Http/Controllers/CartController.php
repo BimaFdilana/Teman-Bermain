@@ -221,9 +221,22 @@ class CartController extends Controller
     public function terimaKasih(Request $request, string $kode_order): View
     {
         $order = Order::where('kode_order', $kode_order)->firstOrFail();
-        $this->otorisasiOrder($request, $order);
+        self::otorisasiOrder($request, $order);
 
         return view('cart.terima-kasih', compact('order'));
+    }
+
+    /** Download invoice PDF (pemilik login atau tamu pemegang session). */
+    public function invoicePdf(Request $request, string $kode_order)
+    {
+        $order = Order::where('kode_order', $kode_order)
+            ->with(['items.product', 'product', 'discountCode'])
+            ->firstOrFail();
+        self::otorisasiOrder($request, $order);
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('checkout.invoice-pdf', compact('order'));
+
+        return $pdf->download('invoice-'.$order->kode_order.'.pdf');
     }
 
     /** Order boleh dibuka pemilik login atau tamu pemegang session. */
