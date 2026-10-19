@@ -96,7 +96,7 @@ class CheckoutTest extends TestCase
         $this->assertEquals('verifikasi', $order->status);
         $this->assertEquals(1, $order->upload_ke);
         Storage::disk('public')->assertExists($order->bukti_path);
-        $response->assertRedirect(route('checkout.riwayat'));
+        $response->assertRedirect(route('checkout.terima-kasih', $order->kode_order));
     }
 
     public function test_upload_bukti_ditolak_bila_file_terlalu_besar(): void

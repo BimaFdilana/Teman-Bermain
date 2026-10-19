@@ -54,6 +54,11 @@ class GoogleController extends Controller
 
         Auth::login($user, true); // ingat saya 30 hari (lihat AppServiceProvider)
 
+        // BR-RC-21: hubungkan order tamu yang emailnya cocok ke akun ini
+        \App\Models\Order::whereNull('user_id')
+            ->where('guest_email', $user->email)
+            ->update(['user_id' => $user->id]);
+
         return redirect()->intended(route('home', absolute: false));
     }
 }

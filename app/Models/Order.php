@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Order extends Model
@@ -11,6 +12,7 @@ class Order extends Model
     protected $fillable = [
         'kode_order', 'user_id', 'product_id', 'total_bayar', 'discount_code_id',
         'status', 'bukti_path', 'upload_ke', 'alasan_tolak', 'batas_bayar',
+        'guest_nama', 'guest_email', 'guest_wa', 'metode_bayar', 'bank_va',
     ];
 
     protected $casts = [
@@ -41,6 +43,41 @@ class Order extends Model
     public function redeemCode(): HasOne
     {
         return $this->hasOne(RedeemCode::class);
+    }
+
+    /** Satu order bisa banyak item (cart) → banyak kode redeem. */
+    public function items(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function redeemCodes(): HasMany
+    {
+        return $this->hasMany(RedeemCode::class);
+    }
+
+    /** Nama pembeli: dari akun, atau data tamu. */
+    public function namaPembeli(): string
+    {
+        return $this->user?->name ?? $this->guest_nama ?? '—';
+    }
+
+    public function emailPembeli(): ?string
+    {
+        return $this->user?->email ?? $this->guest_email;
+    }
+
+    public function waPembeli(): ?string
+    {
+        return $this->user?->whatsapp ?? $this->guest_wa;
+    }
+
+    public function labelMetode(): string
+    {
+        return match ($this->metode_bayar) {
+            'va' => 'Virtual Account'.($this->bank_va ? " ({$this->bank_va})" : ''),
+            default => 'QRIS',
+        };
     }
 
     public function labelStatus(): string

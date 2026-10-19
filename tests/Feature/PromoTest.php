@@ -42,29 +42,31 @@ class PromoTest extends TestCase
         $this->get('/p/ebook-draft')->assertNotFound();
     }
 
-    public function test_tamu_diarahkan_login_google_dulu(): void
+    public function test_tamu_tanpa_login_masuk_cart(): void
     {
         $this->buatProduk();
 
         $response = $this->get('/p/ebook-promo/pesan');
 
-        $response->assertRedirect(route('google.redirect'));
-        $this->assertEquals(route('promo.pesan', 'ebook-promo'), session('url.intended'));
+        // Laporan Final 19 Okt 2026: tanpa login, produk masuk cart
+        $response->assertOk();
+        $response->assertSee('Keranjang Pesanan');
+        $this->assertContains(
+            Product::where('slug', 'ebook-promo')->first()->id,
+            session('cart')
+        );
     }
 
-    public function test_pengguna_login_langsung_buat_order(): void
+    public function test_pengguna_login_masuk_cart_juga(): void
     {
         $this->buatProduk();
         $user = User::factory()->create();
 
         $response = $this->actingAs($user)->get('/p/ebook-promo/pesan');
 
-        $this->assertDatabaseHas('orders', [
-            'user_id' => $user->id,
-            'product_id' => Product::where('slug', 'ebook-promo')->first()->id,
-        ]);
-        $order = \App\Models\Order::where('user_id', $user->id)->first();
-        $response->assertRedirect(route('checkout.bayar', $order->kode_order));
+        $response->assertOk();
+        $response->assertSee('Keranjang Pesanan');
+        $this->assertDatabaseMissing('orders', ['user_id' => $user->id]);
     }
 
     public function test_link_promo_ada_di_manage_produk(): void

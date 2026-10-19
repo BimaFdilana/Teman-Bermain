@@ -16,9 +16,21 @@ Route::get('/harga', [LandingController::class, 'harga'])->name('harga');
 Route::get('/produk', [ProductController::class, 'index'])->name('produk.index');
 Route::get('/produk/{slug}', [ProductController::class, 'show'])->name('produk.show');
 
+// Cart + guest checkout via Iklan (Laporan Final 19 Okt 2026) — tanpa login
+// (didefinisikan SEBELUM /p/{slug} agar tidak tertelan)
+Route::get('/p/{slug}/pesan', [App\Http\Controllers\CartController::class, 'index'])->name('promo.pesan');
+Route::post('/p/cart/tambah/{slug}', [App\Http\Controllers\CartController::class, 'tambah'])->name('cart.tambah');
+Route::post('/p/cart/hapus/{slug}', [App\Http\Controllers\CartController::class, 'hapus'])->name('cart.hapus');
+Route::post('/p/cart/diskon', [App\Http\Controllers\CartController::class, 'diskon'])->name('cart.diskon');
+Route::get('/p/checkout', [App\Http\Controllers\CartController::class, 'checkout'])->name('cart.checkout');
+Route::post('/p/checkout', [App\Http\Controllers\CartController::class, 'store'])->name('cart.store')->middleware('throttle:10,1');
+
 // Halaman promosi per produk ala link-in-bio: /p/{slug}
 Route::get('/p/{slug}', [App\Http\Controllers\PromoController::class, 'show'])->name('promo.show');
-Route::get('/p/{slug}/pesan', [App\Http\Controllers\PromoController::class, 'pesan'])->name('promo.pesan');
+// Halaman bayar: pemilik login ATAU tamu pemegang session (otorisasi di controller)
+Route::get('/bayar/{kode_order}', [CheckoutController::class, 'bayar'])->name('checkout.bayar');
+Route::post('/bayar/{kode_order}/bukti', [CheckoutController::class, 'uploadBukti'])->name('checkout.bukti')->middleware('throttle:10,1');
+Route::get('/terima-kasih/{kode_order}', [App\Http\Controllers\CartController::class, 'terimaKasih'])->name('checkout.terima-kasih');
 
 // Halaman iklan/promo multi-produk dengan hitungan mundur
 Route::get('/iklan/{slug}', [App\Http\Controllers\PromoController::class, 'iklan'])->name('iklan.show');
@@ -34,10 +46,8 @@ Route::middleware(['auth', 'nonadmin'])->group(function () {
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    // Checkout & pembayaran (Fase 3, PRD §5.4)
+    // Checkout & pembayaran (Fase 3, PRD §5.4) — alur login tetap di sini
     Route::post('/checkout/{slug}', [CheckoutController::class, 'store'])->name('checkout.store');
-    Route::get('/bayar/{kode_order}', [CheckoutController::class, 'bayar'])->name('checkout.bayar');
-    Route::post('/bayar/{kode_order}/bukti', [CheckoutController::class, 'uploadBukti'])->name('checkout.bukti');
     Route::get('/pesanan-saya', [CheckoutController::class, 'riwayat'])->name('checkout.riwayat');
     Route::get('/pesanan/{kode_order}', [CheckoutController::class, 'show'])->name('checkout.show');
 

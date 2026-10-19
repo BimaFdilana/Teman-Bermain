@@ -34,9 +34,9 @@
             <tbody>
                 @forelse($orders as $order)
                     <tr class="border-t">
-                        <td class="p-3 font-bold">{{ $order->kode_order }}</td>
-                        <td class="p-3">{{ $order->user->name }}<br><span class="text-xs" style="color:#6b7280">{{ $order->user->email }}</span></td>
-                        <td class="p-3">{{ $order->product->judul }}</td>
+                        <td class="p-3 font-bold">{{ $order->kode_order }}<br><span class="text-xs font-normal" style="color:#6b7280">{{ $order->labelMetode() }}</span></td>
+                        <td class="p-3">{{ $order->namaPembeli() }}<br><span class="text-xs" style="color:#6b7280">{{ $order->emailPembeli() }}</span></td>
+                        <td class="p-3">{{ $order->items->count() > 1 ? $order->items->count().' produk' : ($order->items->first()?->product->judul ?? $order->product?->judul ?? '-') }}</td>
                         <td class="p-3 font-bold">{{ $order->totalRupiah() }}</td>
                         <td class="p-3 text-xs" style="color:#6b7280">{{ $order->created_at->format('d M H:i') }}</td>
                         <td class="p-3"><a href="{{ route('admin.pembayaran.show', $order) }}" class="kidza-btn kidza-btn-blue" style="padding:.4rem 1rem;font-size:.85rem">Periksa</a></td>

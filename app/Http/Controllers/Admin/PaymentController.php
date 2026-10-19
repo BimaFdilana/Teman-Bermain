@@ -23,7 +23,7 @@ class PaymentController extends Controller
             $status = 'verifikasi';
         }
 
-        $query = Order::with(['user', 'product'])->latest();
+        $query = Order::with(['user', 'product', 'items.product'])->latest();
         if ($status !== 'semua') {
             $query->where('status', $status);
         }
@@ -42,23 +42,49 @@ class PaymentController extends Controller
 
     public function show(Order $order): View
     {
-        $order->load(['user', 'product', 'discountCode', 'redeemCode']);
+        $order->load(['user', 'items.product', 'discountCode', 'redeemCodes.product']);
 
-        $waText = null;
-        if ($order->status === Order::ST_DISETUJUI && $order->redeemCode) {
-            $waText = "Halo {$order->user->name}! Terima kasih sudah membeli \"{$order->product->judul}\" di Rumah Cahaya-bks. 🎉\n\nKode redeem kamu: *{$order->redeemCode->kode}*\n\nCara pakai:\n1. Masuk ke akunmu\n2. Buka Home, masukkan kode di kolom Redeem\n3. Klik Redeem — produk langsung jadi milikmu!\n\nSelamat belajar dan bermain! 📚";
+        $waLink = null;
+        $waGagalLink = null;
+        $wa = $order->waPembeli();
+        $nama = $order->namaPembeli();
+        $email = $order->emailPembeli() ?? '-';
+
+        if ($order->status === Order::ST_DISETUJUI && $order->redeemCodes->isNotEmpty() && $wa) {
+            $barisKode = $order->redeemCodes->map(
+                fn ($r) => $r->kode.' — untuk '.$r->product->judul
+            )->implode("\n");
+            $daftarProduk = $order->redeemCodes->map(fn ($r) => $r->product->judul)->implode(', ');
+            $waText = "Halo {$nama}! Terima kasih sudah membeli di Rumah Cahaya-bks 🎉\n\n"
+                ."📦 Detail pesanan:\n"
+                ."• No. Order/Invoice: {$order->kode_order}\n"
+                ."• Produk: {$daftarProduk}\n"
+                ."• Tanggal pesanan: {$order->created_at->format('d M Y, H:i')}\n\n"
+                ."🔑 Kode redeem kamu:\n{$barisKode}\n\n"
+                ."Cara klaim:\n"
+                ."1. Login di ".config('app.url')." pakai Google (email: {$email})\n"
+                ."2. Buka Home, masukkan kode redeem di kolom Redeem\n"
+                ."3. Klik Redeem — produk langsung jadi milikmu!\n\n"
+                ."Jika ada kendala, support kami selalu standby membalas pertanyaanmu 💬";
+            $waLink = 'https://wa.me/'.$wa.'?text='.urlencode($waText);
+        }
+
+        if ($order->status === Order::ST_DITOLAK && $wa) {
+            $waGagal = "Halo {$nama}, terima kasih sudah memesan di Rumah Cahaya-bks.\n\n"
+                ."Mohon maaf, pembayaran untuk No. Order {$order->kode_order} belum bisa kami verifikasi: {$order->alasan_tolak}\n\n"
+                ."Silakan upload ulang bukti transfer yang benar, atau hubungi kami jika butuh bantuan 💬";
+            $waGagalLink = 'https://wa.me/'.$wa.'?text='.urlencode($waGagal);
         }
 
         return view('admin.pembayaran.show', [
             'order' => $order,
-            'waLink' => $waText && $order->user->whatsapp
-                ? 'https://wa.me/'.$order->user->whatsapp.'?text='.urlencode($waText)
-                : null,
+            'waLink' => $waLink,
+            'waGagalLink' => $waGagalLink,
         ]);
     }
 
     /**
-     * Setujui: generate redeem code + kurangi stok (PRD §6.6).
+     * Setujui: generate 1 redeem code per item + kurangi stok per item (Laporan Final 19 Okt 2026).
      */
     public function approve(Order $order): RedirectResponse
     {
@@ -66,27 +92,47 @@ class PaymentController extends Controller
             return back()->with('gagal', 'Hanya order menunggu verifikasi yang bisa disetujui.');
         }
 
-        $redeem = RedeemCode::create([
-            'kode' => RedeemCode::generate(),
-            'order_id' => $order->id,
-            'product_id' => $order->product_id,
-        ]);
+        $order->loadMissing(['items.product']);
+
+        $kodes = [];
+        foreach ($order->items as $item) {
+            $redeem = RedeemCode::create([
+                'kode' => RedeemCode::generate(),
+                'order_id' => $order->id,
+                'product_id' => $item->product_id,
+            ]);
+            $kodes[] = $redeem->kode.' — '.$item->product->judul;
+
+            $product = $item->product;
+            if ($product->stok !== null && $product->stok > 0) {
+                $product->decrement('stok');
+            }
+        }
+
+        // Kompatibilitas: order lama tanpa items
+        if ($order->items->isEmpty() && $order->product_id) {
+            $redeem = RedeemCode::create([
+                'kode' => RedeemCode::generate(),
+                'order_id' => $order->id,
+                'product_id' => $order->product_id,
+            ]);
+            $kodes[] = $redeem->kode.' — '.$order->product->judul;
+            $product = $order->product;
+            if ($product->stok !== null && $product->stok > 0) {
+                $product->decrement('stok');
+            }
+        }
 
         $order->update(['status' => Order::ST_DISETUJUI]);
-
-        $product = $order->product;
-        if ($product->stok !== null && $product->stok > 0) {
-            $product->decrement('stok');
-        }
 
         if ($order->discountCode) {
             $order->discountCode->increment('terpakai');
         }
 
-        \App\Models\ActivityLog::catat('verifikasi_order', "Order {$order->kode_order} ({$order->product->judul}) disetujui — kode {$redeem->kode}");
+        \App\Models\ActivityLog::catat('verifikasi_order', "Order {$order->kode_order} disetujui (".count($kodes)." kode)");
 
         return redirect()->route('admin.pembayaran.show', $order)
-            ->with('sukses', "Order disetujui! Kode redeem {$redeem->kode} dibuat. Kirim ke pengguna via tombol WhatsApp di bawah.");
+            ->with('sukses', 'Order disetujui! '.count($kodes).' kode redeem dibuat. Kirim ke pelanggan via tombol "Kirim Produk" di bawah.');
     }
 
     /**

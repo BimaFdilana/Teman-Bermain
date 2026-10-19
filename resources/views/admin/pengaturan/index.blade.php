@@ -34,6 +34,24 @@
                    class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
         </div>
 
+        <h2 class="font-bold text-lg mb-3" style="font-family:'Quicksand'">💳 Virtual Account (BR-RC-23)</h2>
+        <p class="text-xs mb-3" style="color:#6b7280">Isi nomor VA per bank. Bank yang kosong tidak tampil di checkout.</p>
+        @foreach(['BCA' => 'BCA', 'BRI' => 'BRI', 'MANDIRI' => 'Mandiri', 'BNI' => 'BNI'] as $kode => $nama)
+            <div class="mb-3">
+                <label class="text-sm font-bold block mb-1">VA {{ $nama }}</label>
+                <input type="text" name="va_numbers[{{ $kode }}]" value="{{ old('va_numbers.'.$kode, $vaNumbers[$kode] ?? '') }}"
+                       placeholder="Nomor VA {{ $nama }}" class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+            </div>
+        @endforeach
+
+        <h2 class="font-bold text-lg mb-3" style="font-family:'Quicksand'">🧾 Pajak (BR-RC-22)</h2>
+        <div class="mb-5">
+            <label class="text-sm font-bold block mb-1">Pajak PPN (%)</label>
+            <input type="number" name="pajak_persen" value="{{ old('pajak_persen', $pajakPersen) }}" min="0" max="100" step="0.5"
+                   class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+            <p class="text-xs mt-1" style="color:#6b7280">0 = tidak ada pajak. Tampil di ringkasan cart bila &gt; 0.</p>
+        </div>
+
         <button type="submit" class="kidza-btn kidza-btn-green w-full">Simpan Pengaturan</button>
     </form>
 </x-admin-layout>

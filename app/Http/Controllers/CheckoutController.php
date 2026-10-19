@@ -59,19 +59,34 @@ class CheckoutController extends Controller
             'batas_bayar' => now()->addDay(),
         ]);
 
+        $order->items()->create([
+            'product_id' => $product->id,
+            'harga_saat_beli' => $product->harga,
+            'qty' => 1,
+        ]);
+
+        $request->session()->put('order_terakhir', $order->id);
+
         return redirect()->route('checkout.bayar', $order->kode_order);
     }
 
     /**
-     * Halaman pembayaran: QRIS + nominal + upload bukti (PRD §5.4).
+     * Halaman pembayaran: QRIS / VA + nominal + upload bukti (Laporan Final 19 Okt 2026).
+     * Bisa dibuka pemilik login ATAU tamu pemegang session order.
      */
     public function bayar(Request $request, string $kode_order): View
     {
-        $order = $this->milikPengguna($request, $kode_order);
+        $order = Order::where('kode_order', $kode_order)
+            ->with(['items.product', 'discountCode'])
+            ->firstOrFail();
+        CartController::otorisasiOrder($request, $order);
+
+        $vaNumbers = json_decode(Setting::get('va_numbers', '{}') ?? '{}', true) ?: [];
 
         return view('checkout.bayar', [
             'order' => $order,
             'qrisImage' => Setting::get('qris_image'),
+            'vaNumber' => $order->metode_bayar === 'va' ? ($vaNumbers[$order->bank_va] ?? null) : null,
         ]);
     }
 
@@ -80,7 +95,8 @@ class CheckoutController extends Controller
      */
     public function uploadBukti(Request $request, string $kode_order): RedirectResponse
     {
-        $order = $this->milikPengguna($request, $kode_order);
+        $order = Order::where('kode_order', $kode_order)->firstOrFail();
+        CartController::otorisasiOrder($request, $order);
 
         if (! $order->bolehUploadBukti()) {
             return back()->with('info', 'Bukti tidak dapat diunggah pada status ini.');
@@ -105,7 +121,7 @@ class CheckoutController extends Controller
             'alasan_tolak' => null,
         ]);
 
-        return redirect()->route('checkout.riwayat')
+        return redirect()->route('checkout.terima-kasih', $order->kode_order)
             ->with('sukses', 'Bukti pembayaran terkirim! Admin akan verifikasi maks. 1×24 jam.');
     }
 
