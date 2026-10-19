@@ -114,34 +114,37 @@ class IklanTest extends TestCase
         $response->assertSee('HARGA SPESIAL');
     }
 
-    public function test_iklan_tolak_lebih_dari_4_produk(): void
+    public function test_iklan_tolak_lebih_dari_3_secondary(): void
     {
+        $primary = $this->buatProduk('pp', 'PP');
         $ids = [];
-        foreach (range(1, 5) as $i) {
+        foreach (range(1, 4) as $i) {
             $ids[] = $this->buatProduk("p$i", "P$i")->id;
         }
 
         $response = $this->actingAs($this->admin())->post(route('admin.iklan.store'), [
             'judul' => 'Kebanyakan',
-            'produk_ids' => $ids,
+            'produk_primary_id' => $primary->id,
+            'produk_secondary_ids' => $ids,
+            'tampilan_secondary' => 'card',
             'berakhir_at' => now()->addDays(5)->format('Y-m-d\TH:i'),
             'status' => 'draft',
         ]);
 
-        $response->assertSessionHasErrors('produk_ids');
+        $response->assertSessionHasErrors('produk_secondary_ids');
         $this->assertDatabaseMissing('promo_campaigns', ['judul' => 'Kebanyakan']);
     }
 
-    public function test_iklan_wajib_minimal_1_produk(): void
+    public function test_iklan_wajib_produk_utama(): void
     {
         $response = $this->actingAs($this->admin())->post(route('admin.iklan.store'), [
             'judul' => 'Kosong',
-            'produk_ids' => [],
+            'tampilan_secondary' => 'card',
             'berakhir_at' => now()->addDays(5)->format('Y-m-d\TH:i'),
             'status' => 'draft',
         ]);
 
-        $response->assertSessionHasErrors('produk_ids');
+        $response->assertSessionHasErrors('produk_primary_id');
     }
 
     public function test_halaman_iklan_tampil_untuk_kampanye_live(): void
