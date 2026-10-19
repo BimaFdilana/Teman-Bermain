@@ -32,6 +32,8 @@
                                 <span class="kidza-badge" style="background:#167941">Tayang</span>
                             @elseif($k->isBerakhir())
                                 <span class="kidza-badge" style="background:#6b7280">Berakhir</span>
+                            @elseif($k->status === 'aktif')
+                                <span class="kidza-badge" style="background:#0077B6">Terjadwal</span>
                             @else
                                 <span class="kidza-badge" style="background:#F3A712">Draft</span>
                             @endif
