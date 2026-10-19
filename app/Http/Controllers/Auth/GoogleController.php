@@ -21,7 +21,7 @@ class GoogleController extends Controller
     /**
      * Tangani callback dari Google: cari/buat akun lalu login.
      */
-    public function callback(): RedirectResponse
+    public function callback(Request $request): RedirectResponse
     {
         $googleUser = Socialite::driver('google')->user();
 
@@ -53,6 +53,7 @@ class GoogleController extends Controller
         }
 
         Auth::login($user, true); // ingat saya 30 hari (lihat AppServiceProvider)
+        $request->session()->regenerate(); // cegah session fixation (audit 19 Okt 2026)
 
         // BR-RC-21: hubungkan order tamu yang emailnya cocok ke akun ini
         \App\Models\Order::whereNull('user_id')

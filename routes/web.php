@@ -52,7 +52,7 @@ Route::middleware(['auth', 'nonadmin'])->group(function () {
     Route::get('/pesanan/{kode_order}', [CheckoutController::class, 'show'])->name('checkout.show');
 
     // Redeem code
-    Route::post('/redeem', [RedeemController::class, 'store'])->name('redeem.store');
+    Route::post('/redeem', [RedeemController::class, 'store'])->name('redeem.store')->middleware('throttle:20,1');
 
     // Ebook reader (Fase 4, PRD §5.5)
     Route::get('/baca/{product}', [App\Http\Controllers\EbookController::class, 'baca'])->name('ebook.baca');
