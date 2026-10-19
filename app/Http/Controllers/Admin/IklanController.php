@@ -35,8 +35,11 @@ class IklanController extends Controller
             return back()->withErrors(['testimoni_ss' => 'Upload minimal 3 screenshot testimoni WhatsApp (maksimal 6).'])->withInput();
         }
         $data['materi'] = $this->bersihkanMateri($data['materi'] ?? null);
+        // Keluarkan field non-kolom sebelum create
+        $secondaryIds = $data['produk_secondary_ids'] ?? [];
+        unset($data['produk_secondary_ids'], $data['testimoni_ss'], $data['hapus_ss']);
         $kampanye = PromoCampaign::create($data);
-        $this->simpanProduk($kampanye, $data['produk_primary_id'], $data['produk_secondary_ids'] ?? []);
+        $this->simpanProduk($kampanye, $data['produk_primary_id'], $secondaryIds);
         $this->simpanGambar($request, $kampanye);
         $this->simpanTestimoniSs($request, $kampanye);
 
@@ -55,8 +58,10 @@ class IklanController extends Controller
     {
         $data = $this->validated($request, $iklan->id);
         $data['materi'] = $this->bersihkanMateri($data['materi'] ?? null);
+        $secondaryIds = $data['produk_secondary_ids'] ?? [];
+        unset($data['produk_secondary_ids'], $data['testimoni_ss'], $data['hapus_ss']);
         $iklan->update($data);
-        $this->simpanProduk($iklan, $data['produk_primary_id'], $data['produk_secondary_ids'] ?? []);
+        $this->simpanProduk($iklan, $data['produk_primary_id'], $secondaryIds);
         $this->simpanGambar($request, $iklan);
         $hasilSs = $this->kelolaTestimoniSs($request, $iklan);
         if ($hasilSs !== true) {

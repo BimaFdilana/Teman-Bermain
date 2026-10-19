@@ -38,7 +38,10 @@ class PromoController extends Controller
         if ($kampanye->mulai_at && now()->lt($kampanye->mulai_at)) {
             abort(404);
         }
-        $kampanye->load(['produkPrimary', 'produkSecondary' => fn ($q) => $q->tersedia()]);
+        $kampanye->load([
+            'produkPrimary' => fn ($q) => $q->tersedia(),
+            'produkSecondary' => fn ($q) => $q->tersedia(),
+        ]);
         $testimonis = \App\Models\Testimonial::where('aktif', true)->orderBy('urutan')->take(3)->get();
 
         return view('promo.iklan', ['kampanye' => $kampanye, 'testimonis' => $testimonis]);
