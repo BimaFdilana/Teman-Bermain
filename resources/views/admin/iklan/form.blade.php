@@ -290,7 +290,13 @@
     (function () {
         const $ = (id) => document.getElementById(id);
         const form = document.querySelector('form');
-        const produkData = @json($produks->mapWithKeys(fn($p) => [$p->id => ['judul' => $p->judul, 'harga' => $p->harga, 'harga_coret' => $p->harga_coret, 'cover' => $p->coverUrl()]]));
+        @php
+            $produkData = $produks->mapWithKeys(fn($p) => [$p->id => [
+                'judul' => $p->judul, 'harga' => $p->harga,
+                'harga_coret' => $p->harga_coret, 'cover' => $p->coverUrl(),
+            ]]);
+        @endphp
+        const produkData = @json($produkData);
 
         const txt = (name, elId, def = '') => {
             const inp = form.querySelector(`[name="${name}"]`);
