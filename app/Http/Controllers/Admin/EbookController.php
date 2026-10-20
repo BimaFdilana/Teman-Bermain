@@ -32,7 +32,7 @@ class EbookController extends Controller
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:draft,tersedia',
             'cover' => 'nullable|image|max:2048',
-            'pdf' => 'required|file|mimes:pdf|max:10240',
+            'pdf' => 'required|file|mimes:pdf|max:25600',
             'jumlah_halaman' => 'nullable|integer|min:1',
         ]);
 
@@ -76,7 +76,7 @@ class EbookController extends Controller
             'deskripsi' => 'nullable|string',
             'status' => 'required|in:draft,tersedia,arsip',
             'cover' => 'nullable|image|max:2048',
-            'pdf' => 'nullable|file|mimes:pdf|max:10240',
+            'pdf' => 'nullable|file|mimes:pdf|max:25600',
             'jumlah_halaman' => 'nullable|integer|min:1',
         ]);
 
