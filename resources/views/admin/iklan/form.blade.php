@@ -2,7 +2,7 @@
     <a href="{{ route('admin.iklan.index') }}" class="kidza-link text-sm mb-4 inline-block">← Kembali</a>
     <h1 class="kidza-h2 mb-6">{{ $kampanye->exists ? 'Edit' : 'Buat' }} Iklan Promo</h1>
 
-    <div class="flex flex-col xl:flex-row gap-6 items-start">
+    <div class="flex flex-col lg:flex-row gap-6 items-start">
     <form method="POST" action="{{ $kampanye->exists ? route('admin.iklan.update', $kampanye) : route('admin.iklan.store') }}"
           class="kidza-card p-6 flex-1 w-full" style="max-width:44rem" enctype="multipart/form-data">
         @csrf
@@ -195,7 +195,7 @@
     </form>
 
     {{-- Preview langsung (kanan) --}}
-    <aside class="w-full xl:w-[400px] shrink-0 xl:sticky xl:top-6">
+    <aside class="w-full lg:w-[400px] shrink-0 lg:sticky lg:top-6">
         <p class="text-sm font-bold mb-2" style="color:#6b7280">👁️ Preview Iklan <span class="font-normal">(update otomatis)</span></p>
         <div id="pv-phone" class="mx-auto bg-white rounded-[2rem] overflow-hidden" style="max-width:400px;border:3px solid #1a1a1a;box-shadow:6px 6px 0 #1a1a1a">
             <div class="text-center py-3" style="background:#FFFEF7;border-bottom:2px solid #F0E7CC">
