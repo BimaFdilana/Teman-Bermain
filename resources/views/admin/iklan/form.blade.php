@@ -3,7 +3,7 @@
     <h1 class="kidza-h2 mb-6">{{ $kampanye->exists ? 'Edit' : 'Buat' }} Iklan Promo</h1>
 
     <div class="flex flex-col lg:flex-row gap-6 items-start">
-    <form method="POST" action="{{ $kampanye->exists ? route('admin.iklan.update', $kampanye) : route('admin.iklan.store') }}"
+    <form method="POST" id="form-iklan" action="{{ $kampanye->exists ? route('admin.iklan.update', $kampanye) : route('admin.iklan.store') }}"
           class="kidza-card p-6 flex-1 w-full" style="max-width:44rem" enctype="multipart/form-data">
         @csrf
         @if($kampanye->exists) @method('PUT') @endif
@@ -289,7 +289,7 @@
     // ===== Live preview iklan (panel kanan) =====
     (function () {
         const $ = (id) => document.getElementById(id);
-        const form = document.querySelector('form');
+        const form = document.getElementById('form-iklan');
         @php
             $produkData = $produks->mapWithKeys(fn($p) => [$p->id => [
                 'judul' => $p->judul, 'harga' => $p->harga,
