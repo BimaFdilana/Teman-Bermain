@@ -209,7 +209,7 @@
                 <div class="text-center mb-3">
                     <span class="inline-block px-4 py-1 rounded-full text-xs font-bold" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ Berakhir dalam 2 hari 04:15:30</span>
                 </div>
-                <p id="pv-deskripsi" class="text-sm mb-4" style="color:#5B5344;line-height:1.6"></p>
+                <p id="pv-deskripsi" class="text-sm mb-4" style="color:#5B5344;line-height:1.6;text-align:justify;overflow-wrap:break-word;word-break:break-word"></p>
                 <div id="pv-produk" class="mb-4"></div>
                 <div id="pv-video" class="mb-4" style="display:none">
                     <div class="rounded-2xl flex items-center justify-center text-4xl" style="aspect-ratio:16/9;background:#1a1a1a">▶️</div>
