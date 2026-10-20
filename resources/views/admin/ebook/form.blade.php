@@ -13,7 +13,7 @@
         <x-form-input label="Judul Ebook" name="judul" :value="$product->judul" required />
         <x-form-input label="Deskripsi Singkat" name="deskripsi" type="textarea" :value="$product->deskripsi" attrs="rows=3" />
         <x-form-input label="Cover Ebook (gambar)" name="cover" type="file" help="JPG/PNG maks 2MB." />
-        <x-form-input label="File PDF" name="pdf" type="file" :required="!$product->exists" help="PDF maks 10MB.{{ $product->ebook?->pdf_path ? ' Sudah ada file — upload untuk mengganti.' : '' }}" />
+        <x-form-input label="File PDF" name="pdf" type="file" :required="!$product->exists" help="PDF maks 25MB.{{ $product->ebook?->pdf_path ? ' Sudah ada file — upload untuk mengganti.' : '' }}" />
         <x-form-input label="Jumlah Halaman" name="jumlah_halaman" type="number" :value="$product->ebook?->jumlah_halaman" attrs="min=1" />
         <x-form-input label="Status" name="status" type="select" required>
             @foreach(['draft' => 'Draft (pending)', 'tersedia' => 'Tersedia', 'arsip' => 'Arsip'] as $v => $l)
