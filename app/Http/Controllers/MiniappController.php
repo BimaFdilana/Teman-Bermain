@@ -132,6 +132,10 @@ class MiniappController extends Controller
 
         $headInject = '<link rel="manifest" href="'.e($manifestUrl).'">'."\n"
             .'<meta name="theme-color" content="#167941">'."\n";
+        // Sisipkan viewport hanya bila HTML game belum memilikinya (agar responsif di HP).
+        if (! preg_match('/<meta[^>]+name=["\']viewport["\']/i', $html)) {
+            $headInject .= '<meta name="viewport" content="width=device-width, initial-scale=1">'."\n";
+        }
 
         $btnInject = <<<'HTML'
 <style>
