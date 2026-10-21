@@ -7,6 +7,7 @@ use App\Models\Product;
 use App\Models\PromoCampaign;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -115,13 +116,21 @@ class IklanController extends Controller
             'section_sembunyi' => ['nullable', 'array'],
             'section_sembunyi.*' => ['string', 'in:'.implode(',', array_keys(PromoCampaign::SECTIONS))],
             'mulai_at' => ['nullable', 'date'],
-            'berakhir_at' => ['required', 'date', 'after:mulai_at'],
+            'berakhir_at' => ['required', 'date', 'after_or_equal:mulai_at'],
             'status' => ['required', 'in:draft,aktif'],
         ], [
             'produk_secondary_ids.max' => 'Maksimal 3 produk tambahan.',
             'produk_secondary_ids.*.different' => 'Produk tambahan tidak boleh sama dengan produk utama.',
-            'berakhir_at.after' => 'Waktu berakhir harus setelah waktu mulai.',
+            'berakhir_at.after_or_equal' => 'Tanggal berakhir tidak boleh sebelum tanggal mulai.',
         ]);
+
+        // Form kini hanya mengirim tanggal: mulai = awal hari, berakhir = akhir hari.
+        if (! empty($data['mulai_at'])) {
+            $data['mulai_at'] = Carbon::parse($data['mulai_at'])->startOfDay();
+        }
+        if (! empty($data['berakhir_at'])) {
+            $data['berakhir_at'] = Carbon::parse($data['berakhir_at'])->endOfDay();
+        }
 
         if (empty($data['slug'])) {
             $data['slug'] = $this->slugUnik($data['judul'], $ignoreId);

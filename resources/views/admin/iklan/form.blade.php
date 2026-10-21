@@ -171,15 +171,17 @@
         <div class="grid md:grid-cols-3 gap-4 mb-6">
             <div>
                 <label class="text-sm font-bold block mb-1">Mulai (opsional)</label>
-                <input type="datetime-local" name="mulai_at"
-                       value="{{ old('mulai_at', $kampanye->mulai_at?->format('Y-m-d\TH:i')) }}"
+                <input type="date" name="mulai_at"
+                       value="{{ old('mulai_at', $kampanye->mulai_at?->format('Y-m-d')) }}"
                        class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+                <p class="text-xs mt-1" style="color:#6b7280">Tayang mulai awal hari tanggal ini. Kosongkan = langsung tayang.</p>
             </div>
             <div>
                 <label class="text-sm font-bold block mb-1">Berakhir</label>
-                <input type="datetime-local" name="berakhir_at" required
-                       value="{{ old('berakhir_at', $kampanye->berakhir_at?->format('Y-m-d\TH:i')) }}"
+                <input type="date" name="berakhir_at" required
+                       value="{{ old('berakhir_at', $kampanye->berakhir_at?->format('Y-m-d')) }}"
                        class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+                <p class="text-xs mt-1" style="color:#6b7280">Tayang sampai akhir hari tanggal ini.</p>
                 @error('berakhir_at')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
             </div>
             <div>
