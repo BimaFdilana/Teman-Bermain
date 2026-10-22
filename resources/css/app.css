@@ -240,6 +240,8 @@ body {
   height: 52px; width: auto; max-width: 160px; object-fit: contain;
   align-self: center;
 }
+/* Mode logo: lebih cepat dari marquee teks */
+.kidza-marquee-track-logo { animation-duration: 16s; }
 
 /* Testimonial carousel */
 .kidza-testi-track {

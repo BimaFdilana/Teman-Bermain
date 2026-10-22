@@ -182,9 +182,10 @@
 @php $logoSlider = json_decode(\App\Models\Setting::get('logo_slider', '[]') ?? '[]', true) ?: []; @endphp
 <section style="background:#FFFDF0;border-top:3px solid #EDE4C8;border-bottom:3px solid #EDE4C8">
     <div class="kidza-marquee">
-        <div class="kidza-marquee-track">
+        <div class="kidza-marquee-track {{ !empty($logoSlider) ? 'kidza-marquee-track-logo' : '' }}">
             @if(!empty($logoSlider))
-                @foreach([1, 2] as $putaran)
+                {{-- Diulang 6x: separuh track harus selalu lebih lebar dari layar agar mulus ujung ke ujung --}}
+                @foreach([1, 2, 3, 4, 5, 6] as $putaran)
                     @foreach($logoSlider as $path)
                         <img src="{{ asset('storage/'.$path) }}" alt="Logo" class="kidza-marquee-logo">
                     @endforeach
