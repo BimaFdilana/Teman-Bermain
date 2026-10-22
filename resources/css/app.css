@@ -113,6 +113,7 @@ body {
   box-shadow: 0 3px 0 rgba(150, 110, 0, .35);
 }
 .bottom-nav svg { width: 26px; height: 26px; }
+.bottom-nav img { width: 28px; height: 28px; object-fit: contain; }
 
 .app-shell { background: #FBF6E9; min-height: 100vh; padding-bottom: 92px; } /* ruang untuk bottom nav */
 
