@@ -25,9 +25,14 @@ class Product extends Model
     public const STATUS_TERSEDIA = 'tersedia';
     public const STATUS_ARSIP = 'arsip';
 
+    /**
+     * Produk yang boleh tampil & dijual ke publik: status tersedia DAN
+     * sudah diberi harga (harga > 0). Produk baru dari menu Ebook/MiniApps
+     * lahir dengan harga 0 — baru muncul setelah harga diatur di Manage Produk.
+     */
     public function scopeTersedia($query)
     {
-        return $query->where('status', self::STATUS_TERSEDIA);
+        return $query->where('status', self::STATUS_TERSEDIA)->where('harga', '>', 0);
     }
 
     public function ebook(): HasOne

@@ -19,6 +19,7 @@ class LandingController extends Controller
     public function index(): View
     {
         $bundles = Product::where('tipe', 'bundle')->where('status', 'tersedia')
+            ->where('harga', '>', 0) // hanya bundle berharga yang bisa jadi paket unggulan
             ->orderBy('judul')->get();
         $paketTerpilih = json_decode(Setting::get('paket_unggulan_ids', '[]'), true) ?: [];
 

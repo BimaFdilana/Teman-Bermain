@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class IklanController extends Controller
@@ -100,9 +101,13 @@ class IklanController extends Controller
             'materi.*' => ['nullable', 'string', 'max:120'],
             'testimoni_ids' => ['required', 'array', 'min:3', 'max:6'],
             'testimoni_ids.*' => ['integer', 'exists:testimonial_images,id'],
-            'produk_primary_id' => ['required', 'integer', 'exists:products,id'],
+            'produk_primary_id' => ['required', 'integer', Rule::exists('products', 'id')->where(
+                fn ($q) => $q->where('status', Product::STATUS_TERSEDIA)->where('harga', '>', 0)
+            )],
             'produk_secondary_ids' => ['nullable', 'array', 'max:3'],
-            'produk_secondary_ids.*' => ['integer', 'exists:products,id', 'different:produk_primary_id'],
+            'produk_secondary_ids.*' => ['integer', Rule::exists('products', 'id')->where(
+                fn ($q) => $q->where('status', Product::STATUS_TERSEDIA)->where('harga', '>', 0)
+            ), 'different:produk_primary_id'],
             'tampilan_secondary' => ['required', 'in:card,list'],
             'urutan_konten' => ['nullable', 'array'],
             'urutan_konten.*' => ['string', 'in:'.implode(',', array_keys(PromoCampaign::SECTIONS))],
@@ -113,6 +118,8 @@ class IklanController extends Controller
             'status' => ['required', 'in:draft,aktif'],
         ], [
             'produk_secondary_ids.max' => 'Maksimal 3 produk tambahan.',
+            'produk_primary_id.exists' => 'Produk utama harus produk yang tersedia dan sudah diberi harga (atur harga di Manage Produk).',
+            'produk_secondary_ids.*.exists' => 'Produk tambahan harus tersedia dan sudah diberi harga (atur harga di Manage Produk).',
             'produk_secondary_ids.*.different' => 'Produk tambahan tidak boleh sama dengan produk utama.',
             'testimoni_ids.required' => 'Pilih gambar testimoni dari galeri.',
             'testimoni_ids.min' => 'Pilih minimal 3 gambar testimoni.',
