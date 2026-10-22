@@ -69,20 +69,22 @@ class MiniappController extends Controller
         $icon = $product->miniapp?->icon_path
             ? asset('storage/'.$product->miniapp->icon_path)
             : asset('images/logo-icon.png');
+        $startUrl = route('pwa.launch', ['token' => $token->token]);
 
         return response()->json([
+            'id' => $startUrl,
             'name' => $nama,
             'short_name' => mb_substr($nama, 0, 12),
             'description' => $product->deskripsi,
-            'start_url' => route('pwa.launch', ['token' => $token->token]),
+            'start_url' => $startUrl,
             'scope' => '/',
             'display' => 'standalone',
             'orientation' => 'any',
             'background_color' => '#F9F9F6',
             'theme_color' => '#167941',
             'icons' => [
-                ['src' => $icon, 'sizes' => '192x192', 'type' => 'image/png'],
-                ['src' => $icon, 'sizes' => '512x512', 'type' => 'image/png'],
+                ['src' => $icon, 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+                ['src' => $icon, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
             ],
         ]);
     }
@@ -130,11 +132,31 @@ class MiniappController extends Controller
         $manifestUrl = route('miniapp.manifest', [$product, 'token' => $token]);
         $swUrl = route('miniapp.sw');
 
+        // Cabut link manifest bawaan game (mis. dari paket ZIP): browser hanya membaca
+        // link manifest PERTAMA — manifest sistem (dengan token) harus satu-satunya.
+        $html = preg_replace('/<link[^>]+rel=["\']manifest["\'][^>]*>/i', '', $html);
+
         $headInject = '<link rel="manifest" href="'.e($manifestUrl).'">'."\n"
             .'<meta name="theme-color" content="#167941">'."\n";
         // Sisipkan viewport hanya bila HTML game belum memilikinya (agar responsif di HP).
         if (! preg_match('/<meta[^>]+name=["\']viewport["\']/i', $html)) {
             $headInject .= '<meta name="viewport" content="width=device-width, initial-scale=1">'."\n";
+        }
+        // Meta iOS: ikon layar utama + mode standalone Safari (hanya bila belum ada).
+        $icon = $product->miniapp?->icon_path
+            ? asset('storage/'.$product->miniapp->icon_path)
+            : asset('images/logo-icon.png');
+        if (! preg_match('/<link[^>]+rel=["\']apple-touch-icon["\']/i', $html)) {
+            $headInject .= '<link rel="apple-touch-icon" href="'.e($icon).'">'."\n";
+        }
+        if (! preg_match('/<meta[^>]+name=["\']apple-mobile-web-app-capable["\']/i', $html)) {
+            $headInject .= '<meta name="apple-mobile-web-app-capable" content="yes">'."\n";
+        }
+        if (! preg_match('/<meta[^>]+name=["\']mobile-web-app-capable["\']/i', $html)) {
+            $headInject .= '<meta name="mobile-web-app-capable" content="yes">'."\n";
+        }
+        if (! preg_match('/<meta[^>]+name=["\']apple-mobile-web-app-title["\']/i', $html)) {
+            $headInject .= '<meta name="apple-mobile-web-app-title" content="'.e($product->miniapp?->pwa_name ?: $product->judul).'">'."\n";
         }
 
         $btnInject = <<<'HTML'
@@ -143,22 +165,53 @@ class MiniappController extends Controller
 font-family:system-ui,sans-serif;font-weight:800;font-size:15px;border:3px solid #1a1a1a;border-radius:999px;
 padding:12px 20px;cursor:pointer;box-shadow:4px 4px 0 #1a1a1a;display:none;align-items:center;gap:8px}
 #rc-install-fab:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #1a1a1a}
-@media (display-mode: standalone){#rc-install-fab{display:none!important}}
+#rc-install-panel{position:fixed;bottom:84px;right:18px;z-index:2147483647;width:min(320px,calc(100vw - 36px));
+background:#fff;color:#1a1a1a;font-family:system-ui,sans-serif;font-size:14px;line-height:1.55;
+border:3px solid #1a1a1a;border-radius:16px;box-shadow:4px 4px 0 #1a1a1a;padding:14px 16px;display:none}
+#rc-install-panel p{margin:0 0 6px;font-weight:800}
+#rc-install-panel ol{margin:0;padding-left:20px}
+#rc-panel-tutup{position:absolute;top:6px;right:10px;background:none;border:none;font-size:16px;cursor:pointer;color:#1a1a1a}
+@media (display-mode: standalone){#rc-install-fab,#rc-install-panel{display:none!important}}
 </style>
-<button id="rc-install-fab">📲 Pasang di HP</button>
+<button id="rc-install-fab" type="button">📲 Pasang di HP</button>
+<div id="rc-install-panel">
+<button id="rc-panel-tutup" type="button" aria-label="Tutup">✕</button>
+<div id="rc-panduan-android">
+<p>📲 Pasang aplikasi ini</p>
+<ol>
+<li>Ketuk menu <strong>⋮</strong> di kanan atas Chrome</li>
+<li>Pilih <strong>“Install app”</strong> / <strong>“Tambahkan ke Layar Utama”</strong></li>
+<li>Ketuk <strong>Install</strong> — ikon muncul di layar utama</li>
+</ol>
+</div>
+<div id="rc-panduan-ios" style="display:none">
+<p>📲 Pasang di iPhone/iPad</p>
+<ol>
+<li>Ketuk tombol <strong>Bagikan</strong> (kotak dengan panah ke atas) di Safari</li>
+<li>Pilih <strong>“Tambah ke Layar Utama”</strong></li>
+<li>Ketuk <strong>“Tambah”</strong> — ikon muncul di layar utama</li>
+</ol>
+</div>
+</div>
 <script>
 (function(){
-var btn=document.getElementById('rc-install-fab'),dp=null;
+var btn=document.getElementById('rc-install-fab'),panel=document.getElementById('rc-install-panel'),dp=null;
+var standalone=window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+if(standalone){return;}
 if('serviceWorker' in navigator){navigator.serviceWorker.register(SW_URL,{scope:'/'}).catch(function(){});}
+var ua=window.navigator.userAgent||'';
+var isIos=/iphone|ipad|ipod/i.test(ua)||(window.navigator.platform==='MacIntel'&&window.navigator.maxTouchPoints>1);
 function tampil(){btn.style.display='inline-flex';}
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;tampil();});
-setTimeout(function(){if(!dp)tampil();},3000);
-if(window.matchMedia('(display-mode: standalone)').matches){return;}
+setTimeout(tampil,3000);
 btn.addEventListener('click',function(){
-  if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;btn.style.display='none';});}
-  else{alert('Belum bisa install otomatis.\n\nCara manual:\n1. Buka menu browser (titik tiga)\n2. Pilih "Install app" / "Add to Home screen"');}
+  if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;btn.style.display='none';panel.style.display='none';});return;}
+  document.getElementById('rc-panduan-ios').style.display=isIos?'block':'none';
+  document.getElementById('rc-panduan-android').style.display=isIos?'none':'block';
+  panel.style.display=(panel.style.display==='block')?'none':'block';
 });
-window.addEventListener('appinstalled',function(){btn.style.display='none';});
+document.getElementById('rc-panel-tutup').addEventListener('click',function(){panel.style.display='none';});
+window.addEventListener('appinstalled',function(){btn.style.display='none';panel.style.display='none';});
 })();
 </script>
 HTML;
