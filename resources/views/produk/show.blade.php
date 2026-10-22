@@ -110,4 +110,5 @@
         @endif
     </div>
 </section>
+@include('partials.tombol-home')
 </x-landing-layout>
