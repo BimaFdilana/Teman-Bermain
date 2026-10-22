@@ -180,7 +180,7 @@
 
 <!-- ===== 7. MARQUEE / LOGO SLIDER ===== -->
 @php $logoSlider = json_decode(\App\Models\Setting::get('logo_slider', '[]') ?? '[]', true) ?: []; @endphp
-<section style="background:#FFFDF0;border-top:3px solid #EDE4C8;border-bottom:3px solid #EDE4C8">
+<section style="background:#FFFFFF;border-top:3px solid #EDE4C8;border-bottom:3px solid #EDE4C8">
     <div class="kidza-marquee">
         <div class="kidza-marquee-track {{ !empty($logoSlider) ? 'kidza-marquee-track-logo' : '' }}">
             @if(!empty($logoSlider))
