@@ -159,6 +159,8 @@ Route::middleware(['auth', 'admin', 'admin.idle'])->prefix('admin')->name('admin
     Route::get('/aktivitas', [App\Http\Controllers\Admin\AktivitasController::class, 'index'])->name('aktivitas.index');
     Route::get('/pengaturan', [SettingController::class, 'index'])->name('pengaturan.index');
     Route::post('/pengaturan', [SettingController::class, 'update'])->name('pengaturan.update');
+    Route::post('/pengaturan/logo-slider', [SettingController::class, 'logoSliderStore'])->name('pengaturan.logo-slider.store');
+    Route::delete('/pengaturan/logo-slider/{index}', [SettingController::class, 'logoSliderDestroy'])->name('pengaturan.logo-slider.destroy');
 });
 
 require __DIR__.'/auth.php';

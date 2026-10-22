@@ -178,16 +178,25 @@
     </div>
 </section>
 
-<!-- ===== 7. MARQUEE ===== -->
+<!-- ===== 7. MARQUEE / LOGO SLIDER ===== -->
+@php $logoSlider = json_decode(\App\Models\Setting::get('logo_slider', '[]') ?? '[]', true) ?: []; @endphp
 <section style="background:#FFFDF0;border-top:3px solid #EDE4C8;border-bottom:3px solid #EDE4C8">
     <div class="kidza-marquee">
         <div class="kidza-marquee-track">
-            @foreach(['Ebook Anak 📚', 'MiniApp Game 🎮', 'PAUD Ceria 🌈', 'SD Pintar ⭐', 'Bayar QRIS 💳', 'Kode via WA 💬'] as $b)
-                <span>{{ $b }}</span><span>🌿</span>
-            @endforeach
-            @foreach(['Ebook Anak 📚', 'MiniApp Game 🎮', 'PAUD Ceria 🌈', 'SD Pintar ⭐', 'Bayar QRIS 💳', 'Kode via WA 💬'] as $b)
-                <span>{{ $b }}</span><span>🌿</span>
-            @endforeach
+            @if(!empty($logoSlider))
+                @foreach([1, 2] as $putaran)
+                    @foreach($logoSlider as $path)
+                        <img src="{{ asset('storage/'.$path) }}" alt="Logo" class="kidza-marquee-logo">
+                    @endforeach
+                @endforeach
+            @else
+                @foreach(['Ebook Anak 📚', 'MiniApp Game 🎮', 'PAUD Ceria 🌈', 'SD Pintar ⭐', 'Bayar QRIS 💳', 'Kode via WA 💬'] as $b)
+                    <span>{{ $b }}</span><span>🌿</span>
+                @endforeach
+                @foreach(['Ebook Anak 📚', 'MiniApp Game 🎮', 'PAUD Ceria 🌈', 'SD Pintar ⭐', 'Bayar QRIS 💳', 'Kode via WA 💬'] as $b)
+                    <span>{{ $b }}</span><span>🌿</span>
+                @endforeach
+            @endif
         </div>
     </div>
 </section>

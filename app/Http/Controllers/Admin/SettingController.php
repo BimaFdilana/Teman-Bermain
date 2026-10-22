@@ -23,7 +23,42 @@ class SettingController extends Controller
             'alamat' => Setting::get('alamat'),
             'vaNumbers' => json_decode(Setting::get('va_numbers', '{}') ?? '{}', true) ?: [],
             'pajakPersen' => Setting::get('pajak_persen', '0'),
+            'logoSlider' => json_decode(Setting::get('logo_slider', '[]') ?? '[]', true) ?: [],
         ]);
+    }
+
+    /** Upload logo ke slider landing (logo usaha + logo pendukung). */
+    public function logoSliderStore(Request $request): RedirectResponse
+    {
+        $request->validate([
+            'logo' => ['required', 'array', 'min:1', 'max:10'],
+            'logo.*' => ['image', 'mimes:jpg,jpeg,png,webp,svg', 'max:2048'],
+        ], [
+            'logo.required' => 'Pilih minimal 1 file logo.',
+            'logo.*.image' => 'Semua file harus berupa gambar.',
+            'logo.*.max' => 'Ukuran logo maksimal 2MB per file.',
+        ]);
+
+        $daftar = json_decode(Setting::get('logo_slider', '[]') ?? '[]', true) ?: [];
+        foreach ($request->file('logo', []) as $file) {
+            $daftar[] = $file->store('logo-slider', 'public');
+        }
+        Setting::set('logo_slider', json_encode(array_values($daftar)));
+
+        return back()->with('sukses', 'Logo slider ditambahkan.');
+    }
+
+    /** Hapus satu logo dari slider berdasarkan urutannya. */
+    public function logoSliderDestroy(int $index): RedirectResponse
+    {
+        $daftar = json_decode(Setting::get('logo_slider', '[]') ?? '[]', true) ?: [];
+        if (isset($daftar[$index])) {
+            Storage::disk('public')->delete($daftar[$index]);
+            unset($daftar[$index]);
+            Setting::set('logo_slider', json_encode(array_values($daftar)));
+        }
+
+        return back()->with('sukses', 'Logo slider dihapus.');
     }
 
     public function update(Request $request): RedirectResponse

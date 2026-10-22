@@ -54,4 +54,38 @@
 
         <button type="submit" class="kidza-btn kidza-btn-green w-full">Simpan Pengaturan</button>
     </form>
+
+    <div class="kidza-card p-6 mt-6" style="max-width:36rem">
+        <h2 class="font-bold text-lg mb-2" style="font-family:'Quicksand'">🖼️ Logo Slider (Landing Page)</h2>
+        <p class="text-sm mb-4" style="color:#4b5563">Logo yang tampil berjalan di Landing Page, di bawah section testimoni "Kata Mereka" — isi dengan logo usaha kamu dan logo usaha pendukung. Bila kosong, slider menampilkan teks seperti sekarang.</p>
+
+        @if(!empty($logoSlider))
+            <div class="flex flex-wrap gap-3 mb-5">
+                @foreach($logoSlider as $i => $path)
+                    <div class="relative border-2 rounded-xl p-2" style="border-color:#e5e7eb;background:#FFFDF0">
+                        <img src="{{ asset('storage/'.$path) }}" alt="Logo {{ $i + 1 }}" style="height:56px;width:auto;max-width:140px;object-fit:contain">
+                        <form method="POST" action="{{ route('admin.pengaturan.logo-slider.destroy', $i) }}"
+                              onsubmit="return tanyaForm(this, 'Hapus logo ini dari slider?', '🗑️')" class="absolute -top-2 -right-2">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" title="Hapus logo"
+                                    style="background:#e74c3c;color:#fff;border:2px solid #1a1a1a;border-radius:999px;width:24px;height:24px;font-size:12px;line-height:1;cursor:pointer">✕</button>
+                        </form>
+                    </div>
+                @endforeach
+            </div>
+        @else
+            <p class="text-sm mb-4" style="color:#6b7280">Belum ada logo terupload.</p>
+        @endif
+
+        <form method="POST" action="{{ route('admin.pengaturan.logo-slider.store') }}" enctype="multipart/form-data">
+            @csrf
+            <input type="file" name="logo[]" accept=".jpg,.jpeg,.png,.webp,.svg" multiple
+                   class="w-full border-2 border-dashed border-gray-300 rounded-2xl px-4 py-4 mb-1">
+            <p class="text-xs mb-4" style="color:#6b7280">Bisa pilih banyak sekaligus (maks 10). PNG transparan disarankan. JPG/PNG/WebP/SVG maks 2 MB per file.</p>
+            @error('logo')<p class="text-xs font-bold mb-3" style="color:#e74c3c">{{ $message }}</p>@enderror
+            @error('logo.*')<p class="text-xs font-bold mb-3" style="color:#e74c3c">{{ $message }}</p>@enderror
+            <button type="submit" class="kidza-btn kidza-btn-green w-full">Upload Logo</button>
+        </form>
+    </div>
 </x-admin-layout>

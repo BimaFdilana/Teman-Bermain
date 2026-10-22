@@ -236,6 +236,10 @@ body {
   font-family: 'Quicksand', sans-serif; font-weight: 700; font-size: 1.3rem;
   color: #1F2937; opacity: .45;
 }
+.kidza-marquee-logo {
+  height: 52px; width: auto; max-width: 160px; object-fit: contain;
+  align-self: center;
+}
 
 /* Testimonial carousel */
 .kidza-testi-track {
