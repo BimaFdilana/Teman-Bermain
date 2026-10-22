@@ -62,23 +62,14 @@
                         @endif
                     </div>
                     <p class="text-sm mb-5" style="color:#6b7280">Sekali bayar, akses selamanya.</p>
-                    @auth
-                        @if(auth()->user()->hasProduct($product->id))
-                            <a href="{{ route('home') }}" class="kidza-btn kidza-btn-blue w-full text-lg">Sudah Milikmu — Buka di Home</a>
-                        @elseif($product->stok !== null && $product->stok <= 0)
-                            <button disabled class="kidza-btn w-full text-lg opacity-50 cursor-not-allowed" style="background:#ccc">Stok Habis</button>
-                        @else
-                            <form method="POST" action="{{ route('checkout.store', $product->slug) }}">
-                                @csrf
-                                <input type="text" name="kode_diskon" placeholder="Kode diskon (opsional)"
-                                       class="w-full border-2 border-gray-300 rounded-xl px-4 py-2 mb-3 focus:outline-none focus:border-[#167941] uppercase">
-                                <button type="submit" class="kidza-btn kidza-btn-green w-full text-lg">Beli Sekarang</button>
-                            </form>
-                            <p class="text-xs text-center mt-2" style="color:#6b7280">Bayar via QRIS, kode redeem dikirim ke WhatsApp</p>
-                        @endif
+                    @if(auth()->check() && auth()->user()->hasProduct($product->id))
+                        <a href="{{ route('home') }}" class="kidza-btn kidza-btn-blue w-full text-lg">Sudah Milikmu — Buka di Home</a>
+                    @elseif($product->stok !== null && $product->stok <= 0)
+                        <button disabled class="kidza-btn w-full text-lg opacity-50 cursor-not-allowed" style="background:#ccc">Stok Habis</button>
                     @else
-                        <a href="{{ route('login') }}" class="kidza-btn kidza-btn-green w-full text-lg">Masuk untuk Membeli</a>
-                    @endauth
+                        <a href="{{ route('promo.pesan', $product->slug) }}" class="kidza-btn kidza-btn-green w-full text-lg">Beli Sekarang</a>
+                        <p class="text-xs text-center mt-2" style="color:#6b7280">Tanpa perlu login — checkout sebagai tamu, bayar via QRIS/VA, kode redeem dikirim setelah pembayaran diverifikasi</p>
+                    @endif
                 </div>
             </div>
         </div>
