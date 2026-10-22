@@ -1,5 +1,5 @@
 <x-admin-layout>
-<div class="flex items-center justify-between mb-5">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-5">
     <div>
         <a href="{{ route('admin.miniapp.index') }}" class="text-sm font-bold underline">← Kembali</a>
         <h1 class="text-2xl font-bold mt-1" style="font-family:'Quicksand'">👁️ Preview: {{ $product->judul }}</h1>

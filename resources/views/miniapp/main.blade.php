@@ -64,6 +64,7 @@ if ('serviceWorker' in navigator) {
     setTimeout(() => log('--- 10 dtk, event belum masuk = Chrome menilai tidak installable ---'), 10000);
 })();
 </script>
+<script>
 (function () {
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
     const btn = document.getElementById('btn-pasang');

@@ -54,7 +54,7 @@
 
                 <!-- Harga + Beli -->
                 <div class="kidza-card p-6" style="background:#fff">
-                    <div class="flex items-baseline gap-3 mb-1">
+                    <div class="flex flex-wrap items-baseline gap-3 mb-1">
                         <span class="font-bold text-3xl" style="font-family:'Quicksand';color:#167941">{{ $product->hargaRupiah() }}</span>
                         @if($product->isPromo())
                             <span class="kidza-price-coret text-lg">{{ $product->hargaCoretRupiah() }}</span>

@@ -1,5 +1,5 @@
 <x-admin-layout>
-<div class="flex items-center justify-between mb-5">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-5">
     <h1 class="text-2xl font-bold" style="font-family:'Quicksand'">🎮 MiniApps</h1>
     <a href="{{ route('admin.miniapp.create') }}" class="kidza-btn kidza-btn-green">+ Tambah MiniApp</a>
 </div>

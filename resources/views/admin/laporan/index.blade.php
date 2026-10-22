@@ -1,7 +1,7 @@
 <x-admin-layout>
 <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
     <h1 class="text-2xl font-bold" style="font-family:'Quicksand'">📈 Laporan</h1>
-    <div class="flex gap-2">
+    <div class="flex flex-wrap gap-2">
         @foreach(['minggu' => 'Minggu', 'bulan' => 'Bulan', 'tahun' => 'Tahun'] as $key => $label)
             <a href="{{ route('admin.laporan.index', ['tipe' => $key]) }}"
                class="kidza-btn {{ $tipe === $key ? 'kidza-btn-green' : '' }}"

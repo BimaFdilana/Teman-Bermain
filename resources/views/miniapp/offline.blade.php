@@ -6,7 +6,7 @@
     <title>Kamu sedang offline — Rumah Cahaya-bks</title>
     <link rel="icon" type="image/png" href="/images/favicon-64.png">
     <style>
-        body { margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+        body { margin:0; min-height:100vh; min-height:100dvh; display:flex; align-items:center; justify-content:center;
                background:#FFFEF7; font-family:system-ui, sans-serif; padding:1rem; }
         .card { background:#fff; border:3px solid #1a1a1a; border-radius:1.25rem; padding:2rem;
                 max-width:22rem; text-align:center; box-shadow:5px 5px 0 #1a1a1a; }

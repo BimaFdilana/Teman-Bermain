@@ -1,5 +1,5 @@
 <x-admin-layout>
-<div class="flex items-center justify-between mb-5">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-5">
     <h1 class="text-2xl font-bold" style="font-family:'Quicksand'">🌐 Manage Landing Page</h1>
     <a href="{{ route('landing') }}" target="_blank" class="kidza-btn kidza-btn-blue">👁️ Preview</a>
 </div>

@@ -15,7 +15,7 @@ $cover = $product->coverUrl();
     <meta property="og:type" content="website">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
-<body class="poster" style="background:#FFFEF7;min-height:100vh">
+<body class="poster" style="background:#FFFEF7;min-height:100vh;min-height:100dvh">
 <div class="mx-auto px-4 py-8" style="max-width:28rem">
 
     {{-- Brand --}}

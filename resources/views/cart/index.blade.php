@@ -84,7 +84,7 @@
                     <form method="POST" action="{{ route('cart.diskon') }}" class="flex gap-2 mb-4">
                         @csrf
                         <input type="text" name="kode_diskon" placeholder="Kode diskon" value="{{ $ringkasan['kode_diskon'] }}"
-                               class="flex-1 border-2 border-gray-300 rounded-xl px-3 py-2 text-sm uppercase">
+                               class="flex-1 min-w-0 border-2 border-gray-300 rounded-xl px-3 py-2 text-base uppercase">
                         <button class="kidza-btn" style="background:#fff">Pakai</button>
                     </form>
 

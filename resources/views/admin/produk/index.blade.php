@@ -1,5 +1,5 @@
 <x-admin-layout>
-<div class="flex items-center justify-between mb-5">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-5">
     <h1 class="text-2xl font-bold" style="font-family:'Quicksand'">🏷️ Manage Product</h1>
     @if($tab === 'bundle')
         <a href="{{ route('admin.produk.bundle.create') }}" class="kidza-btn kidza-btn-green">+ Buat Bundle</a>
@@ -7,7 +7,7 @@
 </div>
 
 {{-- 3 tab --}}
-<div class="flex gap-2 mb-5">
+<div class="flex flex-wrap gap-2 mb-5">
     @foreach(['ebook' => '📚 Ebook', 'miniapp' => '🎮 MiniApps', 'bundle' => '🎁 Bundle'] as $key => $label)
         <a href="{{ route('admin.produk.index', ['tab' => $key]) }}"
            class="kidza-btn {{ $tab === $key ? 'kidza-btn-green' : '' }}"

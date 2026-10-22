@@ -3,7 +3,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 @endsection
 
-<div class="flex items-center justify-between mb-5">
+<div class="flex flex-wrap items-center justify-between gap-3 mb-5">
     <h1 class="text-2xl font-bold" style="font-family:'Quicksand'">📊 Dashboard</h1>
     <div class="flex gap-2">
         @foreach(['minggu' => 'Minggu', 'bulan' => 'Bulan', 'tahun' => 'Tahun'] as $key => $label)
@@ -23,7 +23,7 @@
 
 {{-- Chart aktivitas (satu chart, tab Hari / Jam) --}}
 <div class="kidza-card p-5 mb-6">
-    <div class="flex items-center justify-between mb-3">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-3">
         <h2 class="font-bold" style="font-family:'Quicksand'">📈 Aktivitas Login Pengguna</h2>
         <div class="flex gap-2">
             <button type="button" id="tab-hari" class="kidza-btn kidza-btn-green" onclick="gantiTab('hari')">Per Hari</button>

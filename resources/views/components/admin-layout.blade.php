@@ -12,10 +12,10 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @yield('head')
     <style>
-        .admin-shell { display: flex; min-height: 100vh; }
+        .admin-shell { display: flex; min-height: 100vh; min-height: 100dvh; }
         .admin-sidebar {
             width: 240px; flex-shrink: 0; background: #1F2937; color: #F9F9F6;
-            padding: 1.5rem 1rem; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+            padding: 1.5rem 1rem; position: sticky; top: 0; height: 100vh; height: 100dvh; overflow-y: auto;
         }
         .side-group-title {
             font-family: 'Quicksand', sans-serif; font-size: .68rem; font-weight: 800;
