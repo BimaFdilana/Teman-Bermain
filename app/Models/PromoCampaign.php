@@ -75,16 +75,26 @@ class PromoCampaign extends Model
     }
 
     /**
-     * URL publik screenshot testimoni (array).
+     * URL publik screenshot testimoni (array), mengikuti urutan pilihan.
+     * testimoni_ss berisi ID dari galeri testimonial_images.
      *
      * @return string[]
      */
     public function testimoniSsUrls(): array
     {
-        return array_map(
-            fn ($p) => asset('storage/'.$p),
-            $this->testimoni_ss ?? []
-        );
+        $ids = array_map('intval', $this->testimoni_ss ?? []);
+        if ($ids === []) {
+            return [];
+        }
+        $paths = TestimonialImage::whereIn('id', $ids)->pluck('path', 'id');
+        $urls = [];
+        foreach ($ids as $id) {
+            if (isset($paths[$id])) {
+                $urls[] = asset('storage/'.$paths[$id]);
+            }
+        }
+
+        return $urls;
     }
     /** Kampanye sedang tayang: aktif dan dalam rentang waktu. */
     public function isLive(): bool

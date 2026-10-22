@@ -46,23 +46,28 @@
         </div>
 
         <div class="mb-4">
-            <label class="text-sm font-bold block mb-1">📱 Screenshot Testimoni WhatsApp <span class="font-normal" style="color:#6b7280">(wajib 3–6 gambar, JPG/PNG maks 2MB per file)</span></label>
-            @if(!empty($kampanye->testimoni_ss))
+            <label class="text-sm font-bold block mb-1">📱 Screenshot Testimoni WhatsApp <span class="font-normal" style="color:#6b7280">(pilih 3–6 gambar dari galeri)</span></label>
+            @if($gambarTestimoni->isEmpty())
+                <p class="text-sm border-2 border-dashed rounded-xl px-4 py-3" style="color:#6b7280;border-color:#d1d5db">
+                    Galeri masih kosong. <a href="{{ route('admin.testimoni-gambar.index') }}" class="font-bold underline" style="color:#167941">Upload gambar dulu di menu Gambar Testimoni →</a>
+                </p>
+            @else
                 <div class="flex flex-wrap gap-2 mb-2">
-                    @foreach($kampanye->testimoni_ss as $i => $ss)
-                        <label class="relative inline-block cursor-pointer" title="Centang untuk hapus">
-                            <img src="{{ asset('storage/'.$ss) }}" alt="Testimoni {{ $i+1 }}" class="rounded-lg" style="height:90px;border:2px solid #e5e7eb">
-                            <span class="absolute top-0 right-0 bg-white rounded-bl-lg px-1 text-xs">
-                                <input type="checkbox" name="hapus_ss[]" value="{{ $i }}"> 🗑️
-                            </span>
+                    @foreach($gambarTestimoni as $g)
+                        <label class="relative inline-block cursor-pointer" title="Klik untuk memilih">
+                            <input type="checkbox" name="testimoni_ids[]" value="{{ $g->id }}" class="cek-testimoni sr-only"
+                                   data-url="{{ $g->url() }}"
+                                   @checked(in_array($g->id, old('testimoni_ids', array_map('intval', $kampanye->testimoni_ss ?? []))))>
+                            <img src="{{ $g->url() }}" alt="Testimoni" class="rounded-lg gambar-testimoni" style="height:90px;border:3px solid #e5e7eb;opacity:.55">
+                            <span class="tanda-pilih absolute top-0 right-0 rounded-bl-lg px-1 text-xs font-bold" style="background:#167941;color:#fff;display:none">✓</span>
                         </label>
                     @endforeach
                 </div>
-                <p class="text-xs mb-2" style="color:#6b7280">Centang 🗑️ untuk menghapus gambar yang sudah ada.</p>
+                <p class="text-xs" style="color:#6b7280">Terpilih: <span id="hitung-testimoni" class="font-bold">0</span> dari 3–6 gambar.
+                    <a href="{{ route('admin.testimoni-gambar.index') }}" class="font-bold underline" style="color:#167941">Kelola galeri →</a></p>
             @endif
-            <input type="file" name="testimoni_ss[]" accept="image/*" multiple class="w-full border-2 border-gray-300 rounded-xl px-3 py-2 text-sm">
-            @error('testimoni_ss')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
-            @error('testimoni_ss.*')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+            @error('testimoni_ids')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+            @error('testimoni_ids.*')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
         </div>
 
         <div class="mb-4">
@@ -386,35 +391,29 @@
         document.getElementById('tambah-materi').addEventListener('click', () => setTimeout(updMateri, 50));
         updMateri();
 
-        // Screenshot testimoni: gambar lama + file baru
+        // Screenshot testimoni: pilihan dari galeri (checkbox) -> preview + penghitung
         const pvSsWrap = $('pv-ss-wrap'), pvSs = $('pv-ss');
-        const ssLama = @json($kampanye->testimoniSsUrls());
-        const ssHapus = new Set();
-        let ssBaru = [];
+        const cekTestimoni = [...form.querySelectorAll('.cek-testimoni')];
+        const hitungTestimoni = $('hitung-testimoni');
         const updSs = () => {
-            const tampil = ssLama.filter((_, i) => !ssHapus.has(i)).concat(ssBaru);
-            pvSsWrap.style.display = tampil.length ? 'block' : 'none';
-            pvSs.innerHTML = tampil.map(u =>
-                `<img src="${u}" class="rounded-xl shrink-0" style="width:120px;border:2px solid #F0E7CC" alt="Testimoni">`
+            const dipilih = cekTestimoni.filter(cb => cb.checked);
+            if (hitungTestimoni) hitungTestimoni.textContent = dipilih.length;
+            cekTestimoni.forEach(cb => {
+                const label = cb.closest('label');
+                const img = label.querySelector('.gambar-testimoni');
+                const tanda = label.querySelector('.tanda-pilih');
+                img.style.borderColor = cb.checked ? '#167941' : '#e5e7eb';
+                img.style.opacity = cb.checked ? '1' : '.55';
+                tanda.style.display = cb.checked ? 'block' : 'none';
+                cb.disabled = !cb.checked && dipilih.length >= 6;
+                label.style.opacity = cb.disabled ? '.4' : '';
+            });
+            pvSsWrap.style.display = dipilih.length ? 'block' : 'none';
+            pvSs.innerHTML = dipilih.map(cb =>
+                `<img src="${cb.dataset.url}" class="rounded-xl shrink-0" style="width:120px;border:2px solid #F0E7CC" alt="Testimoni">`
             ).join('');
         };
-        form.querySelectorAll('[name="hapus_ss[]"]').forEach(cb => {
-            cb.addEventListener('change', () => {
-                const i = parseInt(cb.value);
-                cb.checked ? ssHapus.add(i) : ssHapus.delete(i);
-                updSs();
-            });
-        });
-        const ssInp = form.querySelector('[name="testimoni_ss[]"]');
-        if (ssInp) ssInp.addEventListener('change', () => {
-            ssBaru = [];
-            [...ssInp.files].forEach(f => {
-                const r = new FileReader();
-                r.onload = (e) => { ssBaru.push(e.target.result); updSs(); };
-                r.readAsDataURL(f);
-            });
-            if (!ssInp.files.length) updSs();
-        });
+        cekTestimoni.forEach(cb => cb.addEventListener('change', updSs));
         updSs();
     })();
     </script>

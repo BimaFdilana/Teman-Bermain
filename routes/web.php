@@ -133,6 +133,11 @@ Route::middleware(['auth', 'admin', 'admin.idle'])->prefix('admin')->name('admin
     // Manage Landing Page (PRD §6.9)
     Route::resource('iklan', App\Http\Controllers\Admin\IklanController::class)->except(['show']);
 
+    // Galeri gambar testimoni untuk iklan (upload sekali, dipilih berulang)
+    Route::get('/testimoni-gambar', [App\Http\Controllers\Admin\TestimoniGambarController::class, 'index'])->name('testimoni-gambar.index');
+    Route::post('/testimoni-gambar', [App\Http\Controllers\Admin\TestimoniGambarController::class, 'store'])->name('testimoni-gambar.store');
+    Route::delete('/testimoni-gambar/{testimoniGambar}', [App\Http\Controllers\Admin\TestimoniGambarController::class, 'destroy'])->name('testimoni-gambar.destroy');
+
     Route::get('/landing', [App\Http\Controllers\Admin\LandingController::class, 'index'])->name('landing.index');
     Route::post('/landing/teks', [App\Http\Controllers\Admin\LandingController::class, 'simpanTeks'])->name('landing.teks');
     Route::post('/landing/foto', [App\Http\Controllers\Admin\LandingController::class, 'simpanFoto'])->name('landing.foto');

@@ -68,6 +68,7 @@
             <a href="{{ route('admin.laporan.index') }}" class="side-link {{ request()->routeIs('admin.laporan.*') ? 'active' : '' }}">📈 Laporan</a>
             <p class="side-group-title">Promosi</p>
             <a href="{{ route('admin.iklan.index') }}" class="side-link {{ request()->routeIs('admin.iklan.*') ? 'active' : '' }}">📢 Iklan Promo</a>
+            <a href="{{ route('admin.testimoni-gambar.index') }}" class="side-link {{ request()->routeIs('admin.testimoni-gambar.*') ? 'active' : '' }}">🖼️ Gambar Testimoni</a>
             <a href="{{ route('admin.landing.index') }}" class="side-link {{ request()->routeIs('admin.landing.*') ? 'active' : '' }}">🌐 Landing Page</a>
             <p class="side-group-title">Lainnya</p>
             <a href="{{ route('admin.pengaturan.index') }}" class="side-link {{ request()->routeIs('admin.pengaturan.*') ? 'active' : '' }}">⚙️ Pengaturan</a>

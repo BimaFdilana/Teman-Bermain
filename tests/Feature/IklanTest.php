@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Product;
+use App\Models\TestimonialImage;
 use App\Models\PromoCampaign;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -29,6 +30,17 @@ class IklanTest extends TestCase
         ]);
     }
 
+
+    /** Buat gambar testimoni di galeri; kembalikan array ID-nya. */
+    private function gambarTestimoni(int $jumlah = 3): array
+    {
+        $ids = [];
+        for ($i = 1; $i <= $jumlah; $i++) {
+            $ids[] = TestimonialImage::create(['path' => 'testimoni/uji-'.uniqid()."-{$i}.jpg"])->id;
+        }
+        return $ids;
+    }
+
     private function buatKampanye(array $over = []): PromoCampaign
     {
         return PromoCampaign::create(array_merge([
@@ -50,11 +62,7 @@ class IklanTest extends TestCase
             'produk_primary_id' => $p1->id,
             'produk_secondary_ids' => [$p2->id],
             'tampilan_secondary' => 'card',
-            'testimoni_ss' => [
-                UploadedFile::fake()->image('t1.jpg'),
-                UploadedFile::fake()->image('t2.jpg'),
-                UploadedFile::fake()->image('t3.jpg'),
-            ],
+            'testimoni_ids' => $this->gambarTestimoni(),
             'berakhir_at' => now()->addDays(5)->format('Y-m-d\TH:i'),
             'status' => 'aktif',
         ]);
@@ -75,11 +83,7 @@ class IklanTest extends TestCase
             'judul' => 'Promo Konten',
             'produk_primary_id' => $p1->id,
             'tampilan_secondary' => 'list',
-            'testimoni_ss' => [
-                UploadedFile::fake()->image('t1.jpg'),
-                UploadedFile::fake()->image('t2.jpg'),
-                UploadedFile::fake()->image('t3.jpg'),
-            ],
+            'testimoni_ids' => $this->gambarTestimoni(),
             'berakhir_at' => now()->addDays(5)->format('Y-m-d\\TH:i'),
             'status' => 'aktif',
             'video_url' => 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
@@ -208,11 +212,7 @@ class IklanTest extends TestCase
             'judul' => 'Promo Test',
             'produk_primary_id' => $p->id,
             'tampilan_secondary' => 'list',
-            'testimoni_ss' => [
-                UploadedFile::fake()->image('t1.jpg'),
-                UploadedFile::fake()->image('t2.jpg'),
-                UploadedFile::fake()->image('t3.jpg'),
-            ],
+            'testimoni_ids' => $this->gambarTestimoni(),
             'urutan_konten' => ['testimoni', 'produk_utama', 'banner'],
             'section_sembunyi' => ['countdown'],
             'berakhir_at' => now()->addDays(5)->format('Y-m-d\\TH:i'),

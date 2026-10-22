@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Product;
 use App\Models\PromoCampaign;
+use App\Models\TestimonialImage;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -26,23 +27,21 @@ class IklanController extends Controller
         return view('admin.iklan.form', [
             'kampanye' => new PromoCampaign(),
             'produks' => $this->produkTersedia(),
+            'gambarTestimoni' => TestimonialImage::latest()->get(),
         ]);
     }
 
     public function store(Request $request): RedirectResponse
     {
         $data = $this->validated($request);
-        if (count($request->file('testimoni_ss', [])) < 3) {
-            return back()->withErrors(['testimoni_ss' => 'Upload minimal 3 screenshot testimoni WhatsApp (maksimal 6).'])->withInput();
-        }
         $data['materi'] = $this->bersihkanMateri($data['materi'] ?? null);
         // Keluarkan field non-kolom sebelum create
         $secondaryIds = $data['produk_secondary_ids'] ?? [];
-        unset($data['produk_secondary_ids'], $data['testimoni_ss'], $data['hapus_ss']);
+        $data['testimoni_ss'] = array_map('intval', $data['testimoni_ids']);
+        unset($data['produk_secondary_ids'], $data['testimoni_ids']);
         $kampanye = PromoCampaign::create($data);
         $this->simpanProduk($kampanye, $data['produk_primary_id'], $secondaryIds);
         $this->simpanGambar($request, $kampanye);
-        $this->simpanTestimoniSs($request, $kampanye);
 
         return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo dibuat.');
     }
@@ -52,6 +51,7 @@ class IklanController extends Controller
         return view('admin.iklan.form', [
             'kampanye' => $iklan->load(['produkPrimary', 'produkSecondary']),
             'produks' => $this->produkTersedia(),
+            'gambarTestimoni' => TestimonialImage::latest()->get(),
         ]);
     }
 
@@ -60,14 +60,11 @@ class IklanController extends Controller
         $data = $this->validated($request, $iklan->id);
         $data['materi'] = $this->bersihkanMateri($data['materi'] ?? null);
         $secondaryIds = $data['produk_secondary_ids'] ?? [];
-        unset($data['produk_secondary_ids'], $data['testimoni_ss'], $data['hapus_ss']);
+        $data['testimoni_ss'] = array_map('intval', $data['testimoni_ids']);
+        unset($data['produk_secondary_ids'], $data['testimoni_ids']);
         $iklan->update($data);
         $this->simpanProduk($iklan, $data['produk_primary_id'], $secondaryIds);
         $this->simpanGambar($request, $iklan);
-        $hasilSs = $this->kelolaTestimoniSs($request, $iklan);
-        if ($hasilSs !== true) {
-            return back()->withErrors(['testimoni_ss' => $hasilSs])->withInput();
-        }
 
         return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo diperbarui.');
     }
@@ -77,9 +74,7 @@ class IklanController extends Controller
         if ($iklan->gambar_path) {
             Storage::disk('public')->delete($iklan->gambar_path);
         }
-        foreach ($iklan->testimoni_ss ?? [] as $path) {
-            Storage::disk('public')->delete($path);
-        }
+        // Gambar testimoni milik galeri bersama — tidak ikut dihapus.
         $iklan->delete();
 
         return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo dihapus.');
@@ -103,10 +98,8 @@ class IklanController extends Controller
             'ajakan' => ['nullable', 'string', 'max:500'],
             'materi' => ['nullable', 'array', 'max:50'],
             'materi.*' => ['nullable', 'string', 'max:120'],
-            'testimoni_ss' => ['nullable', 'array', 'max:6'],
-            'testimoni_ss.*' => ['image', 'max:2048'],
-            'hapus_ss' => ['nullable', 'array'],
-            'hapus_ss.*' => ['integer', 'min:0'],
+            'testimoni_ids' => ['required', 'array', 'min:3', 'max:6'],
+            'testimoni_ids.*' => ['integer', 'exists:testimonial_images,id'],
             'produk_primary_id' => ['required', 'integer', 'exists:products,id'],
             'produk_secondary_ids' => ['nullable', 'array', 'max:3'],
             'produk_secondary_ids.*' => ['integer', 'exists:products,id', 'different:produk_primary_id'],
@@ -121,6 +114,10 @@ class IklanController extends Controller
         ], [
             'produk_secondary_ids.max' => 'Maksimal 3 produk tambahan.',
             'produk_secondary_ids.*.different' => 'Produk tambahan tidak boleh sama dengan produk utama.',
+            'testimoni_ids.required' => 'Pilih gambar testimoni dari galeri.',
+            'testimoni_ids.min' => 'Pilih minimal 3 gambar testimoni.',
+            'testimoni_ids.max' => 'Pilih maksimal 6 gambar testimoni.',
+            'testimoni_ids.*.exists' => 'Ada gambar testimoni yang sudah tidak ada di galeri.',
             'berakhir_at.after_or_equal' => 'Tanggal berakhir tidak boleh sebelum tanggal mulai.',
         ]);
 
@@ -180,47 +177,5 @@ class IklanController extends Controller
             }
             $kampanye->update(['gambar_path' => $request->file('gambar')->store('promo', 'public')]);
         }
-    }
-
-    /** Simpan screenshot testimoni baru (store): langsung jadi array path. */
-    private function simpanTestimoniSs(Request $request, PromoCampaign $kampanye): void
-    {
-        $paths = [];
-        foreach ($request->file('testimoni_ss', []) as $file) {
-            $paths[] = $file->store('promo/testimoni', 'public');
-        }
-        $kampanye->update(['testimoni_ss' => $paths]);
-    }
-
-    /**
-     * Kelola screenshot testimoni saat update: hapus yang ditandai + tambah baru.
-     * Total harus 3-6 gambar. Return true bila OK, pesan error bila tidak.
-     */
-    private function kelolaTestimoniSs(Request $request, PromoCampaign $kampanye): bool|string
-    {
-        $ssSisa = [];
-        foreach ($kampanye->testimoni_ss ?? [] as $i => $path) {
-            if (in_array($i, $request->input('hapus_ss', []))) {
-                Storage::disk('public')->delete($path);
-            } else {
-                $ssSisa[] = $path;
-            }
-        }
-        $ssBaru = [];
-        foreach ($request->file('testimoni_ss', []) as $file) {
-            $ssBaru[] = $file->store('promo/testimoni', 'public');
-        }
-        $total = array_merge($ssSisa, $ssBaru);
-        $jumlah = count($total);
-        if ($jumlah < 3 || $jumlah > 6) {
-            foreach ($ssBaru as $p) {
-                Storage::disk('public')->delete($p);
-            }
-
-            return "Total screenshot testimoni harus 3–6 gambar (saat ini {$jumlah}).";
-        }
-        $kampanye->update(['testimoni_ss' => $total]);
-
-        return true;
     }
 }
