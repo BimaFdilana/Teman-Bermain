@@ -64,6 +64,12 @@ Route::middleware(['auth', 'nonadmin'])->group(function () {
 
     // MiniApp player + PWA (Fase 4, PRD §5.6)
     Route::get('/main/{product}', [App\Http\Controllers\MiniappController::class, 'main'])->name('miniapp.main');
+});
+
+// Install + manifest MiniApp: untuk customer pemilik DAN admin (agar admin bisa
+// uji coba install langsung seperti customer). Otorisasi dijaga di controller:
+// admin / pemilik entitlement / pemegang token install.
+Route::middleware(['auth'])->group(function () {
     Route::get('/miniapp/{product}/pasang', [App\Http\Controllers\MiniappController::class, 'install'])->name('miniapp.install');
     Route::get('/miniapp/{product}/manifest.json', [App\Http\Controllers\MiniappController::class, 'manifest'])->name('miniapp.manifest');
 });
