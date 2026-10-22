@@ -24,6 +24,9 @@
                     <div class="mx-auto mb-4 rounded-2xl border-2 border-gray-200 p-6" style="max-width:280px;background:#FFF9EC">
                         <p class="text-xs mb-1" style="color:#6b7280">Nomor VA {{ $order->bank_va }}</p>
                         <p class="font-bold text-2xl tracking-widest" style="font-family:'Quicksand'">{{ $vaNumber ?? '—' }}</p>
+                        @if($vaNumber)
+                            <button type="button" class="kidza-btn kidza-btn-white mt-3 btn-salin" data-copy="{{ preg_replace('/\D+/', '', $vaNumber) }}" style="padding:.45rem 1.1rem;font-size:.9rem">📋 Salin Nomor VA</button>
+                        @endif
                     </div>
                 @else
                     <h2 class="font-bold text-xl mb-4" style="font-family:'Quicksand'">Scan QRIS untuk membayar</h2>
@@ -36,6 +39,7 @@
                     @endif
                 @endif
                 <p class="font-bold text-3xl mb-1" style="font-family:'Quicksand';color:#167941">{{ $order->totalRupiah() }}</p>
+                <button type="button" class="kidza-btn kidza-btn-white btn-salin mb-3" data-copy="{{ $order->total_bayar }}" style="padding:.45rem 1.1rem;font-size:.9rem">📋 Salin Nominal</button>
                 <p class="text-sm mb-4" style="color:#6b7280">Nominal harus <strong>tepat</strong> agar verifikasi lancar.</p>
                 <div class="kidza-card p-4 text-left text-sm" style="background:#FFF9EC">
                     <p class="mb-1">⏰ Batas upload bukti: <strong>{{ $order->batas_bayar->format('d M Y, H:i') }} WIB</strong></p>
@@ -54,6 +58,33 @@
                     <button type="submit" class="kidza-btn kidza-btn-green w-full text-lg">Verifikasi Pembayaran</button>
                 </form>
             </div>
+
+            <script>
+            document.querySelectorAll('.btn-salin').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var teks = btn.getAttribute('data-copy');
+                    var asal = btn.textContent;
+                    function sukses() {
+                        btn.textContent = '✓ Tersalin!';
+                        setTimeout(function () { btn.textContent = asal; }, 1600);
+                    }
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(teks).then(sukses).catch(function () { salinManual(); });
+                    } else {
+                        salinManual();
+                    }
+                    function salinManual() {
+                        var ta = document.createElement('textarea');
+                        ta.value = teks;
+                        ta.style.position = 'fixed'; ta.style.opacity = '0';
+                        document.body.appendChild(ta);
+                        ta.select();
+                        try { document.execCommand('copy'); sukses(); } catch (e) { /* abaikan */ }
+                        document.body.removeChild(ta);
+                    }
+                });
+            });
+            </script>
         @elseif($order->status === 'verifikasi')
             <div class="kidza-card p-8 text-center">
                 <div class="text-5xl mb-4">🔍</div>
