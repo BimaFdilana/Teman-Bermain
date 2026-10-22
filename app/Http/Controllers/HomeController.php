@@ -14,6 +14,7 @@ class HomeController extends Controller
     {
         return view('home', [
             'miniapps' => $request->user()->ownedProducts('miniapp'),
+            'ebooks' => $request->user()->ownedProducts('ebook'),
         ]);
     }
 }

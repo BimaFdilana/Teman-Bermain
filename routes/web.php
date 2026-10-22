@@ -43,6 +43,10 @@ Route::middleware(['auth', 'nonadmin'])->group(function () {
         return view('ebook', ['ebooks' => request()->user()->ownedProducts('ebook')]);
     })->name('ebook');
 
+    Route::get('/miniapp', function () {
+        return view('miniapp.index', ['miniapps' => request()->user()->ownedProducts('miniapp')]);
+    })->name('miniapp.index');
+
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
