@@ -172,6 +172,6 @@ class MiniappController extends Controller
         $token->update(['dicabut' => true]);
         \App\Models\ActivityLog::catat('cabut_token', "Token {$token->user?->name} untuk \"{$token->product?->judul}\" dicabut");
 
-        return back()->with('sukses', 'Install token dicabut. Aplikasi terpasang tidak bisa dibuka lagi.');
+        return back()->with('sukses', 'Install token dicabut. Aplikasi terpasang tidak bisa dibuka lagi. Pemilik masih bisa memasang ulang dari halaman MiniApp — token baru terbit otomatis.');
     }
 }

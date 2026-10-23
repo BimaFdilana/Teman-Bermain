@@ -20,10 +20,20 @@ class InstallToken extends Model
      */
     public static function untuk(User $user, Product $product): self
     {
-        return static::firstOrCreate(
+        $token = static::firstOrCreate(
             ['user_id' => $user->id, 'product_id' => $product->id],
             ['token' => Str::random(48)]
         );
+
+        // Token yang pernah dicabut dihidupkan lagi KHUSUS lewat jalur ini
+        // (klik Install oleh pemilik/admin yang sah) — dengan string token
+        // BARU, agar pemilik bisa memasang ulang setelah pencabutan/copot
+        // aplikasi, sementara tautan lama tetap mati bagi siapa pun.
+        if ($token->dicabut) {
+            $token->update(['dicabut' => false, 'token' => Str::random(48)]);
+        }
+
+        return $token;
     }
 
     public function user(): BelongsTo

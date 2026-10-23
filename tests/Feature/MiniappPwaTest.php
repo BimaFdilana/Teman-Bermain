@@ -96,6 +96,37 @@ class MiniappPwaTest extends TestCase
         $this->assertSame('300x200', $icons[0]['sizes']);
     }
 
+    public function test_token_dicabut_bangkit_lagi_saat_pemilik_install_ulang(): void
+    {
+        // Setelah token dicabut (atau aplikasi dicopot), pemilik yang klik
+        // Install lagi harus mendapat token BARU yang aktif — bukan 403 abadi.
+        $user = User::factory()->create();
+        $p = Product::create([
+            'tipe' => 'miniapp', 'judul' => 'Game Reinstall', 'slug' => 'game-reinstall-'.uniqid(),
+            'deskripsi' => 'd', 'harga' => 10000, 'status' => 'tersedia',
+        ]);
+        Miniapp::create(['product_id' => $p->id, 'html_path' => 'miniapps/uji.html', 'pwa_name' => 'Game Reinstall']);
+        Entitlement::create(['user_id' => $user->id, 'product_id' => $p->id]);
+        \Illuminate\Support\Facades\Storage::disk('local')->put('miniapps/uji.html', '<html><body>game</body></html>');
+
+        $lama = \App\Models\InstallToken::untuk($user, $p);
+        $stringLama = $lama->token;
+        $lama->update(['dicabut' => true]);
+
+        // Tautan lama tetap mati
+        $this->get(route('pwa.launch', ['token' => $stringLama]))->assertForbidden();
+
+        // Pemilik klik Install lagi → token bangkit dengan string baru
+        $res = $this->actingAs($user)->get(route('miniapp.install', $p));
+        $baru = \App\Models\InstallToken::untuk($user, $p);
+        $this->assertFalse($baru->dicabut);
+        $this->assertNotSame($stringLama, $baru->token);
+        $res->assertRedirect(route('pwa.launch', ['token' => $baru->token]));
+
+        // Tautan baru bisa dibuka
+        $this->get(route('pwa.launch', ['token' => $baru->token]))->assertOk();
+    }
+
     public function test_manifest_bisa_diakses_tamu_dengan_token_install(): void
     {
         // Pengambil manifest Chrome tidak membawa sesi login — token adalah
