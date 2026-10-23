@@ -7,7 +7,7 @@
         <a href="{{ route('admin.iklan.create') }}" class="kidza-btn kidza-btn-green">+ Buat Iklan</a>
     </div>
 
-    <div class="kidza-card overflow-hidden">
+    <div class="kidza-card tabel-scroll">
         <table class="w-full text-sm">
             <thead>
                 <tr style="background:#f3f4f6;text-align:left">

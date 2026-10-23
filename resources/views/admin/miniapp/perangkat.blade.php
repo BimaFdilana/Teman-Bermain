@@ -3,7 +3,7 @@
     <h1 class="kidza-h2 mt-2 mb-1">📲 Perangkat Terpasang</h1>
     <p class="text-sm mb-5" style="color:#6b7280">"{{ $product->judul }}" — cabut token bila perangkat hilang atau akses perlu dihentikan.</p>
 
-    <div class="kidza-card p-5 overflow-x-auto">
+    <div class="kidza-card p-5 tabel-scroll">
         <table class="w-full text-sm">
             <thead>
                 <tr class="text-left" style="border-bottom:2px solid #1a1a1a">

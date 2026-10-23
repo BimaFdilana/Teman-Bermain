@@ -19,7 +19,7 @@
         @endforeach
     </div>
 
-    <div class="kidza-card overflow-hidden">
+    <div class="kidza-card tabel-scroll">
         <table class="w-full text-sm">
             <thead>
                 <tr style="background:#f3f4f6;text-align:left">

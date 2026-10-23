@@ -1,4 +1,4 @@
-<div class="kidza-card overflow-x-auto">
+<div class="kidza-card tabel-scroll">
     <table class="w-full text-sm">
         <thead>
             <tr style="background:#f3f4f6">{{ $head }}</tr>

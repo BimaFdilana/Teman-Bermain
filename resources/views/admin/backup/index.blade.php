@@ -8,7 +8,7 @@
     </div>
     <p class="text-sm mb-5" style="color:#6b7280">Backup otomatis berjalan tiap hari jam 02:00 (database + file). Tersimpan 7 terbaru per jenis.</p>
 
-    <div class="kidza-card p-5 overflow-x-auto">
+    <div class="kidza-card p-5 tabel-scroll">
         <table class="w-full text-sm">
             <thead>
                 <tr class="text-left" style="border-bottom:2px solid #1a1a1a">

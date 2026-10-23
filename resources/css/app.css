@@ -248,6 +248,9 @@ body {
 .kidza-wrap { max-width: 72rem; margin: 0 auto; }
 /* Cegah grid blowout di layar sempit: anak grid boleh menyusut di bawah min-content */
 .kidza-wrap .grid > * { min-width: 0; }
+/* Tabel admin: bisa digeser horizontal di HP (menang atas overflow:hidden .kidza-card) */
+.tabel-scroll { overflow-x: auto !important; overflow-y: hidden; -webkit-overflow-scrolling: touch; }
+.tabel-scroll > table { min-width: 600px; }
 .kidza-kicker {
   display: inline-block; font-family: 'Quicksand', sans-serif; font-weight: 700;
   color: #0f5c31; background: #e8f6ee; border-radius: 999px;
