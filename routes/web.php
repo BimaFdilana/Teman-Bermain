@@ -66,13 +66,17 @@ Route::middleware(['auth', 'nonadmin'])->group(function () {
     Route::get('/main/{product}', [App\Http\Controllers\MiniappController::class, 'main'])->name('miniapp.main');
 });
 
-// Install + manifest MiniApp: untuk customer pemilik DAN admin (agar admin bisa
-// uji coba install langsung seperti customer). Otorisasi dijaga di controller:
-// admin / pemilik entitlement / pemegang token install.
+// Install MiniApp: untuk customer pemilik DAN admin (agar admin bisa uji coba
+// install langsung seperti customer). Otorisasi dijaga di controller.
 Route::middleware(['auth'])->group(function () {
     Route::get('/miniapp/{product}/pasang', [App\Http\Controllers\MiniappController::class, 'install'])->name('miniapp.install');
-    Route::get('/miniapp/{product}/manifest.json', [App\Http\Controllers\MiniappController::class, 'manifest'])->name('miniapp.manifest');
 });
+
+// Manifest MiniApp SENGAJA publik (tanpa middleware auth): pengambil manifest
+// milik Chrome tidak membawa sesi login, jadi manifest harus bisa diotorisasi
+// lewat ?token= saja — penjagaan tetap di controller (otorisasi(): sesi
+// pemilik/admin ATAU token install yang sah; selain itu 403).
+Route::get('/miniapp/{product}/manifest.json', [App\Http\Controllers\MiniappController::class, 'manifest'])->name('miniapp.manifest');
 
 // SEO (PRD §12): sitemap.xml dinamis
 Route::get('/sitemap.xml', function () {

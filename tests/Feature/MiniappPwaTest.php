@@ -96,6 +96,38 @@ class MiniappPwaTest extends TestCase
         $this->assertSame('300x200', $icons[0]['sizes']);
     }
 
+    public function test_manifest_bisa_diakses_tamu_dengan_token_install(): void
+    {
+        // Pengambil manifest Chrome tidak membawa sesi login — token adalah
+        // satu-satunya otorisasi. Jalur ini pernah rusak: rute tertahan
+        // middleware auth + userDariToken() crash (tipe User tidak diimpor).
+        $user = User::factory()->create();
+        $p = Product::create([
+            'tipe' => 'miniapp', 'judul' => 'Game Token', 'slug' => 'game-token-'.uniqid(),
+            'deskripsi' => 'd', 'harga' => 10000, 'status' => 'tersedia',
+        ]);
+        Miniapp::create(['product_id' => $p->id, 'html_path' => 'miniapps/uji.html', 'pwa_name' => 'Game Token']);
+        Entitlement::create(['user_id' => $user->id, 'product_id' => $p->id]);
+        $token = \App\Models\InstallToken::untuk($user, $p);
+
+        $this->get(route('miniapp.manifest', [$p, 'token' => $token->token]))
+            ->assertOk()
+            ->assertJsonPath('display', 'standalone');
+        $this->assertGuest();
+    }
+
+    public function test_manifest_tamu_tanpa_token_sah_ditolak(): void
+    {
+        $p = Product::create([
+            'tipe' => 'miniapp', 'judul' => 'Game Token 2', 'slug' => 'game-token2-'.uniqid(),
+            'deskripsi' => 'd', 'harga' => 10000, 'status' => 'tersedia',
+        ]);
+        Miniapp::create(['product_id' => $p->id, 'html_path' => 'miniapps/uji.html', 'pwa_name' => 'Game Token 2']);
+
+        $this->get(route('miniapp.manifest', $p))->assertForbidden();
+        $this->get(route('miniapp.manifest', [$p, 'token' => 'token-ngawur']))->assertForbidden();
+    }
+
     public function test_launch_tombol_install_menunggu_sinyal_chrome(): void
     {
         \Illuminate\Support\Facades\Storage::disk('local')->put(
