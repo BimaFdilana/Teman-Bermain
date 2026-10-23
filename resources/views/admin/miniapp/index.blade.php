@@ -28,7 +28,6 @@
                 <td class="px-4 py-2 whitespace-nowrap">
                     <a href="{{ route('admin.miniapp.preview', $p) }}" class="kidza-btn" style="background:#fff" title="Preview">👁️</a>
                     <a href="{{ route('miniapp.install', $p) }}" target="_blank" rel="noopener" class="kidza-btn kidza-btn-yellow" title="Uji install — langsung ke HTML game seperti customer">🚀</a>
-                    <a href="{{ route('admin.miniapp.perangkat', $p) }}" class="kidza-btn" style="background:#fff" title="Perangkat terpasang">📲</a>
                     <a href="{{ route('admin.miniapp.edit', $p) }}" class="kidza-btn" style="background:#fff" title="Edit">✏️</a>
                     <form method="POST" action="{{ route('admin.miniapp.destroy', $p) }}" class="inline" onsubmit="return tanyaForm(this, 'Hapus MiniApp ini?')">
                         @csrf @method('DELETE')
