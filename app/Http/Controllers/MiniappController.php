@@ -66,9 +66,6 @@ class MiniappController extends Controller
         abort_unless($user, 403);
         $token = InstallToken::untuk($user, $product);
         $nama = $product->miniapp?->pwa_name ?: $product->judul;
-        $icon = $product->miniapp?->icon_path
-            ? asset('storage/'.$product->miniapp->icon_path)
-            : asset('images/logo-icon.png');
         $startUrl = route('pwa.launch', ['token' => $token->token]);
 
         return response()->json([
@@ -82,11 +79,37 @@ class MiniappController extends Controller
             'orientation' => 'any',
             'background_color' => '#F9F9F6',
             'theme_color' => '#167941',
-            'icons' => [
-                ['src' => $icon, 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
-                ['src' => $icon, 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
-            ],
+            'icons' => $this->ikonManifest($product),
         ]);
+    }
+
+    /**
+     * Ikon manifest dengan ukuran yang JUJUR: Chrome menolak installability
+     * bila ukuran deklarasi tidak cocok dengan file aslinya. Ikon unggahan
+     * admin dinyatakan sesuai ukuran file sebenarnya; fallback memakai
+     * ikon persegi bawaan 192/512 yang ukurannya pasti.
+     */
+    private function ikonManifest(Product $product): array
+    {
+        $path = $product->miniapp?->icon_path;
+        if ($path) {
+            $sizes = '512x512';
+            try {
+                $full = \Illuminate\Support\Facades\Storage::disk('public')->path($path);
+                if (is_file($full) && ($info = getimagesize($full)) !== false) {
+                    $sizes = $info[0].'x'.$info[1];
+                }
+            } catch (\Throwable) {
+                // Abaikan — pakai deklarasi default.
+            }
+
+            return [['src' => asset('storage/'.$path), 'sizes' => $sizes, 'type' => 'image/png', 'purpose' => 'any']];
+        }
+
+        return [
+            ['src' => asset('images/pwa-icon-192.png'), 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+            ['src' => asset('images/pwa-icon-512.png'), 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+        ];
     }
 
     /**
@@ -145,7 +168,7 @@ class MiniappController extends Controller
         // Meta iOS: ikon layar utama + mode standalone Safari (hanya bila belum ada).
         $icon = $product->miniapp?->icon_path
             ? asset('storage/'.$product->miniapp->icon_path)
-            : asset('images/logo-icon.png');
+            : asset('images/apple-touch-icon-180.png');
         if (! preg_match('/<link[^>]+rel=["\']apple-touch-icon["\']/i', $html)) {
             $headInject .= '<link rel="apple-touch-icon" href="'.e($icon).'">'."\n";
         }
@@ -204,11 +227,27 @@ var isIos=/iphone|ipad|ipod/i.test(ua)||(window.navigator.platform==='MacIntel'&
 function tampil(){btn.style.display='inline-flex';}
 window.addEventListener('beforeinstallprompt',function(e){e.preventDefault();dp=e;tampil();});
 setTimeout(tampil,3000);
+function promptInstall(){dp.prompt();dp.userChoice.then(function(){dp=null;btn.style.display='none';panel.style.display='none';});}
+var menunggu=false;
 btn.addEventListener('click',function(){
-  if(dp){dp.prompt();dp.userChoice.then(function(){dp=null;btn.style.display='none';panel.style.display='none';});return;}
-  document.getElementById('rc-panduan-ios').style.display=isIos?'block':'none';
-  document.getElementById('rc-panduan-android').style.display=isIos?'none':'block';
-  panel.style.display=(panel.style.display==='block')?'none':'block';
+  if(dp){promptInstall();return;}
+  if(panel.style.display==='block'){panel.style.display='none';return;}
+  if(menunggu){return;}
+  // Chrome kadang terlambat memberi sinyal install — tunggu dulu sampai 10 detik.
+  menunggu=true;
+  var labelAsli=btn.innerHTML;
+  btn.innerHTML='⏳ Menyiapkan…';
+  var selesai=false;
+  var timer=setTimeout(function(){
+    if(selesai){return;} selesai=true; menunggu=false; btn.innerHTML=labelAsli;
+    document.getElementById('rc-panduan-ios').style.display=isIos?'block':'none';
+    document.getElementById('rc-panduan-android').style.display=isIos?'none':'block';
+    panel.style.display='block';
+  },10000);
+  window.addEventListener('beforeinstallprompt',function(){
+    if(selesai){return;} selesai=true; clearTimeout(timer); menunggu=false; btn.innerHTML=labelAsli;
+    if(dp){promptInstall();}
+  },{once:true});
 });
 document.getElementById('rc-panel-tutup').addEventListener('click',function(){panel.style.display='none';});
 window.addEventListener('appinstalled',function(){btn.style.display='none';panel.style.display='none';});

@@ -66,6 +66,57 @@ class MiniappPwaTest extends TestCase
         $this->assertSame('any', $data['icons'][0]['purpose']);
         $this->assertSame('192x192', $data['icons'][0]['sizes']);
         $this->assertSame('512x512', $data['icons'][1]['sizes']);
+        // Fallback tanpa icon_path memakai ikon persegi bawaan yang ukurannya pasti
+        $this->assertStringContainsString('pwa-icon-192.png', $data['icons'][0]['src']);
+        $this->assertStringContainsString('pwa-icon-512.png', $data['icons'][1]['src']);
+    }
+
+    public function test_manifest_ikon_unggahan_dinyatakan_sesuai_ukuran_asli(): void
+    {
+        // Buat ikon unggahan 300x200 — manifest harus menyatakan 300x200, bukan 192/512 karangan
+        $img = imagecreatetruecolor(300, 200);
+        ob_start();
+        imagepng($img);
+        \Illuminate\Support\Facades\Storage::disk('public')->put('miniapp-icons/uji.png', ob_get_clean());
+        imagedestroy($img);
+
+        $user = User::factory()->create();
+        $p = Product::create([
+            'tipe' => 'miniapp', 'judul' => 'Game Ikon', 'slug' => 'game-ikon-'.uniqid(),
+            'deskripsi' => 'd', 'harga' => 10000, 'status' => 'tersedia',
+        ]);
+        Miniapp::create(['product_id' => $p->id, 'html_path' => 'miniapps/uji.html', 'pwa_name' => 'Game Ikon', 'icon_path' => 'miniapp-icons/uji.png']);
+        Entitlement::create(['user_id' => $user->id, 'product_id' => $p->id]);
+
+        $res = $this->actingAs($user)->get(route('miniapp.manifest', $p));
+
+        $res->assertOk();
+        $icons = $res->json('icons');
+        $this->assertCount(1, $icons);
+        $this->assertSame('300x200', $icons[0]['sizes']);
+    }
+
+    public function test_launch_tombol_install_menunggu_sinyal_chrome(): void
+    {
+        \Illuminate\Support\Facades\Storage::disk('local')->put(
+            'miniapps/uji3.html',
+            '<html><head></head><body>game</body></html>'
+        );
+        $user = User::factory()->create();
+        $p = Product::create([
+            'tipe' => 'miniapp', 'judul' => 'Game Tunggu', 'slug' => 'game-tunggu-'.uniqid(),
+            'deskripsi' => 'd', 'harga' => 10000, 'status' => 'tersedia',
+        ]);
+        Miniapp::create(['product_id' => $p->id, 'html_path' => 'miniapps/uji3.html', 'pwa_name' => 'Game Tunggu']);
+        Entitlement::create(['user_id' => $user->id, 'product_id' => $p->id]);
+        $token = \App\Models\InstallToken::untuk($user, $p);
+
+        $res = $this->get(route('pwa.launch', ['token' => $token->token]));
+
+        $res->assertOk();
+        // Tombol menunggu sinyal beforeinstallprompt dulu (⏳ Menyiapkan) sebelum panel instruksi
+        $res->assertSee('Menyiapkan', false);
+        $res->assertSee('10000', false);
     }
 
     public function test_launch_injeksi_meta_ios_dan_cabut_manifest_bawaan_game(): void
