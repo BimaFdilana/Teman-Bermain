@@ -3,10 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\KirimWaJob;
+use App\Mail\KodeRedeemMail;
 use App\Models\Order;
 use App\Models\RedeemCode;
 use App\Services\MetaConversionsApi;
+use App\Services\WablasService;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -87,11 +91,13 @@ class PaymentController extends Controller
 
     /**
      * Setujui: generate 1 redeem code per item + kurangi stok per item (Laporan Final 19 Okt 2026).
+     * Menerima status verifikasi DAN ditolak: tolak tidak memaksa order ulang —
+     * setelah chat WA, admin menyetujui order yang sama (keputusan 19 Okt 2026).
      */
     public function approve(Order $order): RedirectResponse
     {
-        if ($order->status !== Order::ST_VERIFIKASI) {
-            return back()->with('gagal', 'Hanya order menunggu verifikasi yang bisa disetujui.');
+        if (! in_array($order->status, [Order::ST_VERIFIKASI, Order::ST_DITOLAK])) {
+            return back()->with('gagal', 'Hanya order menunggu verifikasi atau ditolak yang bisa disetujui.');
         }
 
         $order->loadMissing(['items.product']);
@@ -143,12 +149,42 @@ class PaymentController extends Controller
 
         \App\Models\ActivityLog::catat('verifikasi_order', "Order {$order->kode_order} disetujui (".count($kodes)." kode)");
 
-        return redirect()->route('admin.pembayaran.show', $order)
-            ->with('sukses', 'Order disetujui! '.count($kodes).' kode redeem dibuat. Kirim ke pelanggan via tombol "Kirim Produk" di bawah.');
+        // Notifikasi otomatis: kode redeem via WA (+email antrean). Tombol
+        // wa.me manual di halaman detail tetap jadi fallback bila Wablas gagal.
+        $waPelanggan = $order->waPembeli();
+        if (WablasService::enabled() && $waPelanggan) {
+            $daftarKode = implode("\n", $kodes);
+            KirimWaJob::dispatch($waPelanggan,
+                "Halo {$order->namaPembeli()}! Terima kasih sudah membeli di Rumah Cahaya-bks 🎉\n\n"
+                ."📦 No. Order/Invoice: {$order->kode_order}\n\n"
+                ."🔑 Kode redeem kamu:\n{$daftarKode}\n\n"
+                .'Cara klaim:'."\n"
+                .'1. Login di '.config('app.url').' pakai Google (email: '.$order->emailPembeli().")\n"
+                ."2. Buka Home, masukkan kode redeem di kolom Redeem\n"
+                .'3. Klik Redeem — produk langsung jadi milikmu!');
+        }
+        if ($order->emailPembeli()) {
+            try {
+                Mail::to($order->emailPembeli())->queue(new KodeRedeemMail($order, $kodes));
+            } catch (\Throwable $e) {
+                Log::warning('Email kode redeem gagal diantrekan: '.$e->getMessage(), [
+                    'kode_order' => $order->kode_order,
+                ]);
+            }
+        }
+
+        $pesan = 'Order disetujui! '.count($kodes).' kode redeem dibuat.';
+        $pesan .= WablasService::enabled()
+            ? ' Kode redeem dikirim otomatis via WA (+email) ke pelanggan. Tombol "Kirim Produk" tetap tersedia bila perlu kirim ulang manual.'
+            : ' Kirim ke pelanggan via tombol "Kirim Produk" di bawah.';
+
+        return redirect()->route('admin.pembayaran.show', $order)->with('sukses', $pesan);
     }
 
     /**
-     * Tolak + alasan; pengguna boleh upload ulang 1x (PRD §5.4).
+     * Tolak + alasan; alasan terkirim otomatis via WA pelanggan.
+     * Pengguna boleh upload ulang 1x (PRD §5.4) ATAU admin menyetujui order
+     * yang sama setelah chat WA (tidak perlu order ulang).
      */
     public function reject(Request $request, Order $order): RedirectResponse
     {
@@ -165,7 +201,20 @@ class PaymentController extends Controller
 
         \App\Models\ActivityLog::catat('tolak_order', "Order {$order->kode_order} ({$order->product->judul}) ditolak: {$request->alasan_tolak}");
 
+        // Alasan penolakan terkirim otomatis via WA pelanggan (antrean).
+        if (WablasService::enabled() && ($waPelanggan = $order->waPembeli())) {
+            KirimWaJob::dispatch($waPelanggan,
+                "Halo {$order->namaPembeli()}, terima kasih sudah memesan di Rumah Cahaya-bks.\n\n"
+                ."Mohon maaf, pembayaran untuk No. Order {$order->kode_order} belum bisa kami verifikasi: {$request->alasan_tolak}\n\n"
+                .'Silakan chat admin via WA ini untuk tindak lanjut — kamu tidak perlu order ulang, admin bisa menyetujui order yang sama setelah dikonfirmasi.');
+        }
+
+        $pesan = 'Order ditolak. Pengguna akan melihat alasan dan bisa upload ulang 1x.';
+        if (WablasService::enabled()) {
+            $pesan .= ' Alasan juga dikirim via WA pelanggan.';
+        }
+
         return redirect()->route('admin.pembayaran.show', $order)
-            ->with('sukses', 'Order ditolak. Pengguna akan melihat alasan dan bisa upload ulang 1x.');
+            ->with('sukses', $pesan);
     }
 }

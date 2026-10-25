@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Jobs\KirimWaJob;
 use App\Models\DiscountCode;
+use App\Services\WablasService;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Setting;
@@ -216,6 +218,17 @@ class CartController extends Controller
                 'harga_saat_beli' => $p->harga,
                 'qty' => 1,
             ]);
+        }
+
+        // Notifikasi order baru ke WA admin (antrean; hanya bila Wablas aktif).
+        if (WablasService::enabled() && ($waAdmin = Setting::get('wa_admin'))) {
+            KirimWaJob::dispatch($waAdmin,
+                "🔔 Order baru di Rumah Cahaya-bks!\n"
+                ."• No. Order: {$order->kode_order}\n"
+                ."• Pembeli: {$order->namaPembeli()}\n"
+                ."• Produk: ".$items->pluck('judul')->implode(', ')."\n"
+                ."• Total: Rp ".number_format($order->total_bayar, 0, ',', '.')."\n"
+                .'Silakan verifikasi di admin.');
         }
 
         // Kosongkan cart; ingat order untuk akses halaman bayar (tamu)

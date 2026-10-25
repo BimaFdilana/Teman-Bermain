@@ -24,6 +24,9 @@ class SettingController extends Controller
             'vaNumbers' => json_decode(Setting::get('va_numbers', '{}') ?? '{}', true) ?: [],
             'pajakPersen' => Setting::get('pajak_persen', '0'),
             'logoSlider' => json_decode(Setting::get('logo_slider', '[]') ?? '[]', true) ?: [],
+            'wablasAktif' => Setting::get('wablas_aktif') === '1',
+            'wablasDomain' => Setting::get('wablas_domain', 'console.wablas.com'),
+            'wablasTokenTersimpan' => \App\Services\WablasService::tokenTersimpan(),
         ]);
     }
 
@@ -71,6 +74,8 @@ class SettingController extends Controller
             'pajak_persen' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'va_numbers' => ['nullable', 'array'],
             'va_numbers.*' => ['nullable', 'string', 'max:30'],
+            'wablas_domain' => ['nullable', 'string', 'max:100'],
+            'wablas_token' => ['nullable', 'string', 'max:255'],
         ]);
 
         if ($request->hasFile('qris')) {
@@ -96,6 +101,37 @@ class SettingController extends Controller
         Setting::set('va_numbers', json_encode($va));
         Setting::set('pajak_persen', (string) max(0, (float) $request->input('pajak_persen', 0)));
 
+        // Notifikasi WhatsApp via Wablas (token disimpan terenkripsi; kosong = pertahankan lama).
+        Setting::set('wablas_aktif', $request->boolean('wablas_aktif') ? '1' : '0');
+        if ($request->filled('wablas_domain')) {
+            Setting::set('wablas_domain', trim($request->input('wablas_domain')));
+        }
+        if ($request->filled('wablas_token')) {
+            Setting::set('wablas_token', \Illuminate\Support\Facades\Crypt::encryptString($request->input('wablas_token')));
+        }
+
         return back()->with('sukses', 'Pengaturan disimpan.');
+    }
+
+    /** Kirim pesan test Wablas ke No. WhatsApp Admin (hasil langsung, tanpa antrean). */
+    public function wablasTest(): RedirectResponse
+    {
+        if (! \App\Services\WablasService::enabled()) {
+            return back()->with('gagal', 'Aktifkan Wablas dan isi token + domain dulu, lalu simpan.');
+        }
+
+        $waAdmin = Setting::get('wa_admin');
+        if (! $waAdmin) {
+            return back()->with('gagal', 'Isi No. WhatsApp Admin dulu, lalu simpan.');
+        }
+
+        $ok = app(\App\Services\WablasService::class)->kirim(
+            $waAdmin,
+            '✅ Tes Wablas Rumah Cahaya-bks berhasil! Notifikasi otomatis sudah aktif.'
+        );
+
+        return $ok
+            ? back()->with('sukses', 'Pesan test terkirim ke WA admin. Cek HP admin.')
+            : back()->with('gagal', 'Pesan test gagal terkirim. Cek token, domain, dan status device Wablas.');
     }
 }

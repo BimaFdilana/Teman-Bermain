@@ -12,6 +12,9 @@ Artisan::command('inspire', function () {
 // Di shared hosting: cron tiap menit -> `php artisan schedule:run`
 Schedule::command('order:kadaluarsa')->everyFiveMinutes();
 
+// Wablas: proses antrean WA tiap menit (shared hosting tanpa worker tetap).
+Schedule::command('queue:work --stop-when-empty')->everyMinute()->withoutOverlapping();
+
 // Fase 6: backup database + file harian jam 02:00 (disimpan 7 hari terakhir per jenis).
 Schedule::command('backup:database --files')->dailyAt('02:00');
 

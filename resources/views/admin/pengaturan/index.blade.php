@@ -52,8 +52,39 @@
             <p class="text-xs mt-1" style="color:#6b7280">0 = tidak ada pajak. Tampil di ringkasan cart bila &gt; 0.</p>
         </div>
 
+        <h2 class="font-bold text-lg mb-3" style="font-family:'Quicksand'">📱 Notifikasi WhatsApp (Wablas)</h2>
+        <p class="text-xs mb-3" style="color:#6b7280">Kirim otomatis: order baru ke WA admin, kode redeem ke pelanggan saat disetujui, alasan saat ditolak. Token dari dashboard Wablas → API Keys. Bila Wablas gagal, tombol wa.me manual tetap tersedia.</p>
+        <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">
+                <input type="checkbox" name="wablas_aktif" value="1" @checked(old('wablas_aktif', $wablasAktif))>
+                Aktifkan notifikasi Wablas
+            </label>
+        </div>
+        <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">Token API Wablas</label>
+            <input type="password" name="wablas_token" value=""
+                   placeholder="{{ $wablasTokenTersimpan ? 'Token tersimpan ✓ (kosongkan bila tidak diubah)' : 'Tempel token API Wablas' }}"
+                   class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+        </div>
+        <div class="mb-5">
+            <label class="text-sm font-bold block mb-1">Domain Server Wablas</label>
+            <input type="text" name="wablas_domain" value="{{ old('wablas_domain', $wablasDomain) }}"
+                   placeholder="console.wablas.com"
+                   class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+            <p class="text-xs mt-1" style="color:#6b7280">Alamat server API yang tertera di dashboard Wablas.</p>
+        </div>
+
         <button type="submit" class="kidza-btn kidza-btn-green w-full">Simpan Pengaturan</button>
     </form>
+
+    <div class="kidza-card p-6 mt-6" style="max-width:36rem">
+        <h2 class="font-bold text-lg mb-2" style="font-family:'Quicksand'">📱 Tes Wablas</h2>
+        <p class="text-sm mb-4" style="color:#4b5563">Mengirim pesan test ke No. WhatsApp Admin di atas. Simpan dulu bila baru mengubah token/domain.</p>
+        <form method="POST" action="{{ route('admin.pengaturan.wablas-test') }}">
+            @csrf
+            <button type="submit" class="kidza-btn kidza-btn-green w-full">Kirim Pesan Test</button>
+        </form>
+    </div>
 
     <div class="kidza-card p-6 mt-6" style="max-width:36rem">
         <h2 class="font-bold text-lg mb-2" style="font-family:'Quicksand'">🖼️ Logo Slider (Landing Page)</h2>
