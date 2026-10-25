@@ -260,14 +260,14 @@
                     <div data-pv-section="harga_cta" class="mb-4">
                         <div id="pv-harga-wrap" class="text-center" style="display:none">
                             <p class="font-extrabold mb-2" style="font-size:1.2rem;color:#14532D">HARGA SPESIAL</p>
+                            <div id="pv-countdown-bawah-wrap" class="text-center mb-2">
+                                <span class="inline-block px-4 py-1 rounded-full text-xs font-bold" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ <span id="pv-countdown-bawah-text"></span></span>
+                                <p id="pv-countdown-bawah-sampai" class="text-xs mt-1" style="color:#a39e93"></p>
+                            </div>
                             <div id="pv-harga-list"></div>
                         </div>
                         <div class="text-center mt-4">
                             <span class="kidza-btn kidza-btn-green" style="font-size:.9rem;display:inline-block;pointer-events:none">👉 Pesan Sekarang 👈</span>
-                        </div>
-                        <div id="pv-countdown-bawah-wrap" class="text-center mt-4">
-                            <span class="inline-block px-4 py-1 rounded-full text-xs font-bold" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ <span id="pv-countdown-bawah-text"></span></span>
-                            <p id="pv-countdown-bawah-sampai" class="text-xs mt-1" style="color:#a39e93"></p>
                         </div>
                     </div>
                 </div>

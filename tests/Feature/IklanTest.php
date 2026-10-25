@@ -315,7 +315,7 @@ class IklanTest extends TestCase
             ->assertSee('Berakhir dalam');
     }
 
-    /** Hitungan mundur tampil dua kali: di section-nya + di bawah HARGA SPESIAL. */
+    /** Hitungan mundur tampil dua kali: di section-nya + di bawah judul HARGA SPESIAL (sebelum tombol). */
     public function test_countdown_juga_tampil_di_bawah_harga_spesial(): void
     {
         $p1 = $this->buatProduk('utama', 'Produk Utama');
@@ -323,6 +323,11 @@ class IklanTest extends TestCase
 
         $html = $this->get(route('iklan.show', $k->slug))->assertOk()->getContent();
         $this->assertSame(2, substr_count($html, 'Berakhir dalam'));
+        // Duplikatnya terletak sesudah judul HARGA SPESIAL dan sebelum tombol Pesan
+        $posHarga = strpos($html, 'HARGA SPESIAL');
+        $posPesan = strpos($html, 'Pesan Sekarang', $posHarga);
+        $posCd2 = strpos($html, 'Berakhir dalam', $posHarga);
+        $this->assertTrue($posCd2 !== false && $posCd2 < $posPesan);
 
         // Kalau section countdown disembunyikan, duplikatnya ikut hilang
         $k->update(['section_sembunyi' => ['countdown']]);

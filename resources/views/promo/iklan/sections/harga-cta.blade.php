@@ -3,6 +3,10 @@
 @if($utama)
     <div class="text-center mt-12 mb-8">
         <p class="font-extrabold mb-3" style="font-size:1.7rem;color:#14532D">HARGA SPESIAL</p>
+        {{-- Hitungan mundur juga tampil di bawah judul HARGA SPESIAL --}}
+        @if($kampanye->sectionTampil('countdown'))
+            @include('promo.iklan.sections.countdown')
+        @endif
         <div class="mb-2">
             <p class="text-xs font-bold" style="color:#a39e93">{{ $utama->judul }}</p>
             @if($utama->harga_coret)
@@ -15,9 +19,5 @@
                 <span class="anim-tunjuk">👉</span> Pesan Sekarang <span class="anim-tunjuk-kiri">👈</span>
             </a>
         </div>
-        {{-- Hitungan mundur juga tampil di bawah HARGA SPESIAL --}}
-        @if($kampanye->sectionTampil('countdown'))
-            @include('promo.iklan.sections.countdown')
-        @endif
     </div>
 @endif
