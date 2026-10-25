@@ -80,6 +80,16 @@ class WablasTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_service_menyimpan_penyebab_gagal(): void
+    {
+        $this->aktifkanWablas();
+        Http::fake(['*console.wablas.com/*' => Http::response('unauthorized', 401)]);
+
+        $service = app(WablasService::class);
+        $this->assertFalse($service->kirim('081234567890', 'halo'));
+        $this->assertEquals('HTTP 401', $service->errorTerakhir);
+    }
+
     public function test_order_baru_mengantre_notif_admin(): void
     {
         $this->aktifkanWablas();

@@ -57,17 +57,24 @@ class WablasService
         return $domain !== '' ? $domain : null;
     }
 
+    /** Penyebab gagal terakhir (untuk ditampilkan tombol test). */
+    public ?string $errorTerakhir = null;
+
     /** Kirim pesan teks; false bila nonaktif/gagal (tidak throw). */
     public function kirim(?string $tujuan, string $pesan): bool
     {
+        $this->errorTerakhir = null;
         $tujuan = User::normalizeWhatsapp($tujuan);
         if ($tujuan === null || $pesan === '') {
+            $this->errorTerakhir = 'nomor tujuan tidak valid';
+
             return false;
         }
 
         $token = self::token();
         $domain = self::domain();
         if ($token === null || $domain === null) {
+            $this->errorTerakhir = 'token/domain belum dikonfigurasi';
             Log::info('Wablas dilewati: token/domain belum dikonfigurasi.', [
                 'tujuan' => $tujuan,
             ]);
@@ -84,6 +91,7 @@ class WablasService
                 ]);
 
             if (! $response->successful()) {
+                $this->errorTerakhir = 'HTTP '.$response->status();
                 Log::warning('Wablas gagal mengirim.', [
                     'tujuan' => $tujuan,
                     'status' => $response->status(),
@@ -95,6 +103,7 @@ class WablasService
 
             return true;
         } catch (\Throwable $e) {
+            $this->errorTerakhir = 'tidak bisa terhubung ke '.$domain;
             Log::warning('Wablas error: '.$e->getMessage(), ['tujuan' => $tujuan]);
 
             return false;

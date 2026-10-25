@@ -125,13 +125,14 @@ class SettingController extends Controller
             return back()->with('gagal', 'Isi No. WhatsApp Admin dulu, lalu simpan.');
         }
 
-        $ok = app(\App\Services\WablasService::class)->kirim(
+        $wablas = app(\App\Services\WablasService::class);
+        $ok = $wablas->kirim(
             $waAdmin,
             '✅ Tes Wablas Rumah Cahaya-bks berhasil! Notifikasi otomatis sudah aktif.'
         );
 
         return $ok
             ? back()->with('sukses', 'Pesan test terkirim ke WA admin. Cek HP admin.')
-            : back()->with('gagal', 'Pesan test gagal terkirim. Cek token, domain, dan status device Wablas.');
+            : back()->with('gagal', 'Pesan test gagal terkirim ('.$wablas->errorTerakhir.'). Cek token, domain, dan status device Wablas.');
     }
 }
