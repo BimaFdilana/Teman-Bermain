@@ -315,6 +315,26 @@ class IklanTest extends TestCase
             ->assertSee('Berakhir dalam');
     }
 
+    /** HARGA SPESIAL hanya menampilkan produk utama (bukan semua produk). */
+    public function test_harga_spesial_hanya_menampilkan_produk_utama(): void
+    {
+        $p1 = $this->buatProduk('utama', 'Produk Utama');
+        $p1->update(['harga' => 79000, 'harga_coret' => 118000]);
+        $p2 = $this->buatProduk('tambahan', 'Produk Tambahan');
+        $p2->update(['harga' => 49000]);
+        $k = $this->buatKampanye(['judul' => 'Promo Harga', 'slug' => 'promo-harga', 'produk_primary_id' => $p1->id]);
+        $k->produkSecondary()->sync([$p2->id]);
+
+        $html = $this->get(route('iklan.show', $k->slug))->assertOk()->getContent();
+        $awal = strpos($html, 'HARGA SPESIAL');
+        $akhir = strpos($html, 'Pesan Sekarang', $awal);
+        $blok = substr($html, $awal, $akhir - $awal);
+
+        $this->assertStringContainsString('Rp 79.000', $blok);
+        $this->assertStringContainsString('Rp 118.000', $blok);
+        $this->assertStringNotContainsString('Rp 49.000', $blok);
+    }
+
     /** Tabel iklan menampilkan status mentah (aktif/draft) di bawah badge tayang. */
     public function test_tabel_iklan_menampilkan_status_mentah(): void
     {

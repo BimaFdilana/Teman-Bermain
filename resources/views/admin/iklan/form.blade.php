@@ -406,15 +406,14 @@
                     return p ? (mode === 'list' ? listProduk(p) : cardProduk(p, false)) : '';
                 }).join('')
                 : '';
-            // Rekap HARGA SPESIAL: semua produk terpilih (utama + tambahan)
-            const semua = [pUtama, ...ids.map(id => produkData[id])].filter(Boolean);
-            pvHargaWrap.style.display = semua.length ? 'block' : 'none';
-            pvHargaList.innerHTML = semua.map(p => `
+            // Rekap HARGA SPESIAL: hanya produk utama (seperti halaman publik)
+            pvHargaWrap.style.display = pUtama ? 'block' : 'none';
+            pvHargaList.innerHTML = pUtama ? `
                 <div class="mb-2">
-                    <p class="text-xs font-bold" style="color:#a39e93">${p.judul}</p>
-                    ${p.harga_coret ? `<span class="text-xs line-through" style="color:#a39e93">${rp(p.harga_coret)}</span> ` : ''}
-                    <p class="font-extrabold" style="font-size:1.1rem;color:#14532D">${rp(p.harga)}</p>
-                </div>`).join('');
+                    <p class="text-xs font-bold" style="color:#a39e93">${pUtama.judul}</p>
+                    ${pUtama.harga_coret ? `<span class="text-xs line-through" style="color:#a39e93">${rp(pUtama.harga_coret)}</span> ` : ''}
+                    <p class="font-extrabold" style="font-size:1.1rem;color:#14532D">${rp(pUtama.harga)}</p>
+                </div>` : '';
         };
         form.querySelectorAll('.cek-produk').forEach(c => c.addEventListener('change', updProduk));
         document.getElementById('pilih-primary').addEventListener('change', updProduk);
