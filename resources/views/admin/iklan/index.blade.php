@@ -37,6 +37,7 @@
                             @else
                                 <span class="kidza-badge" style="background:#F3A712">Draft</span>
                             @endif
+                            <br><span class="text-xs" style="color:#6b7280">status: {{ $k->status }}</span>
                         </td>
                         <td class="p-3">
                             <button class="kidza-btn" style="background:#e8f6ee" title="Salin link iklan"

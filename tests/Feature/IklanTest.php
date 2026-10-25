@@ -282,6 +282,19 @@ class IklanTest extends TestCase
             ->assertDontSee('Pratinjau admin');
     }
 
+    /** Tabel iklan menampilkan status mentah (aktif/draft) di bawah badge tayang. */
+    public function test_tabel_iklan_menampilkan_status_mentah(): void
+    {
+        $this->buatKampanye(['judul' => 'Promo Aktif X', 'slug' => 'promo-aktif-x', 'status' => 'aktif']);
+        $this->buatKampanye(['judul' => 'Promo Draft Y', 'slug' => 'promo-draft-y', 'status' => 'draft']);
+
+        $response = $this->actingAs($this->admin())->get(route('admin.iklan.index'));
+
+        $response->assertOk();
+        $response->assertSee('status: aktif');
+        $response->assertSee('status: draft');
+    }
+
     /** Regresi laporan admin 2026-10-25: iklan tersimpan HARUS muncul di tabel index. */
     public function test_iklan_tersimpan_muncul_di_tabel_index(): void
     {
