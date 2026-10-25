@@ -315,6 +315,28 @@ class IklanTest extends TestCase
             ->assertSee('Berakhir dalam');
     }
 
+    /** Hitungan mundur menampilkan periode lengkap (tanggal awal s/d tanggal berakhir). */
+    public function test_countdown_menampilkan_periode_lengkap(): void
+    {
+        $p1 = $this->buatProduk('utama', 'Produk Utama');
+        $mulai = now()->subDay();
+        $berakhir = now()->addDays(14)->endOfDay();
+        $k = $this->buatKampanye([
+            'judul' => 'Promo Periode', 'slug' => 'promo-periode', 'produk_primary_id' => $p1->id,
+            'mulai_at' => $mulai, 'berakhir_at' => $berakhir,
+        ]);
+
+        $periode = $mulai->format('d M Y').' s/d '.$berakhir->format('d M Y, H:i').' WIB';
+        $html = $this->get(route('iklan.show', $k->slug))->assertOk()->getContent();
+        $this->assertStringContainsString($periode, $html);
+
+        // Tanpa tanggal mulai, tetap hanya "s/d ..."
+        $k->update(['mulai_at' => null]);
+        $html = $this->get(route('iklan.show', $k->slug))->assertOk()->getContent();
+        $this->assertStringContainsString('s/d '.$berakhir->format('d M Y, H:i').' WIB', $html);
+        $this->assertStringNotContainsString($mulai->format('d M Y').' s/d', $html);
+    }
+
     /** Hitungan mundur tampil dua kali: di section-nya + di bawah judul HARGA SPESIAL (sebelum tombol). */
     public function test_countdown_juga_tampil_di_bawah_harga_spesial(): void
     {

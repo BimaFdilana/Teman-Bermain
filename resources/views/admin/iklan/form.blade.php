@@ -471,10 +471,16 @@
 
         // Hitungan mundur LIVE dari tanggal berakhir (akhir hari), bukan teks statis
         const berakhirInp = form.querySelector('[name="berakhir_at"]');
+        const mulaiInp = form.querySelector('[name="mulai_at"]');
         const pvCountdownText = $('pv-countdown-text');
         const pvCountdownSampai = $('pv-countdown-sampai');
         const pvCountdownBawahText = $('pv-countdown-bawah-text');
         const pvCountdownBawahSampai = $('pv-countdown-bawah-sampai');
+        const fmtTgl = (v) => v.split('-').reverse().join(' ');
+        const teksSampai = () => {
+            const sd = fmtTgl(berakhirInp.value) + ', 23:59 WIB';
+            return mulaiInp?.value ? fmtTgl(mulaiInp.value) + ' s/d ' + sd : 's/d ' + sd;
+        };
         const updCountdown = () => {
             if (!berakhirInp.value) {
                 pvCountdownText.textContent = 'Atur tanggal berakhir untuk melihat hitungan mundur';
@@ -492,11 +498,12 @@
             pvCountdownText.textContent = sisa <= 0
                 ? 'Promo telah berakhir'
                 : `Berakhir dalam ${hari} hari ${jam}:${mnt}:${dtk}`;
-            pvCountdownSampai.textContent = 's/d ' + berakhirInp.value.split('-').reverse().join(' ') + ', 23:59 WIB';
+            pvCountdownSampai.textContent = teksSampai();
             if (pvCountdownBawahText) pvCountdownBawahText.textContent = pvCountdownText.textContent;
             if (pvCountdownBawahSampai) pvCountdownBawahSampai.textContent = pvCountdownSampai.textContent;
         };
         berakhirInp.addEventListener('change', updCountdown);
+        mulaiInp?.addEventListener('change', updCountdown);
         updCountdown();
         setInterval(updCountdown, 1000);
 
