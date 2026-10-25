@@ -68,6 +68,12 @@
             @endif
             @error('testimoni_ids')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
             @error('testimoni_ids.*')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
+            <div class="mt-3 flex items-center gap-2 flex-wrap">
+                <label class="text-sm font-bold" for="testimoni_bg">🎨 Warna latar kartu foto testimoni</label>
+                <input type="color" id="testimoni_bg" name="testimoni_bg" value="{{ old('testimoni_bg', $kampanye->testimoni_bg ?? '#ffffff') }}" class="rounded border" style="width:44px;height:32px;padding:2px">
+                <span class="text-xs" style="color:#6b7280">Menjadi frame di sekeliling tiap foto screenshot. Default putih.</span>
+            </div>
+            @error('testimoni_bg')<p class="text-xs font-bold mt-1" style="color:#e74c3c">{{ $message }}</p>@enderror
         </div>
 
         <div class="mb-4">
@@ -450,11 +456,13 @@
                 label.style.opacity = cb.disabled ? '.4' : '';
             });
             pvSsWrap.style.display = dipilih.length ? 'block' : 'none';
+            const bgSs = document.getElementById('testimoni_bg')?.value || '#ffffff';
             pvSs.innerHTML = dipilih.map(cb =>
-                `<img src="${cb.dataset.url}" class="rounded-xl shrink-0" style="width:120px;border:2px solid #F0E7CC" alt="Testimoni">`
+                `<div class="shrink-0 rounded-xl" style="width:120px;background:${bgSs};border:2px solid #F0E7CC;padding:6px"><img src="${cb.dataset.url}" class="rounded-lg w-full" alt="Testimoni"></div>`
             ).join('');
         };
         cekTestimoni.forEach(cb => cb.addEventListener('change', updSs));
+        document.getElementById('testimoni_bg')?.addEventListener('input', updSs);
         updSs();
 
         // Hitungan mundur LIVE dari tanggal berakhir (akhir hari), bukan teks statis

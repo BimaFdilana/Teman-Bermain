@@ -13,7 +13,7 @@ class PromoCampaign extends Model
 
     protected $fillable = [
         'judul', 'subjudul', 'slug', 'deskripsi', 'gambar_path',
-        'video_url', 'ajakan', 'materi', 'testimoni_ss',
+        'video_url', 'ajakan', 'materi', 'testimoni_ss', 'testimoni_bg',
         'produk_primary_id', 'tampilan_secondary', 'urutan_konten', 'section_sembunyi',
         'mulai_at', 'berakhir_at', 'status',
     ];

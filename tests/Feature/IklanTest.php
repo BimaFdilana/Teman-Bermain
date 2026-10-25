@@ -315,6 +315,49 @@ class IklanTest extends TestCase
             ->assertSee('Berakhir dalam');
     }
 
+    /** Warna latar kartu testimoni tersimpan & tampil sebagai frame di halaman publik. */
+    public function test_testimoni_bg_tampil_sebagai_frame_kartu(): void
+    {
+        $k = $this->buatKampanye([
+            'judul' => 'Promo BG', 'slug' => 'promo-bg',
+            'testimoni_ss' => $this->gambarTestimoni(),
+            'testimoni_bg' => '#167941',
+        ]);
+
+        $html = $this->get(route('iklan.show', $k->slug))->assertOk()->getContent();
+        $this->assertStringContainsString('background:#167941;padding:10px', $html);
+    }
+
+    /** Tanpa warna latar, kartu testimoni default putih. */
+    public function test_testimoni_bg_default_putih(): void
+    {
+        $k = $this->buatKampanye([
+            'judul' => 'Promo BG2', 'slug' => 'promo-bg2',
+            'testimoni_ss' => $this->gambarTestimoni(),
+        ]);
+
+        $html = $this->get(route('iklan.show', $k->slug))->assertOk()->getContent();
+        $this->assertStringContainsString('background:#ffffff;padding:10px', $html);
+    }
+
+    /** Admin bisa menyimpan warna latar testimoni lewat form iklan. */
+    public function test_admin_bisa_simpan_warna_latar_testimoni(): void
+    {
+        $p1 = $this->buatProduk('a', 'A');
+        $response = $this->actingAs($this->admin())->post(route('admin.iklan.store'), [
+            'judul' => 'Promo Warna',
+            'produk_primary_id' => $p1->id,
+            'tampilan_secondary' => 'card',
+            'testimoni_ids' => $this->gambarTestimoni(),
+            'testimoni_bg' => '#F5B301',
+            'berakhir_at' => now()->addDays(5)->format('Y-m-d\\TH:i'),
+            'status' => 'aktif',
+        ]);
+
+        $response->assertRedirect(route('admin.iklan.index'));
+        $this->assertSame('#F5B301', PromoCampaign::where('slug', 'promo-warna')->first()->testimoni_bg);
+    }
+
     /** HARGA SPESIAL hanya menampilkan produk utama (bukan semua produk). */
     public function test_harga_spesial_hanya_menampilkan_produk_utama(): void
     {

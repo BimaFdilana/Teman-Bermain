@@ -19,8 +19,8 @@
     <style>
     .ss-slider{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:4px 2px;scroll-behavior:smooth}
     .ss-slider::-webkit-scrollbar{display:none}
-    .ss-slide{flex:0 0 auto;width:min(240px,68vw);scroll-snap-align:center;border-radius:16px;overflow:hidden;background:#fff;border:2px solid #F0E7CC;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-    .ss-slide img{width:100%;height:auto;display:block}
+    .ss-slide{flex:0 0 auto;width:min(240px,68vw);scroll-snap-align:center;border-radius:16px;overflow:hidden;background:{{ $kampanye->testimoni_bg ?? '#ffffff' }};padding:10px;border:2px solid #F0E7CC;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+    .ss-slide img{width:100%;height:auto;display:block;border-radius:10px}
     .ss-dots{display:flex;justify-content:center;gap:8px;margin-top:12px}
     .ss-dots button{width:10px;height:10px;border-radius:999px;border:none;background:#E5DCC3;cursor:pointer;padding:0;transition:background .3s}
     .ss-dots button.aktif{background:#1E7B34;transform:scale(1.2)}

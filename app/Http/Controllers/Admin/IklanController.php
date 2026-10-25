@@ -107,6 +107,7 @@ class IklanController extends Controller
             'materi.*' => ['nullable', 'string', 'max:120'],
             'testimoni_ids' => ['required', 'array', 'min:3', 'max:6'],
             'testimoni_ids.*' => ['integer', 'exists:testimonial_images,id'],
+            'testimoni_bg' => ['nullable', 'regex:/^#[0-9A-Fa-f]{6}$/'],
             'produk_primary_id' => ['required', 'integer', Rule::exists('products', 'id')->where(
                 fn ($q) => $q->where('status', Product::STATUS_TERSEDIA)->where('harga', '>', 0)
             )],
@@ -129,6 +130,7 @@ class IklanController extends Controller
             'produk_secondary_ids.*.different' => 'Produk tambahan tidak boleh sama dengan produk utama.',
             'testimoni_ids.required' => 'Pilih gambar testimoni dari galeri.',
             'testimoni_ids.min' => 'Pilih minimal 3 gambar testimoni.',
+            'testimoni_bg.regex' => 'Warna latar testimoni harus format heksadesimal, mis. #167941.',
             'testimoni_ids.max' => 'Pilih maksimal 6 gambar testimoni.',
             'testimoni_ids.*.exists' => 'Ada gambar testimoni yang sudah tidak ada di galeri.',
             'berakhir_at.after_or_equal' => 'Tanggal berakhir tidak boleh sebelum tanggal mulai.',
