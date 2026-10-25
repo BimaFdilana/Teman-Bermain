@@ -33,6 +33,7 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         @media (prefers-reduced-motion: reduce) { .anim-tunjuk, .anim-tunjuk-kiri, .daun-anim { animation:none; } }
     </style>
     @include('partials.meta-pixel-script')
+        @include('partials.meta-pixel-events')
 </head>
 <body style="background:#FAF6EC;min-height:100vh;min-height:100dvh;margin:0">
     @include('partials.meta-pixel-noscript')

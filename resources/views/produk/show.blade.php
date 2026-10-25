@@ -111,4 +111,13 @@
     </div>
 </section>
 @include('partials.tombol-home')
+<script>
+fbq('track', 'ViewContent', {
+    content_ids: @json([(string) $product->id]),
+    content_type: 'product',
+    content_name: @json($product->judul),
+    value: {{ (float) $product->harga }},
+    currency: 'IDR',
+});
+</script>
 </x-landing-layout>

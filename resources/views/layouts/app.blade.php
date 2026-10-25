@@ -17,6 +17,7 @@
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @yield('head')
         @include('partials.meta-pixel-script')
+        @include('partials.meta-pixel-events')
     </head>
     <body class="antialiased">
         @include('partials.meta-pixel-noscript')

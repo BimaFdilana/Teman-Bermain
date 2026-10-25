@@ -15,6 +15,7 @@ $cover = $product->coverUrl();
     <meta property="og:type" content="website">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('partials.meta-pixel-script')
+    @include('partials.meta-pixel-events')
 </head>
 <body class="poster" style="background:#FFFEF7;min-height:100vh;min-height:100dvh">
     @include('partials.meta-pixel-noscript')
@@ -66,7 +67,8 @@ $cover = $product->coverUrl();
 
     {{-- CTA --}}
     <a href="{{ route('promo.pesan', $product->slug) }}"
-       class="kidza-btn kidza-btn-green w-full text-center mb-2" style="font-size:1.1rem;padding:1rem">
+       class="kidza-btn kidza-btn-green w-full text-center mb-2 js-meta-lead"
+       data-meta-name="{{ $product->judul }}" data-meta-value="{{ $product->harga }}" style="font-size:1.1rem;padding:1rem">
         <span style="display:inline-flex;align-items:center;gap:.5rem;justify-content:center">
             <span style="background:#fff;border-radius:9999px;width:1.5rem;height:1.5rem;display:inline-flex;align-items:center;justify-content:center;font-weight:900;color:#4285F4">G</span>
             Pesan Sekarang
@@ -91,5 +93,14 @@ $cover = $product->coverUrl();
 
     <p class="text-center text-xs" style="color:#a39e93">© {{ date('Y') }} Rumah Cahaya</p>
 </div>
+<script>
+fbq('track', 'ViewContent', {
+    content_ids: @json([(string) $product->id]),
+    content_type: 'product',
+    content_name: @json($product->judul),
+    value: {{ (float) $product->harga }},
+    currency: 'IDR',
+});
+</script>
 </body>
 </html>

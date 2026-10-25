@@ -16,6 +16,7 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @include('partials.meta-pixel-script')
+    @include('partials.meta-pixel-events')
 </head>
 <body class="antialiased kidza poster">
     @include('partials.meta-pixel-noscript')

@@ -15,7 +15,7 @@
             <p class="font-extrabold" style="font-size:1.6rem;color:#14532D">Rp {{ number_format($utama->harga, 0, ',', '.') }}</p>
         </div>
         <div class="text-center">
-            <a href="{{ route('promo.pesan', $utama->slug) }}" class="kidza-btn kidza-btn-green mt-2" style="font-size:1rem;display:inline-block">
+            <a href="{{ route('promo.pesan', $utama->slug) }}" class="kidza-btn kidza-btn-green mt-2 js-meta-lead" data-meta-name="{{ $utama->judul }}" data-meta-value="{{ $utama->harga }}" style="font-size:1rem;display:inline-block">
                 <span class="anim-tunjuk">👉</span> Pesan Sekarang <span class="anim-tunjuk-kiri">👈</span>
             </a>
         </div>

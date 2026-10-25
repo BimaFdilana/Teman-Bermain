@@ -70,6 +70,14 @@ class CartController extends Controller
         if (! in_array($produk->id, $cart)) {
             $cart[] = $produk->id;
             $request->session()->put('cart', $cart);
+            // Dipakai partial meta-pixel-events (AddToCart) di response ini / berikutnya.
+            $request->session()->put('meta_add_to_cart', [
+                'content_ids' => [(string) $produk->id],
+                'content_type' => 'product',
+                'content_name' => $produk->judul,
+                'value' => (float) $produk->harga,
+                'currency' => 'IDR',
+            ]);
         }
     }
 

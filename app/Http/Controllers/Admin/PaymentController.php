@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Order;
 use App\Models\RedeemCode;
+use App\Services\MetaConversionsApi;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -124,6 +126,16 @@ class PaymentController extends Controller
         }
 
         $order->update(['status' => Order::ST_DISETUJUI]);
+
+        // Conversions API: Purchase server (satu-satunya Purchase; browser
+        // berhenti di InitiateCheckout). Gagal kirim tidak menggagalkan approval.
+        try {
+            app(MetaConversionsApi::class)->purchase($order);
+        } catch (\Throwable $e) {
+            Log::warning('Meta CAPI hook approve gagal: '.$e->getMessage(), [
+                'kode_order' => $order->kode_order,
+            ]);
+        }
 
         if ($order->discountCode) {
             $order->discountCode->increment('terpakai');

@@ -84,4 +84,12 @@
     toggle();
 })();
 </script>
+<script>
+fbq('track', 'InitiateCheckout', {
+    content_ids: @json($items->pluck('id')->map(fn ($id) => (string) $id)->all()),
+    content_type: 'product',
+    value: {{ (float) $ringkasan['total'] }},
+    currency: 'IDR',
+});
+</script>
 </x-landing-layout>
