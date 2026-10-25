@@ -66,6 +66,13 @@
                    placeholder="{{ $wablasTokenTersimpan ? 'Token tersimpan ✓ (kosongkan bila tidak diubah)' : 'Tempel token API Wablas' }}"
                    class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
         </div>
+        <div class="mb-4">
+            <label class="text-sm font-bold block mb-1">Secret Key Wablas</label>
+            <input type="password" name="wablas_secret" value=""
+                   placeholder="{{ $wablasSecretTersimpan ? 'Secret tersimpan ✓ (kosongkan bila tidak diubah)' : 'Tempel secret key Wablas' }}"
+                   class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+            <p class="text-xs mt-1" style="color:#6b7280">Token dan secret ada di dashboard Wablas → API Keys, pada kartu device yang Connected. Keduanya wajib diisi.</p>
+        </div>
         <div class="mb-5">
             <label class="text-sm font-bold block mb-1">Domain Server Wablas</label>
             <input type="text" name="wablas_domain" value="{{ old('wablas_domain', $wablasDomain) }}"

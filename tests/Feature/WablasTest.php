@@ -53,6 +53,7 @@ class WablasTest extends TestCase
     {
         Setting::set('wablas_aktif', '1');
         Setting::set('wablas_token', Crypt::encryptString('token-uji'));
+        Setting::set('wablas_secret', Crypt::encryptString('secret-uji'));
         Setting::set('wablas_domain', 'console.wablas.com');
         Setting::set('wa_admin', '6280000000001');
     }
@@ -66,7 +67,7 @@ class WablasTest extends TestCase
 
         Http::assertSent(function ($request) {
             return str_contains($request->url(), 'console.wablas.com/api/send-message')
-                && $request->header('Authorization')[0] === 'token-uji'
+                && $request->header('Authorization')[0] === 'token-uji.secret-uji'
                 && $request->data()['phone'] === '6281234567890'
                 && $request->data()['message'] === 'halo';
         });
@@ -215,11 +216,14 @@ class WablasTest extends TestCase
         $this->actingAs($this->admin())->post(route('admin.pengaturan.update'), [
             'wablas_aktif' => '1',
             'wablas_token' => 'token-rahasia',
+            'wablas_secret' => 'secret-rahasia',
             'wablas_domain' => 'console.wablas.com',
         ])->assertRedirect();
 
         $tersimpan = Setting::get('wablas_token');
         $this->assertNotEquals('token-rahasia', $tersimpan);
         $this->assertEquals('token-rahasia', WablasService::token());
+        $this->assertNotEquals('secret-rahasia', Setting::get('wablas_secret'));
+        $this->assertEquals('secret-rahasia', WablasService::secret());
     }
 }

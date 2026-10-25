@@ -14,9 +14,12 @@ use Illuminate\Support\Facades\Log;
  * Konfigurasi di ⚙️ Pengaturan (bukan .env, agar admin bisa tempel sendiri):
  * - wablas_aktif: '1' = aktif
  * - wablas_token: token API device (disimpan terenkripsi)
- * - wablas_domain: domain server API (default console.wablas.com)
+ * - wablas_secret: secret key device (disimpan terenkripsi)
+ * - wablas_domain: domain server API (akun ini: texas.wablas.com)
  * - wa_admin: nomor WA admin penerima notifikasi order baru (sudah ada)
  *
+ * Autentikasi sesuai dokumentasi Wablas (V1 POST):
+ * header "Authorization: TOKEN.SECRET_KEY", form phone + message.
  * Tanpa konfigurasi lengkap, enabled() = false dan semua pengiriman
  * dilewati diam-diam — tombol wa.me manual tetap jadi fallback.
  * Kegagalan kirim tidak pernah melempar exception ke caller.
@@ -27,12 +30,23 @@ class WablasService
     {
         return Setting::get('wablas_aktif') === '1'
             && self::token() !== null
+            && self::secret() !== null
             && self::domain() !== null;
     }
 
     public static function token(): ?string
     {
-        $tersimpan = Setting::get('wablas_token');
+        return self::kredensial('wablas_token');
+    }
+
+    public static function secret(): ?string
+    {
+        return self::kredensial('wablas_secret');
+    }
+
+    private static function kredensial(string $key): ?string
+    {
+        $tersimpan = Setting::get($key);
         if (! $tersimpan) {
             return null;
         }
@@ -40,7 +54,7 @@ class WablasService
         try {
             return Crypt::decryptString($tersimpan);
         } catch (\Throwable) {
-            // Token lama yang tersimpan polos tetap dipakai.
+            // Nilai lama yang tersimpan polos tetap dipakai.
             return $tersimpan;
         }
     }
@@ -48,6 +62,11 @@ class WablasService
     public static function tokenTersimpan(): bool
     {
         return Setting::get('wablas_token') !== null;
+    }
+
+    public static function secretTersimpan(): bool
+    {
+        return Setting::get('wablas_secret') !== null;
     }
 
     public static function domain(): ?string
@@ -75,10 +94,11 @@ class WablasService
         }
 
         $token = self::token();
+        $secret = self::secret();
         $domain = self::domain();
-        if ($token === null || $domain === null) {
-            $this->errorTerakhir = 'token/domain belum dikonfigurasi';
-            Log::info('Wablas dilewati: token/domain belum dikonfigurasi.', [
+        if ($token === null || $secret === null || $domain === null) {
+            $this->errorTerakhir = 'token/secret/domain belum dikonfigurasi';
+            Log::info('Wablas dilewati: token/secret/domain belum dikonfigurasi.', [
                 'tujuan' => $tujuan,
             ]);
 
@@ -87,17 +107,29 @@ class WablasService
 
         try {
             $response = Http::timeout(10)
-                ->withHeaders(['Authorization' => $token])
+                ->withHeaders(['Authorization' => $token.'.'.$secret])
+                ->asForm()
                 ->post('https://'.$domain.'/api/send-message', [
                     'phone' => $tujuan,
                     'message' => $pesan,
                 ]);
 
+            $apiMessage = $response->json('message');
             if (! $response->successful()) {
-                $this->errorTerakhir = 'HTTP '.$response->status();
+                $this->errorTerakhir = 'HTTP '.$response->status()
+                    .($apiMessage ? ': '.$apiMessage : '');
                 Log::warning('Wablas gagal mengirim.', [
                     'tujuan' => $tujuan,
                     'status' => $response->status(),
+                    'body' => $response->body(),
+                ]);
+
+                return false;
+            }
+            if ($response->json('status') === false) {
+                $this->errorTerakhir = $apiMessage ? 'API: '.$apiMessage : 'API status false';
+                Log::warning('Wablas menolak pengiriman.', [
+                    'tujuan' => $tujuan,
                     'body' => $response->body(),
                 ]);
 

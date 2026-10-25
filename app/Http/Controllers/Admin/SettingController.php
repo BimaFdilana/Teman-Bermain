@@ -27,6 +27,7 @@ class SettingController extends Controller
             'wablasAktif' => Setting::get('wablas_aktif') === '1',
             'wablasDomain' => Setting::get('wablas_domain', 'console.wablas.com'),
             'wablasTokenTersimpan' => \App\Services\WablasService::tokenTersimpan(),
+            'wablasSecretTersimpan' => \App\Services\WablasService::secretTersimpan(),
         ]);
     }
 
@@ -76,6 +77,7 @@ class SettingController extends Controller
             'va_numbers.*' => ['nullable', 'string', 'max:30'],
             'wablas_domain' => ['nullable', 'string', 'max:100'],
             'wablas_token' => ['nullable', 'string', 'max:255'],
+            'wablas_secret' => ['nullable', 'string', 'max:255'],
         ]);
 
         if ($request->hasFile('qris')) {
@@ -101,13 +103,16 @@ class SettingController extends Controller
         Setting::set('va_numbers', json_encode($va));
         Setting::set('pajak_persen', (string) max(0, (float) $request->input('pajak_persen', 0)));
 
-        // Notifikasi WhatsApp via Wablas (token disimpan terenkripsi; kosong = pertahankan lama).
+        // Notifikasi WhatsApp via Wablas (token & secret disimpan terenkripsi; kosong = pertahankan lama).
         Setting::set('wablas_aktif', $request->boolean('wablas_aktif') ? '1' : '0');
         if ($request->filled('wablas_domain')) {
             Setting::set('wablas_domain', trim($request->input('wablas_domain')));
         }
         if ($request->filled('wablas_token')) {
             Setting::set('wablas_token', \Illuminate\Support\Facades\Crypt::encryptString($request->input('wablas_token')));
+        }
+        if ($request->filled('wablas_secret')) {
+            Setting::set('wablas_secret', \Illuminate\Support\Facades\Crypt::encryptString($request->input('wablas_secret')));
         }
 
         return back()->with('sukses', 'Pengaturan disimpan.');
@@ -117,7 +122,7 @@ class SettingController extends Controller
     public function wablasTest(): RedirectResponse
     {
         if (! \App\Services\WablasService::enabled()) {
-            return back()->with('gagal', 'Aktifkan Wablas dan isi token + domain dulu, lalu simpan.');
+            return back()->with('gagal', 'Aktifkan Wablas dan isi token + secret + domain dulu, lalu simpan.');
         }
 
         $waAdmin = Setting::get('wa_admin');
