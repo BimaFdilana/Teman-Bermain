@@ -244,4 +244,98 @@ class IklanTest extends TestCase
         $response->assertSee('Produk Tambahan');
         $response->assertSee('+ Lihat');
     }
+
+    /** Regresi laporan admin 2026-10-25: iklan tersimpan HARUS muncul di tabel index. */
+    public function test_iklan_tersimpan_muncul_di_tabel_index(): void
+    {
+        $p1 = $this->buatProduk('a', 'A');
+        $this->actingAs($this->admin())->post(route('admin.iklan.store'), [
+            'judul' => 'Promo Muncul Tabel',
+            'produk_primary_id' => $p1->id,
+            'tampilan_secondary' => 'card',
+            'testimoni_ids' => $this->gambarTestimoni(),
+            'berakhir_at' => now()->addDays(5)->format('Y-m-d'),
+            'status' => 'aktif',
+        ])->assertRedirect(route('admin.iklan.index'));
+
+        $this->get(route('admin.iklan.index'))
+            ->assertOk()
+            ->assertSee('Promo Muncul Tabel');
+    }
+
+    /** Slogan boleh panjang: 400 karakter tersimpan utuh & tampil di halaman publik. */
+    public function test_subjudul_panjang_400_karakter_tersimpan_utuh(): void
+    {
+        $p1 = $this->buatProduk('a', 'A');
+        $slogan = substr(str_repeat('Slogan panjang untuk orang tua. ', 13), 0, 400);
+
+        $this->actingAs($this->admin())->post(route('admin.iklan.store'), [
+            'judul' => 'Promo Slogan Panjang',
+            'subjudul' => $slogan,
+            'produk_primary_id' => $p1->id,
+            'tampilan_secondary' => 'card',
+            'testimoni_ids' => $this->gambarTestimoni(),
+            'berakhir_at' => now()->addDays(5)->format('Y-m-d'),
+            'status' => 'aktif',
+        ])->assertRedirect(route('admin.iklan.index'));
+
+        $k = PromoCampaign::where('slug', 'promo-slogan-panjang')->first();
+        $this->assertNotNull($k);
+        $this->assertSame(mb_strlen($slogan), mb_strlen($k->subjudul));
+        $this->assertSame($slogan, $k->subjudul);
+        $this->get(route('iklan.show', $k->slug))->assertOk()->assertSee($slogan);
+    }
+
+    /** Simpan sebagai Draft harus jelas di flash — bukan dikira hilang. */
+    public function test_flash_draft_menyebut_status_draft(): void
+    {
+        $p1 = $this->buatProduk('a', 'A');
+        $this->actingAs($this->admin())->post(route('admin.iklan.store'), [
+            'judul' => 'Promo Draft Saja',
+            'produk_primary_id' => $p1->id,
+            'tampilan_secondary' => 'card',
+            'testimoni_ids' => $this->gambarTestimoni(),
+            'berakhir_at' => now()->addDays(5)->format('Y-m-d'),
+            'status' => 'draft',
+        ])->assertSessionHas('sukses', 'Iklan promo dibuat sebagai Draft — ubah status ke Aktif agar tayang di halaman publik.');
+    }
+
+    /** Preview halaman create memuat SEMUA section + blok HARGA SPESIAL + countdown live. */
+    public function test_preview_create_memuat_semua_section(): void
+    {
+        $response = $this->actingAs($this->admin())->get(route('admin.iklan.create'));
+
+        $response->assertOk();
+        foreach (array_keys(PromoCampaign::SECTIONS) as $key) {
+            $response->assertSee('data-pv-section="'.$key.'"', false);
+        }
+        $response->assertSee('HARGA SPESIAL');
+        $response->assertSee('pv-countdown-text');
+    }
+
+    /** Setelah berakhir: iklan TETAP di tabel admin (badge Berakhir), halaman publik
+     *  menampilkan "Promo telah berakhir", dan harga produk TIDAK berubah otomatis. */
+    public function test_iklan_berakhir_tetap_di_tabel_dan_harga_tidak_berubah(): void
+    {
+        $p = Product::create([
+            'tipe' => 'ebook', 'judul' => 'Ebook Promo', 'slug' => 'ebook-promo',
+            'deskripsi' => 'x', 'harga' => 79000, 'harga_coret' => 118000,
+            'jenjang' => 'PAUD', 'status' => 'tersedia',
+        ]);
+        $k = $this->buatKampanye([
+            'judul' => 'Promo Sampai 8 Nov', 'slug' => 'promo-8-nov',
+            'berakhir_at' => now()->subDay(), 'produk_primary_id' => $p->id,
+        ]);
+
+        $this->actingAs($this->admin())->get(route('admin.iklan.index'))
+            ->assertOk()
+            ->assertSee('Promo Sampai 8 Nov')
+            ->assertSee('Berakhir');
+        $this->get(route('iklan.show', $k->slug))
+            ->assertOk()
+            ->assertSee('Promo telah berakhir');
+
+        $this->assertSame(79000, (int) $p->fresh()->harga);
+        $this->assertSame(118000, (int) $p->fresh()->harga_coret);
+    }
 }

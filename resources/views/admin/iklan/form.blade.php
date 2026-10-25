@@ -25,7 +25,7 @@
 
         <div class="mb-4">
             <label class="text-sm font-bold block mb-1">Sub-judul <span class="font-normal" style="color:#6b7280">(ajakan untuk orang tua, mis. "Parents, pernah bingung...?")</span></label>
-            <input type="text" name="subjudul" value="{{ old('subjudul', $kampanye->subjudul) }}" maxlength="200"
+            <input type="text" name="subjudul" value="{{ old('subjudul', $kampanye->subjudul) }}" maxlength="500"
                    class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
         </div>
 
@@ -209,31 +209,57 @@
                 <span class="font-extrabold" style="font-family:'Baloo 2',cursive;color:#1E7B34">rumahcahaya-bks</span>
             </div>
             <div class="p-4 overflow-y-auto" style="max-height:70vh;background:#FFFEF7">
+                {{-- Judul + slogan: tetap di atas seperti halaman publik --}}
                 <p class="text-center font-extrabold mb-1" style="color:#A63D2F;font-size:.8rem">🔥 PROMO SPESIAL 🔥</p>
                 <h2 id="pv-judul" class="text-center font-extrabold mb-2" style="color:#14532D;font-size:1.3rem;line-height:1.3">Judul Promo</h2>
                 <p id="pv-subjudul" class="text-center text-sm mb-3" style="color:#5B5344"></p>
-                <img id="pv-banner" class="rounded-2xl w-full object-cover mb-3" style="display:none;aspect-ratio:16/9" alt="Banner">
-                <div class="text-center mb-3">
-                    <span class="inline-block px-4 py-1 rounded-full text-xs font-bold" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ Berakhir dalam 2 hari 04:15:30</span>
-                </div>
-                <p id="pv-deskripsi" class="text-sm mb-4" style="color:#5B5344;line-height:1.6;text-align:justify;overflow-wrap:break-word;word-break:break-word"></p>
-                <div id="pv-produk" class="mb-4"></div>
-                <div id="pv-video" class="mb-4" style="display:none">
-                    <div class="rounded-2xl flex items-center justify-center text-4xl" style="aspect-ratio:16/9;background:#1a1a1a">▶️</div>
-                </div>
-                <div id="pv-ajakan-wrap" class="mb-4" style="display:none">
-                    <p id="pv-ajakan" class="text-center text-sm font-bold italic px-4" style="color:#1E7B34"></p>
-                </div>
-                <div id="pv-materi-wrap" class="mb-4" style="display:none">
-                    <p class="font-extrabold text-sm mb-2" style="color:#14532D">📖 Materi Ebook</p>
-                    <ul id="pv-materi" class="text-sm space-y-1" style="color:#5B5344"></ul>
-                </div>
-                <div id="pv-ss-wrap" class="mb-4" style="display:none">
-                    <p class="font-extrabold text-center text-sm mb-2" style="color:#14532D">💬 Kata Mereka</p>
-                    <div id="pv-ss" class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width:none"></div>
-                </div>
-                <div class="text-center mt-4">
-                    <span class="kidza-btn kidza-btn-green" style="font-size:.9rem;display:inline-block;pointer-events:none">👉 Pesan Sekarang 👈</span>
+                {{-- Section preview: urutan & visibilitas mengikuti pengaturan admin --}}
+                <div id="pv-konten">
+                    <div data-pv-section="banner" class="mb-3">
+                        <img id="pv-banner" class="rounded-2xl w-full object-cover" style="display:none;aspect-ratio:16/9" alt="Banner">
+                    </div>
+                    <div data-pv-section="countdown" class="text-center mb-3">
+                        <span class="inline-block px-4 py-1 rounded-full text-xs font-bold" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ <span id="pv-countdown-text">Atur tanggal berakhir untuk melihat hitungan mundur</span></span>
+                        <p id="pv-countdown-sampai" class="text-xs mt-1" style="color:#a39e93"></p>
+                    </div>
+                    <div data-pv-section="deskripsi" class="mb-4">
+                        <p id="pv-deskripsi" class="text-sm" style="color:#5B5344;line-height:1.6;text-align:justify;overflow-wrap:break-word;word-break:break-word"></p>
+                    </div>
+                    <div data-pv-section="produk_utama" class="mb-4">
+                        <div id="pv-produk-utama"></div>
+                    </div>
+                    <div data-pv-section="produk_tambahan" class="mb-4">
+                        <div id="pv-produk-tambahan"></div>
+                    </div>
+                    <div data-pv-section="video_ajakan" class="mb-4">
+                        <div id="pv-video" style="display:none">
+                            <div class="rounded-2xl flex items-center justify-center text-4xl" style="aspect-ratio:16/9;background:#1a1a1a">▶️</div>
+                        </div>
+                        <div id="pv-ajakan-wrap" class="mt-2" style="display:none">
+                            <p id="pv-ajakan" class="text-center text-sm font-bold italic px-4" style="color:#1E7B34"></p>
+                        </div>
+                    </div>
+                    <div data-pv-section="materi" class="mb-4">
+                        <div id="pv-materi-wrap" style="display:none">
+                            <p class="font-extrabold text-sm mb-2" style="color:#14532D">📖 Materi Ebook</p>
+                            <ul id="pv-materi" class="text-sm space-y-1" style="color:#5B5344"></ul>
+                        </div>
+                    </div>
+                    <div data-pv-section="testimoni" class="mb-4">
+                        <div id="pv-ss-wrap" style="display:none">
+                            <p class="font-extrabold text-center text-sm mb-2" style="color:#14532D">💬 Kata Mereka</p>
+                            <div id="pv-ss" class="flex gap-2 overflow-x-auto pb-2" style="scrollbar-width:none"></div>
+                        </div>
+                    </div>
+                    <div data-pv-section="harga_cta" class="mb-4">
+                        <div id="pv-harga-wrap" class="text-center" style="display:none">
+                            <p class="font-extrabold mb-2" style="font-size:1.2rem;color:#14532D">HARGA SPESIAL</p>
+                            <div id="pv-harga-list"></div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <span class="kidza-btn kidza-btn-green" style="font-size:.9rem;display:inline-block;pointer-events:none">👉 Pesan Sekarang 👈</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -314,7 +340,14 @@
         txt('judul', 'pv-judul', 'Judul Promo');
         txt('subjudul', 'pv-subjudul');
         txt('deskripsi', 'pv-deskripsi');
-        txt('ajakan', 'pv-ajakan');
+        // Ajakan: tampilkan/sembunyikan WRAP-nya (sebelumnya wrap tidak pernah dibuka)
+        const ajakanInp = form.querySelector('[name="ajakan"]');
+        const pvAjakanWrap = $('pv-ajakan-wrap');
+        const updAjakan = () => {
+            $('pv-ajakan').textContent = ajakanInp.value.trim();
+            pvAjakanWrap.style.display = ajakanInp.value.trim() ? 'block' : 'none';
+        };
+        ajakanInp.addEventListener('input', updAjakan); updAjakan();
 
         // Banner: file baru (FileReader) atau gambar lama
         const bannerInp = form.querySelector('[name="gambar"]');
@@ -337,8 +370,11 @@
         const updVideo = () => { pvVideo.style.display = videoInp.value.trim() ? 'block' : 'none'; };
         videoInp.addEventListener('input', updVideo); updVideo();
 
-        // Produk: utama (besar) + tambahan (card/list sesuai pilihan)
-        const pvProduk = $('pv-produk');
+        // Produk: utama & tambahan terpisah + rekap HARGA SPESIAL (seperti halaman publik)
+        const pvProdukUtama = $('pv-produk-utama');
+        const pvProdukTambahan = $('pv-produk-tambahan');
+        const pvHargaWrap = $('pv-harga-wrap');
+        const pvHargaList = $('pv-harga-list');
         const rp = (n) => 'Rp ' + Number(n).toLocaleString('id-ID');
         const cardProduk = (p, besar) => `
             <div class="rounded-2xl p-3 mb-2 bg-white" style="border:2px solid #F0E7CC">
@@ -359,20 +395,26 @@
         const updProduk = () => {
             const primaryEl = document.getElementById('pilih-primary');
             const mode = form.querySelector('[name="tampilan_secondary"]:checked')?.value || 'card';
-            let html = '';
             const pUtama = produkData[primaryEl.value];
-            if (pUtama) {
-                html += `<p class="text-xs font-bold mb-1" style="color:#a39e93">⭐ PRODUK UTAMA</p>` + cardProduk(pUtama, true);
-            }
+            pvProdukUtama.innerHTML = pUtama
+                ? `<p class="text-xs font-bold mb-1" style="color:#a39e93">⭐ PRODUK UTAMA</p>` + cardProduk(pUtama, true)
+                : '<p class="text-xs text-center" style="color:#a39e93">— belum ada produk utama —</p>';
             const ids = [...form.querySelectorAll('.cek-produk:checked')].map(c => c.value);
-            if (ids.length) {
-                html += `<p class="text-xs font-bold mb-1 mt-3" style="color:#a39e93">🎁 PRODUK TAMBAHAN</p>`;
-                html += ids.map(id => {
+            pvProdukTambahan.innerHTML = ids.length
+                ? `<p class="text-xs font-bold mb-1" style="color:#a39e93">🎁 PRODUK TAMBAHAN</p>` + ids.map(id => {
                     const p = produkData[id];
                     return p ? (mode === 'list' ? listProduk(p) : cardProduk(p, false)) : '';
-                }).join('');
-            }
-            pvProduk.innerHTML = html || '<p class="text-xs text-center" style="color:#a39e93">— belum ada produk dipilih —</p>';
+                }).join('')
+                : '';
+            // Rekap HARGA SPESIAL: semua produk terpilih (utama + tambahan)
+            const semua = [pUtama, ...ids.map(id => produkData[id])].filter(Boolean);
+            pvHargaWrap.style.display = semua.length ? 'block' : 'none';
+            pvHargaList.innerHTML = semua.map(p => `
+                <div class="mb-2">
+                    <p class="text-xs font-bold" style="color:#a39e93">${p.judul}</p>
+                    ${p.harga_coret ? `<span class="text-xs line-through" style="color:#a39e93">${rp(p.harga_coret)}</span> ` : ''}
+                    <p class="font-extrabold" style="font-size:1.1rem;color:#14532D">${rp(p.harga)}</p>
+                </div>`).join('');
         };
         form.querySelectorAll('.cek-produk').forEach(c => c.addEventListener('change', updProduk));
         document.getElementById('pilih-primary').addEventListener('change', updProduk);
@@ -415,6 +457,48 @@
         };
         cekTestimoni.forEach(cb => cb.addEventListener('change', updSs));
         updSs();
+
+        // Hitungan mundur LIVE dari tanggal berakhir (akhir hari), bukan teks statis
+        const berakhirInp = form.querySelector('[name="berakhir_at"]');
+        const pvCountdownText = $('pv-countdown-text');
+        const pvCountdownSampai = $('pv-countdown-sampai');
+        const updCountdown = () => {
+            if (!berakhirInp.value) {
+                pvCountdownText.textContent = 'Atur tanggal berakhir untuk melihat hitungan mundur';
+                pvCountdownSampai.textContent = '';
+                return;
+            }
+            const akhir = new Date(berakhirInp.value + 'T23:59:59').getTime();
+            const sisa = Math.max(0, akhir - Date.now());
+            const hari = Math.floor(sisa / 86400000);
+            const jam = String(Math.floor(sisa / 3600000) % 24).padStart(2, '0');
+            const mnt = String(Math.floor(sisa / 60000) % 60).padStart(2, '0');
+            const dtk = String(Math.floor(sisa / 1000) % 60).padStart(2, '0');
+            pvCountdownText.textContent = sisa <= 0
+                ? 'Promo telah berakhir'
+                : `Berakhir dalam ${hari} hari ${jam}:${mnt}:${dtk}`;
+            pvCountdownSampai.textContent = 's/d ' + berakhirInp.value.split('-').reverse().join(' ') + ', 23:59 WIB';
+        };
+        berakhirInp.addEventListener('change', updCountdown);
+        updCountdown();
+        setInterval(updCountdown, 1000);
+
+        // Urutan & section tersembunyi preview mengikuti pengaturan admin (▲▼ dan 🙈)
+        const pvKonten = $('pv-konten');
+        const daftarSection = document.getElementById('daftar-section');
+        const terapkanUrutanPreview = () => {
+            if (!daftarSection || !pvKonten) return;
+            [...daftarSection.querySelectorAll('.section-row')].forEach(row => {
+                const blok = pvKonten.querySelector(`[data-pv-section="${row.dataset.key}"]`);
+                if (!blok) return;
+                const sembunyi = row.querySelector('.cek-sembunyi')?.checked;
+                blok.style.display = sembunyi ? 'none' : '';
+                pvKonten.appendChild(blok);
+            });
+        };
+        daftarSection?.addEventListener('click', () => setTimeout(terapkanUrutanPreview, 0));
+        daftarSection?.addEventListener('change', terapkanUrutanPreview);
+        terapkanUrutanPreview();
     })();
     </script>
 </x-admin-layout>

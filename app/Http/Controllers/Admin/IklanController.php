@@ -44,7 +44,10 @@ class IklanController extends Controller
         $this->simpanProduk($kampanye, $data['produk_primary_id'], $secondaryIds);
         $this->simpanGambar($request, $kampanye);
 
-        return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo dibuat.');
+        return redirect()->route('admin.iklan.index')->with('sukses',
+            $kampanye->status === 'draft'
+                ? 'Iklan promo dibuat sebagai Draft — ubah status ke Aktif agar tayang di halaman publik.'
+                : 'Iklan promo dibuat.');
     }
 
     public function edit(PromoCampaign $iklan): View
@@ -67,7 +70,10 @@ class IklanController extends Controller
         $this->simpanProduk($iklan, $data['produk_primary_id'], $secondaryIds);
         $this->simpanGambar($request, $iklan);
 
-        return redirect()->route('admin.iklan.index')->with('sukses', 'Iklan promo diperbarui.');
+        return redirect()->route('admin.iklan.index')->with('sukses',
+            $iklan->status === 'draft'
+                ? 'Iklan promo diperbarui sebagai Draft — ubah status ke Aktif agar tayang di halaman publik.'
+                : 'Iklan promo diperbarui.');
     }
 
     public function destroy(PromoCampaign $iklan): RedirectResponse
@@ -91,7 +97,7 @@ class IklanController extends Controller
     {
         $data = $request->validate([
             'judul' => ['required', 'string', 'max:120'],
-            'subjudul' => ['nullable', 'string', 'max:200'],
+            'subjudul' => ['nullable', 'string', 'max:500'],
             'slug' => ['nullable', 'string', 'max:120', 'regex:/^[a-z0-9-]+$/', 'unique:promo_campaigns,slug,'.$ignoreId],
             'deskripsi' => ['nullable', 'string', 'max:1000'],
             'gambar' => ['nullable', 'image', 'max:2048'],
