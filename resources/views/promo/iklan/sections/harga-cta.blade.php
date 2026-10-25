@@ -15,5 +15,9 @@
                 <span class="anim-tunjuk">👉</span> Pesan Sekarang <span class="anim-tunjuk-kiri">👈</span>
             </a>
         </div>
+        {{-- Hitungan mundur juga tampil di bawah HARGA SPESIAL --}}
+        @if($kampanye->sectionTampil('countdown'))
+            @include('promo.iklan.sections.countdown')
+        @endif
     </div>
 @endif

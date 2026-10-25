@@ -315,6 +315,21 @@ class IklanTest extends TestCase
             ->assertSee('Berakhir dalam');
     }
 
+    /** Hitungan mundur tampil dua kali: di section-nya + di bawah HARGA SPESIAL. */
+    public function test_countdown_juga_tampil_di_bawah_harga_spesial(): void
+    {
+        $p1 = $this->buatProduk('utama', 'Produk Utama');
+        $k = $this->buatKampanye(['judul' => 'Promo CD', 'slug' => 'promo-cd', 'produk_primary_id' => $p1->id]);
+
+        $html = $this->get(route('iklan.show', $k->slug))->assertOk()->getContent();
+        $this->assertSame(2, substr_count($html, 'Berakhir dalam'));
+
+        // Kalau section countdown disembunyikan, duplikatnya ikut hilang
+        $k->update(['section_sembunyi' => ['countdown']]);
+        $html = $this->get(route('iklan.show', $k->slug))->assertOk()->getContent();
+        $this->assertSame(0, substr_count($html, 'Berakhir dalam'));
+    }
+
     /** Foto testimoni terpusat vertikal di dalam kartunya (bukan menempel di atas). */
     public function test_gambar_testimoni_terpusat_di_kartu(): void
     {

@@ -265,6 +265,10 @@
                         <div class="text-center mt-4">
                             <span class="kidza-btn kidza-btn-green" style="font-size:.9rem;display:inline-block;pointer-events:none">👉 Pesan Sekarang 👈</span>
                         </div>
+                        <div id="pv-countdown-bawah-wrap" class="text-center mt-4">
+                            <span class="inline-block px-4 py-1 rounded-full text-xs font-bold" style="background:#FDF0EC;color:#A63D2F;border:1.5px solid #E8C4BC">⏳ <span id="pv-countdown-bawah-text"></span></span>
+                            <p id="pv-countdown-bawah-sampai" class="text-xs mt-1" style="color:#a39e93"></p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -469,10 +473,14 @@
         const berakhirInp = form.querySelector('[name="berakhir_at"]');
         const pvCountdownText = $('pv-countdown-text');
         const pvCountdownSampai = $('pv-countdown-sampai');
+        const pvCountdownBawahText = $('pv-countdown-bawah-text');
+        const pvCountdownBawahSampai = $('pv-countdown-bawah-sampai');
         const updCountdown = () => {
             if (!berakhirInp.value) {
                 pvCountdownText.textContent = 'Atur tanggal berakhir untuk melihat hitungan mundur';
                 pvCountdownSampai.textContent = '';
+                if (pvCountdownBawahText) pvCountdownBawahText.textContent = 'Atur tanggal berakhir untuk melihat hitungan mundur';
+                if (pvCountdownBawahSampai) pvCountdownBawahSampai.textContent = '';
                 return;
             }
             const akhir = new Date(berakhirInp.value + 'T23:59:59').getTime();
@@ -485,6 +493,8 @@
                 ? 'Promo telah berakhir'
                 : `Berakhir dalam ${hari} hari ${jam}:${mnt}:${dtk}`;
             pvCountdownSampai.textContent = 's/d ' + berakhirInp.value.split('-').reverse().join(' ') + ', 23:59 WIB';
+            if (pvCountdownBawahText) pvCountdownBawahText.textContent = pvCountdownText.textContent;
+            if (pvCountdownBawahSampai) pvCountdownBawahSampai.textContent = pvCountdownSampai.textContent;
         };
         berakhirInp.addEventListener('change', updCountdown);
         updCountdown();
@@ -502,6 +512,10 @@
                 blok.style.display = sembunyi ? 'none' : '';
                 pvKonten.appendChild(blok);
             });
+            // Duplikat hitungan mundur di bawah HARGA SPESIAL ikut 🙈 section countdown
+            const rowCountdown = daftarSection.querySelector('.section-row[data-key="countdown"]');
+            const bawahWrap = document.getElementById('pv-countdown-bawah-wrap');
+            if (bawahWrap) bawahWrap.style.display = rowCountdown?.querySelector('.cek-sembunyi')?.checked ? 'none' : '';
         };
         daftarSection?.addEventListener('click', () => setTimeout(terapkanUrutanPreview, 0));
         daftarSection?.addEventListener('change', terapkanUrutanPreview);
