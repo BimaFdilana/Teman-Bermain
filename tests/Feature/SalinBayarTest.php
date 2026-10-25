@@ -45,7 +45,7 @@ class SalinBayarTest extends TestCase
             ->get(route('checkout.bayar', $order->kode_order));
 
         $response->assertOk();
-        $response->assertSee('Salin Nomor VA');
+        $response->assertSee('Salin Nomor Rekening');
         // Nomor yang disalin = digit saja, tanpa spasi
         $response->assertSee('data-copy="880123456789"', false);
         $response->assertSee('Salin Nominal');
@@ -61,6 +61,6 @@ class SalinBayarTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('Salin Nominal');
-        $response->assertDontSee('Salin Nomor VA');
+        $response->assertDontSee('Salin Nomor Rekening');
     }
 }

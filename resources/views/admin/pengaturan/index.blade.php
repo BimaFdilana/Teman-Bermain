@@ -34,13 +34,13 @@
                    class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
         </div>
 
-        <h2 class="font-bold text-lg mb-3" style="font-family:'Quicksand'">💳 Virtual Account (BR-RC-23)</h2>
-        <p class="text-xs mb-3" style="color:#6b7280">Isi nomor VA per bank. Bank yang kosong tidak tampil di checkout.</p>
+        <h2 class="font-bold text-lg mb-3" style="font-family:'Quicksand'">💳 Rekening Bank (BR-RC-23)</h2>
+        <p class="text-xs mb-3" style="color:#6b7280">Isi nomor rekening per bank. Bank yang kosong tidak tampil di checkout.</p>
         @foreach(['BCA' => 'BCA', 'BRI' => 'BRI', 'MANDIRI' => 'Mandiri', 'BNI' => 'BNI', 'SEABANK' => 'SeaBank'] as $kode => $nama)
             <div class="mb-3">
-                <label class="text-sm font-bold block mb-1">VA {{ $nama }}</label>
+                <label class="text-sm font-bold block mb-1">Rekening {{ $nama }}</label>
                 <input type="text" name="va_numbers[{{ $kode }}]" value="{{ old('va_numbers.'.$kode, $vaNumbers[$kode] ?? '') }}"
-                       placeholder="Nomor VA {{ $nama }}" class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
+                       placeholder="Nomor Rekening {{ $nama }}" class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
             </div>
         @endforeach
 

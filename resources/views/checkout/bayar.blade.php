@@ -20,12 +20,12 @@
         @if($order->status === 'pembayaran')
             <div class="kidza-card p-6 md:p-8 mb-6 text-center">
                 @if($order->metode_bayar === 'va')
-                    <h2 class="font-bold text-xl mb-4" style="font-family:'Quicksand'">Transfer ke Virtual Account {{ $order->bank_va }}</h2>
+                    <h2 class="font-bold text-xl mb-4" style="font-family:'Quicksand'">Transfer ke Rekening {{ $order->bank_va }}</h2>
                     <div class="mx-auto mb-4 rounded-2xl border-2 border-gray-200 p-6" style="max-width:280px;background:#FFF9EC">
-                        <p class="text-xs mb-1" style="color:#6b7280">Nomor VA {{ $order->bank_va }}</p>
+                        <p class="text-xs mb-1" style="color:#6b7280">Nomor Rekening {{ $order->bank_va }}</p>
                         <p class="font-bold text-2xl tracking-widest" style="font-family:'Quicksand'">{{ $vaNumber ?? '—' }}</p>
                         @if($vaNumber)
-                            <button type="button" class="kidza-btn kidza-btn-white mt-3 btn-salin" data-copy="{{ preg_replace('/\D+/', '', $vaNumber) }}" style="padding:.45rem 1.1rem;font-size:.9rem">📋 Salin Nomor VA</button>
+                            <button type="button" class="kidza-btn kidza-btn-white mt-3 btn-salin" data-copy="{{ preg_replace('/\D+/', '', $vaNumber) }}" style="padding:.45rem 1.1rem;font-size:.9rem">📋 Salin Nomor Rekening</button>
                         @endif
                     </div>
                 @else

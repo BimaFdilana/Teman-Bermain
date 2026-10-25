@@ -91,7 +91,7 @@ class SettingController extends Controller
             }
         }
 
-        // Nomor VA per bank (BR-RC-23) & pajak (BR-RC-22)
+        // Nomor rekening per bank (BR-RC-23) & pajak (BR-RC-22)
         $va = array_filter(array_map('trim', (array) $request->input('va_numbers', [])));
         Setting::set('va_numbers', json_encode($va));
         Setting::set('pajak_persen', (string) max(0, (float) $request->input('pajak_persen', 0)));

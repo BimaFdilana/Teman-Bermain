@@ -42,7 +42,7 @@
                             class="w-full border-2 border-gray-300 rounded-xl px-4 py-2">
                         <option value="qris" {{ old('metode_bayar') === 'qris' ? 'selected' : '' }}>QRIS</option>
                         @if(count($banks) > 0)
-                            <option value="va" {{ old('metode_bayar') === 'va' ? 'selected' : '' }}>Virtual Account</option>
+                            <option value="va" {{ old('metode_bayar') === 'va' ? 'selected' : '' }}>Rekening</option>
                         @endif
                     </select>
                 </div>

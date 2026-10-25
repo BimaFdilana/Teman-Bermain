@@ -75,7 +75,7 @@ class Order extends Model
     public function labelMetode(): string
     {
         return match ($this->metode_bayar) {
-            'va' => 'Virtual Account'.($this->bank_va ? " ({$this->bank_va})" : ''),
+            'va' => 'Rekening'.($this->bank_va ? " ({$this->bank_va})" : ''),
             default => 'QRIS',
         };
     }

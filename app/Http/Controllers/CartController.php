@@ -252,7 +252,7 @@ class CartController extends Controller
     {
         $va = json_decode(Setting::get('va_numbers', '{}') ?? '{}', true) ?: [];
         $nama = ['BCA' => 'BCA', 'BRI' => 'BRI', 'MANDIRI' => 'Mandiri', 'BNI' => 'BNI'];
-        // Hanya bank yang nomor VA-nya sudah diisi admin
+        // Hanya bank yang nomor rekeningnya sudah diisi admin
         return array_filter($nama, fn ($b) => ! empty($va[$b]));
     }
 }
