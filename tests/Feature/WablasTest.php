@@ -80,6 +80,19 @@ class WablasTest extends TestCase
         Http::assertNothingSent();
     }
 
+    public function test_domain_menerima_tempelan_url_lengkap(): void
+    {
+        $this->aktifkanWablas();
+        Setting::set('wablas_domain', 'https://texas.wablas.com/');
+        Http::fake(['*texas.wablas.com/*' => Http::response(['status' => true], 200)]);
+
+        $this->assertTrue(app(WablasService::class)->kirim('081234567890', 'halo'));
+
+        Http::assertSent(function ($request) {
+            return $request->url() === 'https://texas.wablas.com/api/send-message';
+        });
+    }
+
     public function test_service_menyimpan_penyebab_gagal(): void
     {
         $this->aktifkanWablas();

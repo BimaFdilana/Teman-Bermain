@@ -53,6 +53,9 @@ class WablasService
     public static function domain(): ?string
     {
         $domain = trim((string) Setting::get('wablas_domain', 'console.wablas.com'));
+        // Terima tempelan URL lengkap (https://texas.wablas.com/) -> texas.wablas.com
+        $domain = (string) preg_replace('#^https?://#i', '', $domain);
+        $domain = explode('/', $domain)[0];
 
         return $domain !== '' ? $domain : null;
     }
