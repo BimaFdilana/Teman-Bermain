@@ -315,6 +315,18 @@ class IklanTest extends TestCase
             ->assertSee('Berakhir dalam');
     }
 
+    /** Foto testimoni terpusat vertikal di dalam kartunya (bukan menempel di atas). */
+    public function test_gambar_testimoni_terpusat_di_kartu(): void
+    {
+        $k = $this->buatKampanye([
+            'judul' => 'Promo Tengah2', 'slug' => 'promo-tengah2',
+            'testimoni_ss' => $this->gambarTestimoni(),
+        ]);
+
+        $html = $this->get(route('iklan.show', $k->slug))->assertOk()->getContent();
+        $this->assertStringContainsString('flex-direction:column;justify-content:center', $html);
+    }
+
     /** Slider testimoni terpusat: kartu pertama/terakhir berhenti di tengah. */
     public function test_slider_testimoni_terpusat(): void
     {
