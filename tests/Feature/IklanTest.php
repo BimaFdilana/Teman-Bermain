@@ -245,6 +245,43 @@ class IklanTest extends TestCase
         $response->assertSee('+ Lihat');
     }
 
+    /** Admin boleh pratinjau iklan Draft lewat tombol Lihat (bukan 404). */
+    public function test_admin_bisa_pratinjau_iklan_draft(): void
+    {
+        $k = $this->buatKampanye(['status' => 'draft', 'slug' => 'draft-pratinjau']);
+
+        $this->actingAs($this->admin())->get(route('iklan.show', $k->slug))
+            ->assertOk()
+            ->assertSee('Pratinjau admin');
+        auth()->logout();
+        $this->get(route('iklan.show', $k->slug))->assertNotFound();
+    }
+
+    /** Admin boleh pratinjau iklan terjadwal (mulai di masa depan). */
+    public function test_admin_bisa_pratinjau_iklan_terjadwal(): void
+    {
+        $k = $this->buatKampanye([
+            'status' => 'aktif', 'slug' => 'terjadwal-pratinjau',
+            'mulai_at' => now()->addDays(3), 'berakhir_at' => now()->addDays(10),
+        ]);
+
+        $this->actingAs($this->admin())->get(route('iklan.show', $k->slug))
+            ->assertOk()
+            ->assertSee('Pratinjau admin');
+        auth()->logout();
+        $this->get(route('iklan.show', $k->slug))->assertNotFound();
+    }
+
+    /** Iklan tayang tidak menampilkan banner pratinjau meski dibuka admin. */
+    public function test_iklan_tayang_tanpa_banner_pratinjau(): void
+    {
+        $k = $this->buatKampanye(['slug' => 'tayang-tanpa-banner']);
+
+        $this->actingAs($this->admin())->get(route('iklan.show', $k->slug))
+            ->assertOk()
+            ->assertDontSee('Pratinjau admin');
+    }
+
     /** Regresi laporan admin 2026-10-25: iklan tersimpan HARUS muncul di tabel index. */
     public function test_iklan_tersimpan_muncul_di_tabel_index(): void
     {

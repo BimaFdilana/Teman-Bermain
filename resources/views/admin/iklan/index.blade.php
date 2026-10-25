@@ -43,7 +43,7 @@
                                     onclick="navigator.clipboard.writeText('{{ route('iklan.show', $k->slug) }}');this.textContent='✅';setTimeout(()=>this.textContent='🔗',1500)">🔗</button>
                         </td>
                         <td class="p-3 whitespace-nowrap">
-                            <a href="{{ route('iklan.show', $k->slug) }}" target="_blank" class="kidza-link text-sm mr-3">Lihat</a>
+                            <a href="{{ route('iklan.show', $k->slug) }}" target="_blank" class="kidza-link text-sm mr-3">{{ ($k->status === 'draft' || ($k->mulai_at && now()->lt($k->mulai_at))) ? 'Pratinjau' : 'Lihat' }}</a>
                             <a href="{{ route('admin.iklan.edit', $k) }}" class="kidza-link text-sm mr-3">Edit</a>
                             <form method="POST" action="{{ route('admin.iklan.destroy', $k) }}" class="inline"
                                   onsubmit="return tanyaForm(this, 'Hapus iklan {{ $k->judul }}?')">

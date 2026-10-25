@@ -36,6 +36,9 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
 <body style="background:#FAF6EC;min-height:100vh;min-height:100dvh;margin:0">
 {{-- Bingkai HP: putih, di atas background krem --}}
 <div class="mx-auto bg-white" style="max-width:430px;min-height:100vh;min-height:100dvh;box-shadow:0 0 40px rgba(90,70,30,.12)">
+    @if($pratinjau ?? false)
+        <div class="text-center px-5 py-3 font-bold text-sm" style="background:#F5B301;color:#14532D">👁️ Pratinjau admin — iklan ini belum tayang untuk publik ({{ $kampanye->status === 'draft' ? 'Draft' : 'Terjadwal' }}). Ubah status ke Aktif agar bisa dibuka pengunjung.</div>
+    @endif
 <div class="px-5 py-8 text-center" style="position:relative">
 
     {{-- Daun hias ala landing page --}}

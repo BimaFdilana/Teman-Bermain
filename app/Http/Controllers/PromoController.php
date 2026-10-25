@@ -26,17 +26,28 @@ class PromoController extends Controller
 
     /**
      * Halaman iklan/promo multi-produk dengan hitungan mundur.
-     * Draft & belum mulai → 404; sudah berakhir → tampil status berakhir.
+     *
+     * Draft & belum mulai → 404 untuk pengunjung, TAPI admin yang login
+     * tetap bisa membukanya sebagai pratinjau (tombol Lihat di tabel iklan)
+     * dengan banner penanda; sudah berakhir → tampil status berakhir.
      */
     public function iklan(string $slug): View
     {
         $kampanye = \App\Models\PromoCampaign::where('slug', $slug)->firstOrFail();
 
-        if ($kampanye->status !== \App\Models\PromoCampaign::STATUS_AKTIF) {
-            abort(404);
-        }
-        if ($kampanye->mulai_at && now()->lt($kampanye->mulai_at)) {
-            abort(404);
+        // Pratinjau admin: hanya bila halaman ini memang belum tayang publik.
+        $admin = auth()->user()?->isAdmin() ?? false;
+        $belumTayang = $kampanye->status !== \App\Models\PromoCampaign::STATUS_AKTIF
+            || ($kampanye->mulai_at && now()->lt($kampanye->mulai_at));
+        $pratinjau = $admin && $belumTayang;
+
+        if (! $pratinjau) {
+            if ($kampanye->status !== \App\Models\PromoCampaign::STATUS_AKTIF) {
+                abort(404);
+            }
+            if ($kampanye->mulai_at && now()->lt($kampanye->mulai_at)) {
+                abort(404);
+            }
         }
         $kampanye->load([
             'produkPrimary' => fn ($q) => $q->tersedia(),
@@ -44,7 +55,7 @@ class PromoController extends Controller
         ]);
         $testimonis = \App\Models\Testimonial::where('aktif', true)->orderBy('urutan')->take(3)->get();
 
-        return view('promo.iklan', ['kampanye' => $kampanye, 'testimonis' => $testimonis]);
+        return view('promo.iklan', ['kampanye' => $kampanye, 'testimonis' => $testimonis, 'pratinjau' => $pratinjau]);
     }
 
     /**
