@@ -52,10 +52,10 @@ class WablasService
         }
 
         try {
-            return Crypt::decryptString($tersimpan);
+            return trim(Crypt::decryptString($tersimpan));
         } catch (\Throwable) {
             // Nilai lama yang tersimpan polos tetap dipakai.
-            return $tersimpan;
+            return trim($tersimpan);
         }
     }
 

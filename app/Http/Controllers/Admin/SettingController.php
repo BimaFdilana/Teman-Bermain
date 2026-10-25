@@ -109,10 +109,10 @@ class SettingController extends Controller
             Setting::set('wablas_domain', trim($request->input('wablas_domain')));
         }
         if ($request->filled('wablas_token')) {
-            Setting::set('wablas_token', \Illuminate\Support\Facades\Crypt::encryptString($request->input('wablas_token')));
+            Setting::set('wablas_token', \Illuminate\Support\Facades\Crypt::encryptString(trim($request->input('wablas_token'))));
         }
         if ($request->filled('wablas_secret')) {
-            Setting::set('wablas_secret', \Illuminate\Support\Facades\Crypt::encryptString($request->input('wablas_secret')));
+            Setting::set('wablas_secret', \Illuminate\Support\Facades\Crypt::encryptString(trim($request->input('wablas_secret'))));
         }
 
         return back()->with('sukses', 'Pengaturan disimpan.');
