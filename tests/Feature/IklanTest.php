@@ -282,6 +282,39 @@ class IklanTest extends TestCase
             ->assertDontSee('Pratinjau admin');
     }
 
+    /** Regresi 2026-10-25: hilangkan SEMUA centang 🙈 lalu simpan HARUS
+     *  membuka semua section (checkbox yang tak dicentang tidak dikirim
+     *  browser — daftar sembunyi lama tidak boleh bertahan). */
+    public function test_update_tanpa_section_sembunyi_membuka_semua_section(): void
+    {
+        $p1 = $this->buatProduk('a', 'A');
+        $k = $this->buatKampanye([
+            'judul' => 'Promo Sembunyi', 'slug' => 'promo-sembunyi',
+            'section_sembunyi' => array_keys(PromoCampaign::SECTIONS),
+            'produk_primary_id' => $p1->id,
+        ]);
+
+        // Pratinjau admin sebelum perbaikan: tidak ada section yang tampil
+        $this->actingAs($this->admin())->get(route('iklan.show', $k->slug))
+            ->assertOk()
+            ->assertDontSee('Berakhir dalam');
+
+        // Edit tanpa mengirim section_sembunyi sama sekali (semua 🙈 dibuka)
+        $this->actingAs($this->admin())->put(route('admin.iklan.update', $k), [
+            'judul' => 'Promo Sembunyi',
+            'produk_primary_id' => $p1->id,
+            'tampilan_secondary' => 'card',
+            'testimoni_ids' => $this->gambarTestimoni(),
+            'berakhir_at' => now()->addDays(5)->format('Y-m-d'),
+            'status' => 'aktif',
+        ])->assertRedirect(route('admin.iklan.index'));
+
+        $this->assertSame([], $k->fresh()->section_sembunyi);
+        $this->actingAs($this->admin())->get(route('iklan.show', $k->slug))
+            ->assertOk()
+            ->assertSee('Berakhir dalam');
+    }
+
     /** Tabel iklan menampilkan status mentah (aktif/draft) di bawah badge tayang. */
     public function test_tabel_iklan_menampilkan_status_mentah(): void
     {

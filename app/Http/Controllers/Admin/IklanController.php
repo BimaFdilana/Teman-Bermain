@@ -134,6 +134,13 @@ class IklanController extends Controller
             'berakhir_at.after_or_equal' => 'Tanggal berakhir tidak boleh sebelum tanggal mulai.',
         ]);
 
+        // Checkbox 🙈 yang tak satu pun dicentang tidak dikirim browser sama
+        // sekali — default-kan ke array kosong agar "hilangkan semua centang"
+        // benar-benar membuka semua section (tanpa ini, daftar sembunyi lama
+        // tidak pernah terhapus saat update).
+        $data['section_sembunyi'] = $data['section_sembunyi'] ?? [];
+        $data['urutan_konten'] = $data['urutan_konten'] ?? [];
+
         // Form kini hanya mengirim tanggal: mulai = awal hari, berakhir = akhir hari.
         if (! empty($data['mulai_at'])) {
             $data['mulai_at'] = Carbon::parse($data['mulai_at'])->startOfDay();
