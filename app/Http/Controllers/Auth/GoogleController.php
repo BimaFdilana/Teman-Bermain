@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+use Laravel\Socialite\Two\InvalidStateException;
 
 class GoogleController extends Controller
 {
@@ -21,10 +22,20 @@ class GoogleController extends Controller
 
     /**
      * Tangani callback dari Google: cari/buat akun lalu login.
+     *
+     * State OAuth yang tidak cocok (sesi berubah/hilang selama ke Google dan
+     * kembali — umum di HP: browser in-app, tab baru, ketuk ganda) TIDAK
+     * boleh jadi 500: arahkan kembali ke login dengan pesan coba lagi.
      */
     public function callback(Request $request): RedirectResponse
     {
-        $googleUser = Socialite::driver('google')->user();
+        try {
+            $googleUser = Socialite::driver('google')->user();
+        } catch (InvalidStateException) {
+            return redirect()->route('login')->withErrors([
+                'google' => 'Sesi login Google kedaluwarsa atau tidak cocok. Silakan ketuk "Masuk dengan Google" sekali lagi.',
+            ]);
+        }
 
         $user = User::where('google_id', $googleUser->getId())->first();
 
