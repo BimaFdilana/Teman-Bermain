@@ -16,8 +16,10 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
         @yield('head')
+        @include('partials.meta-pixel-script')
     </head>
     <body class="antialiased">
+        @include('partials.meta-pixel-noscript')
         <div class="app-shell min-h-screen">
             <!-- Header -->
             <header class="bg-white sticky top-0 z-30" style="border-bottom:2px solid #EDE4C8">

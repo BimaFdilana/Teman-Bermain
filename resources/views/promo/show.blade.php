@@ -14,8 +14,10 @@ $cover = $product->coverUrl();
     @if($cover)<meta property="og:image" content="{{ $cover }}">@endif
     <meta property="og:type" content="website">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.meta-pixel-script')
 </head>
 <body class="poster" style="background:#FFFEF7;min-height:100vh;min-height:100dvh">
+    @include('partials.meta-pixel-noscript')
 <div class="mx-auto px-4 py-8" style="max-width:28rem">
 
     {{-- Brand --}}

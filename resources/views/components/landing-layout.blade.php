@@ -15,8 +15,10 @@
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Quicksand:wght@500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @include('partials.meta-pixel-script')
 </head>
 <body class="antialiased kidza poster">
+    @include('partials.meta-pixel-noscript')
     <!-- ===== Navbar ===== -->
     <header class="kidza-nav">
         <div class="kidza-nav-inner">

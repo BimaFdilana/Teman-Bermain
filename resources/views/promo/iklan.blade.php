@@ -32,8 +32,10 @@ if ($videoLink && preg_match('~(?:youtube\.com/(?:watch\?v=|embed/|shorts/)|yout
         .daun-anim { animation:daun-goyang 7s ease-in-out infinite; }
         @media (prefers-reduced-motion: reduce) { .anim-tunjuk, .anim-tunjuk-kiri, .daun-anim { animation:none; } }
     </style>
+    @include('partials.meta-pixel-script')
 </head>
 <body style="background:#FAF6EC;min-height:100vh;min-height:100dvh;margin:0">
+    @include('partials.meta-pixel-noscript')
 {{-- Bingkai HP: putih, di atas background krem --}}
 <div class="mx-auto bg-white" style="max-width:430px;min-height:100vh;min-height:100dvh;box-shadow:0 0 40px rgba(90,70,30,.12)">
     @if($pratinjau ?? false)
